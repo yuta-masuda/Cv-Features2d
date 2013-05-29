@@ -1,6 +1,6 @@
-Revision history for Perl extension Cv::Feature2D::ORB.
+Revision history for Perl extension Cv::FeatureDetector
 
 0.01  Tue May 28 05:59:41 2013
 	- original version; created by h2xs 1.23 with options
-		-An Cv::Feature2D::ORB
+		-An Cv::FFeatureDetector
 

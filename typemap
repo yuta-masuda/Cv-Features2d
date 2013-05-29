@@ -3,7 +3,26 @@
 ##################################################
 TYPEMAP
 
-ORB*					O_OBJECT
+FeatureDetector*					O_OBJECT
+const FeatureDetector*				O_OBJECT
+FastFeatureDetector*				O_OBJECT
+const FastFeatureDetector*			O_OBJECT
+GoodFeaturesToTrackDetector*		O_OBJECT
+const GoodFeaturesToTrackDetector*	O_OBJECT
+MserFeatureDetector*				O_OBJECT
+const MserFeatureDetector*			O_OBJECT
+StarFeatureDetector*				O_OBJECT
+const StarFeatureDetector*			O_OBJECT
+DenseFeatureDetector*				O_OBJECT
+const DenseFeatureDetector*			O_OBJECT
+SIFT*								O_OBJECT
+const SIFT*							O_OBJECT
+SURF*								O_OBJECT
+const SURF*							O_OBJECT
+ORB*								O_OBJECT
+const ORB*							O_OBJECT
+BRISK*								O_OBJECT
+const BRISK*						O_OBJECT
 
 ##################################################
 INPUT
@@ -13,7 +32,7 @@ O_OBJECT
 		$var = ($type)SvIV((SV*)SvRV($arg));
 	else
 		Perl_croak(aTHX_ \"%s is not of type %s in %s\",
-			\"$var\", \"$type\", \"$pname\")
+			\"$var\", \"@{(my $t = $type) =~ s/\bconst\s+//g; [$t]}\", \"$pname\")
 
 
 ##################################################

@@ -22,9 +22,9 @@ use Cv::Config;
 my $cf = new Cv::Config;
 
 WriteMakefile(
-	NAME => "Cv::Features2D::ORB",
-	VERSION_FROM => "lib/Cv/Features2D/ORB.pm",
-	ABSTRACT_FROM => "lib/Cv/Features2D/ORB.pm",
+	NAME => "Cv::FeatureDetector",
+	VERSION_FROM => "lib/Cv/FeatureDetector.pm",
+	ABSTRACT_FROM => "lib/Cv/FeatureDetector.pm",
 	AUTHOR => 'MASUDA Yuta <yuta.cpan@gmail.com>',
 	CONFIGURE_REQUIRES => \%CONFIGURE_REQUIRES,
 	TEST_REQUIRES => \%TEST_REQUIRES,

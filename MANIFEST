@@ -1,12 +1,12 @@
 Changes
-lib/Cv/Features2D/ORB.pm
+FeatureDetector.xs
+lib/Cv/FeatureDetector.pm
 Makefile.PL
 MANIFEST
 MANIFEST.SKIP
-ORB.xs
 ppport.h
 README.md
 t/beaver.png
-t/Cv-Features2D-ORB.t
+t/Cv-FeatureDetector.t
 t/pod-coverage.t
 typemap
