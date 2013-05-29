@@ -25,7 +25,7 @@ BRISK*								O_OBJECT
 const BRISK*						O_OBJECT
 
 DescriptorExtractor*				O_OBJECT
-
+BriefDescriptorExtractor*			O_OBJECT
 
 ##################################################
 INPUT

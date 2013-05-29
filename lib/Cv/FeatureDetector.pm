@@ -10,8 +10,8 @@ Cv::FeatureDetector - Cv extension for Features Detector
 
   use Cv::FeatureDetector;
   
-  my $mser = Cv->MSER();
-  my $keypoints = $mser->detect($image, $mask);
+  my $surf = Cv::FeatureDetector::SURF->new;
+  my $keypoints = $surf->detect($image, $mask);
 
 =cut
 
@@ -31,15 +31,11 @@ require Exporter;
 
 our @ISA = qw(Exporter);
 
-our @EXPORT_OK = grep /^(IPL|CV|cv)/, (keys %Cv::FeatureDetector::);
-
-our %EXPORT_TAGS = (
-	'all' => \@EXPORT_OK,
-	);
-
+our @EXPORT_OK = ( );
+our %EXPORT_TAGS = ( 'all' => \@EXPORT_OK );
 our @EXPORT = ( );
 
-*AUTOLOAD = \&Cv::autoload;
+# *AUTOLOAD = \&Cv::autoload;
 
 package Cv::FeatureDetector::FAST;  our @ISA = qw(Cv::FeatureDetector);
 package Cv::FeatureDetector::STAR;  our @ISA = qw(Cv::FeatureDetector);

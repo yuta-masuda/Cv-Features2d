@@ -132,9 +132,9 @@ DenseFeatureDetector::DESTROY()
 MODULE = Cv::FeatureDetector		PACKAGE = Cv::DescriptorExtractor
 
 DescriptorExtractor*
-DescriptorExtractor::new(const char* type)
+create(const char* CLASS, const char* descriptorExtractorType)
 CODE:
-	RETVAL = DescriptorExtractor::create(type);
+	RETVAL = DescriptorExtractor::create(descriptorExtractorType);
 OUTPUT:
 	RETVAL
 
@@ -174,6 +174,16 @@ CODE:
 	cvSetData(RETVAL, _descriptors.data, CV_AUTOSTEP);
 OUTPUT:
 	RETVAL
+
+
+
+MODULE = Cv::FeatureDetector		PACKAGE = Cv::DescriptorExtractor::BRIEF
+
+BriefDescriptorExtractor*
+BriefDescriptorExtractor::new(int bytes = 32)
+
+void
+BriefDescriptorExtractor::DESTROY()
 
 
 MODULE = Cv::FeatureDetector		PACKAGE = Cv::FeatureDetector

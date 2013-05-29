@@ -1,5 +1,6 @@
 Changes
 FeatureDetector.xs
+lib/Cv/DescriptorExtractor.pm
 lib/Cv/FeatureDetector.pm
 Makefile.PL
 MANIFEST
@@ -7,6 +8,7 @@ MANIFEST.SKIP
 ppport.h
 README.md
 t/beaver.png
-t/Cv-FeatureDetector.t
+t/DescriptorExtractor.t
+t/FeatureDetector.t
 t/pod-coverage.t
 typemap

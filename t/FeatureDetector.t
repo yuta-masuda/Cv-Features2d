@@ -28,7 +28,6 @@ for (
 	{ Dense => [] },
 	) {
 	my ($k, $v) = %$_;
-	my ($x, $y) = (10, $image->height - 10);
 	my $class = "Cv::FeatureDetector::$k";
 	my $detector1 = Cv::FeatureDetector->new($k, @$v);
 	isa_ok($detector1, $class);
@@ -47,6 +46,7 @@ for (
 		my ($x1, $y1) = ($x0 + $size * cos($angle), $y0 + $size * sin($angle));
 		$clone->line([$x0, $y0], [$x1, $y1], $color, 2, CV_AA);
 	}
+	my ($x, $y) = (10, $image->height - 10);
 	$clone->putText($ti, [ $x-1, $y-1 ], $font, cvScalarAll(250));
 	$clone->putText($ti, [ $x+1, $y+1 ], $font, cvScalarAll(50));
 	$clone->putText($ti, [ $x+0, $y+0 ], $font, [100, 150, 250]);
