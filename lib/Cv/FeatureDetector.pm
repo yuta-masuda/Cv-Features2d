@@ -54,7 +54,7 @@ package Cv::FeatureDetector::GFTT;  our @ISA = qw(Cv::FeatureDetector);
 package Cv::FeatureDetector;
 
 # ============================================================
-#  features2d. 2D Features Framework
+#  features2d. Feature Detection and Description
 # ============================================================
 
 =head1 DESCRIPTION
@@ -88,12 +88,13 @@ package Cv::FeatureDetector;
 =cut
 
 sub new {
-	my $class = shift;
-	join('::', $class, shift)->new(@_);
+	join('::', splice(@_, 0, 2))->new(@_);
 }
 
-
 =item detect
+
+  my @keypoints = $detector->detect($image);
+  my @keypoints = $detector->detect($image, $mask);
 
 =cut
 

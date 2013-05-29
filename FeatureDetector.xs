@@ -17,30 +17,10 @@ static double HvNV(HV* hv, const char* name, double value)
 	return value;
 }
 
-static AV* newAV_keypoints(vector<KeyPoint> &keypoints)
-{
-	AV* av_keypoints = newAV();
-	int n = (int)keypoints.size();
-	for (int i = 0; i < n; i++) {
-		AV* av_kpt = newAV();
-		AV* av_pt = newAV();
-		av_push(av_pt, newSVnv(keypoints[i].pt.x));
-		av_push(av_pt, newSVnv(keypoints[i].pt.y));
-		av_push(av_kpt, newRV_inc(sv_2mortal((SV*)av_pt)));
-		av_push(av_kpt, newSVnv(keypoints[i].size));
-		av_push(av_kpt, newSVnv(keypoints[i].angle));
-		av_push(av_kpt, newSVnv(keypoints[i].response));
-		av_push(av_kpt, newSViv(keypoints[i].octave));
-		av_push(av_kpt, newSViv(keypoints[i].class_id));
-		av_push(av_keypoints, newRV_inc(sv_2mortal((SV*)av_kpt)));
-	}
-	return av_keypoints;
-}
-
 
 MODULE = Cv::FeatureDetector		PACKAGE = Cv::FeatureDetector
 
-void
+AV*
 FeatureDetector::detect(CvArr* image, CvArr* mask = NULL)
 CODE:
 	Mat _image = cv::cvarrToMat(image);
@@ -51,10 +31,23 @@ CODE:
 	} else {
 		THIS->detect(_image, _keypoints);
 	}
-	ST(0) = sv_newmortal();
-	sv_setsv(ST(0), newRV((SV*)newAV_keypoints(_keypoints)));
-	XSRETURN(1);
-
+	RETVAL = newAV();
+	int n = (int)_keypoints.size();
+	for (int i = 0; i < n; i++) {
+		AV* av_kpt = newAV();
+		AV* av_pt = newAV();
+		av_push(av_pt, newSVnv(_keypoints[i].pt.x));
+		av_push(av_pt, newSVnv(_keypoints[i].pt.y));
+		av_push(av_kpt, newRV_inc(sv_2mortal((SV*)av_pt)));
+		av_push(av_kpt, newSVnv(_keypoints[i].size));
+		av_push(av_kpt, newSVnv(_keypoints[i].angle));
+		av_push(av_kpt, newSVnv(_keypoints[i].response));
+		av_push(av_kpt, newSViv(_keypoints[i].octave));
+		av_push(av_kpt, newSViv(_keypoints[i].class_id));
+		av_push(RETVAL, newRV_inc(sv_2mortal((SV*)av_kpt)));
+	}
+OUTPUT:
+	RETVAL
 
 MODULE = Cv::FeatureDetector		PACKAGE = Cv::FeatureDetector::FAST
 
@@ -135,6 +128,52 @@ DenseFeatureDetector::new(float initFeatureScale=1.f, int featureScaleLevels=1, 
 
 void
 DenseFeatureDetector::DESTROY()
+
+MODULE = Cv::FeatureDetector		PACKAGE = Cv::DescriptorExtractor
+
+DescriptorExtractor*
+DescriptorExtractor::new(const char* type)
+CODE:
+	RETVAL = DescriptorExtractor::create(type);
+OUTPUT:
+	RETVAL
+
+void
+DescriptorExtractor::DESTROY()
+
+CvMat*
+DescriptorExtractor::compute(CvMat* image, AV* keypoints)
+CODE:
+	Mat _image = cvarrToMat(image);
+	vector<KeyPoint> _keypoints;
+	Mat _descriptors;
+	int n = av_len(keypoints) + 1;
+	for (int i = 0; i < n; i++) {
+		SV* sv_keypoint = (SV*)*av_fetch(keypoints, i, 0);
+		AV* av_keypoint = (AV*)SvRV(sv_keypoint);
+		SV* sv_pt       = (SV*)*av_fetch(av_keypoint, 0, 0);
+		SV* sv_size     = (SV*)*av_fetch(av_keypoint, 1, 0);
+		SV* sv_angle    = (SV*)*av_fetch(av_keypoint, 2, 0);
+		SV* sv_response = (SV*)*av_fetch(av_keypoint, 3, 0);
+		SV* sv_octave   = (SV*)*av_fetch(av_keypoint, 4, 0);
+		SV* sv_classId  = (SV*)*av_fetch(av_keypoint, 5, 0);
+		AV* av_pt       = (AV*)SvRV(sv_pt);
+		SV* sv_pt_x     = (SV*)*av_fetch(av_pt, 0, 0);
+		SV* sv_pt_y     = (SV*)*av_fetch(av_pt, 1, 0);
+		_keypoints.push_back(
+			KeyPoint(
+				Point2f(SvNV(sv_pt_x), SvNV(sv_pt_y)),
+				SvNV(sv_size), SvNV(sv_angle), SvNV(sv_response),
+				SvNV(sv_octave), SvNV(sv_classId)
+				)
+			);
+	}
+	THIS->compute(_image, _keypoints, _descriptors);
+	RETVAL = cvCreateMatHeader(
+		_descriptors.rows, _descriptors.cols, _descriptors.flags);
+	cvSetData(RETVAL, _descriptors.data, CV_AUTOSTEP);
+OUTPUT:
+	RETVAL
 
 
 MODULE = Cv::FeatureDetector		PACKAGE = Cv::FeatureDetector
