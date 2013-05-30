@@ -18,7 +18,7 @@ static double HvNV(HV* hv, const char* name, double value)
 }
 
 
-MODULE = Cv::FeatureDetector		PACKAGE = Cv::FeatureDetector
+MODULE = Cv::Features2d		PACKAGE = Cv::Features2d::FeatureDetector
 
 AV*
 FeatureDetector::detect(CvArr* image, CvArr* mask = NULL)
@@ -49,7 +49,7 @@ CODE:
 OUTPUT:
 	RETVAL
 
-MODULE = Cv::FeatureDetector		PACKAGE = Cv::FeatureDetector::FAST
+MODULE = Cv::Features2d		PACKAGE = Cv::Features2d::FeatureDetector::FAST
 
 FastFeatureDetector*
 FastFeatureDetector::new(int threshold=1, bool nonmaxSuppression=true)
@@ -58,7 +58,7 @@ void
 FastFeatureDetector::DESTROY()
 
 
-MODULE = Cv::FeatureDetector		PACKAGE = Cv::FeatureDetector::STAR
+MODULE = Cv::Features2d		PACKAGE = Cv::Features2d::FeatureDetector::STAR
 
 StarFeatureDetector*
 StarFeatureDetector::new(int maxSize=16, int responseThreshold=30, int lineThresholdProjected = 10, int lineThresholdBinarized=8, int suppressNonmaxSize=5)
@@ -67,7 +67,7 @@ void
 StarFeatureDetector::DESTROY()
 
 
-MODULE = Cv::FeatureDetector		PACKAGE = Cv::FeatureDetector::SIFT
+MODULE = Cv::Features2d		PACKAGE = Cv::Features2d::FeatureDetector::SIFT
 
 SIFT*
 SIFT::new(int nfeatures=0, int nOctaveLayers=3, double contrastThreshold=0.04, double edgeThreshold=10, double sigma=1.6)
@@ -76,7 +76,7 @@ void
 SIFT::DESTROY()
 
 
-MODULE = Cv::FeatureDetector		PACKAGE = Cv::FeatureDetector::SURF
+MODULE = Cv::Features2d		PACKAGE = Cv::Features2d::FeatureDetector::SURF
 
 SURF*
 SURF::new(double hessianThreshold, int nOctaves=4, int nOctaveLayers=2, bool extended=true, bool upright=false)
@@ -85,7 +85,7 @@ void
 SURF::DESTROY()
 
 
-MODULE = Cv::FeatureDetector		PACKAGE = Cv::FeatureDetector::ORB
+MODULE = Cv::Features2d		PACKAGE = Cv::Features2d::FeatureDetector::ORB
 
 ORB*
 ORB::new(int nfeatures=500, float scaleFactor=1.2f, int nlevels=8, int edgeThreshold=31, int firstLevel=0, int WTA_K=2, int scoreType=ORB::HARRIS_SCORE, int patchSize=31)
@@ -94,7 +94,7 @@ void
 ORB::DESTROY()
 
 
-MODULE = Cv::FeatureDetector		PACKAGE = Cv::FeatureDetector::BRISK
+MODULE = Cv::Features2d		PACKAGE = Cv::Features2d::FeatureDetector::BRISK
 
 BRISK*
 BRISK::new(int thresh=30, int octaves=3, float patternScale=1.0f)
@@ -103,7 +103,7 @@ void
 BRISK::DESTROY()
 
 
-MODULE = Cv::FeatureDetector		PACKAGE = Cv::FeatureDetector::GFTT
+MODULE = Cv::Features2d		PACKAGE = Cv::Features2d::FeatureDetector::GFTT
 
 GoodFeaturesToTrackDetector*
 GoodFeaturesToTrackDetector::new(int maxCorners=1000, double qualityLevel=0.01, double minDistance=1., int blockSize=3, bool useHarrisDetector=false, double k=0.04 )
@@ -112,7 +112,7 @@ void
 GoodFeaturesToTrackDetector::DESTROY()
 
 
-MODULE = Cv::FeatureDetector		PACKAGE = Cv::FeatureDetector::MSER
+MODULE = Cv::Features2d		PACKAGE = Cv::Features2d::FeatureDetector::MSER
 
 MserFeatureDetector*
 MserFeatureDetector::new(int delta, int minArea, int maxArea, double maxVariation, double minDiversity, int maxEvolution, double areaThreshold, double minMargin, int edgeBlurSize)
@@ -121,7 +121,7 @@ void
 MserFeatureDetector::DESTROY()
 
 
-MODULE = Cv::FeatureDetector		PACKAGE = Cv::FeatureDetector::Dense
+MODULE = Cv::Features2d		PACKAGE = Cv::Features2d::FeatureDetector::Dense
 
 DenseFeatureDetector*
 DenseFeatureDetector::new(float initFeatureScale=1.f, int featureScaleLevels=1, float featureScaleMul=0.1f, int initXyStep=6, int initImgBound=0, bool varyXyStepWithScale=true, bool varyImgBoundWithScale=false)
@@ -129,7 +129,7 @@ DenseFeatureDetector::new(float initFeatureScale=1.f, int featureScaleLevels=1, 
 void
 DenseFeatureDetector::DESTROY()
 
-MODULE = Cv::FeatureDetector		PACKAGE = Cv::DescriptorExtractor
+MODULE = Cv::Features2d		PACKAGE = Cv::Features2d::DescriptorExtractor
 
 DescriptorExtractor*
 create(const char* CLASS, const char* descriptorExtractorType)
@@ -177,7 +177,7 @@ OUTPUT:
 
 
 
-MODULE = Cv::FeatureDetector		PACKAGE = Cv::DescriptorExtractor::BRIEF
+MODULE = Cv::Features2d		PACKAGE = Cv::Features2d::DescriptorExtractor::BRIEF
 
 BriefDescriptorExtractor*
 BriefDescriptorExtractor::new(int bytes = 32)
@@ -186,4 +186,4 @@ void
 BriefDescriptorExtractor::DESTROY()
 
 
-MODULE = Cv::FeatureDetector		PACKAGE = Cv::FeatureDetector
+MODULE = Cv::Features2d		PACKAGE = Cv::Features2d

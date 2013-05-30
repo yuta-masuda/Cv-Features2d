@@ -6,7 +6,8 @@ use Test::More qw(no_plan);
 # use Test::More;
 use Test::Exception;
 BEGIN { use_ok('Cv') }
-BEGIN { use_ok('Cv::FeatureDetector') }
+BEGIN { use_ok('Cv::Features2d') }
+BEGIN { use_ok('Cv::Features2d::FeatureDetector') }
 
 my $verbose = Cv->hasGUI;
 
@@ -28,8 +29,8 @@ for (
 	{ Dense => [] },
 	) {
 	my ($k, $v) = %$_;
-	my $class = "Cv::FeatureDetector::$k";
-	my $detector1 = Cv::FeatureDetector->new($k, @$v);
+	my $class = "Cv::Features2d::FeatureDetector::$k";
+	my $detector1 = Cv::Features2d::FeatureDetector->new($k, @$v);
 	isa_ok($detector1, $class);
 	my $detector2 = $class->new(@$v);
 	isa_ok($detector2, $class);
