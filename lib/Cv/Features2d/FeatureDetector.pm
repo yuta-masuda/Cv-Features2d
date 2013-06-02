@@ -4,14 +4,9 @@
 
 =head1 NAME
 
-Cv::Features2d::FeatureDetector - Cv extension for Features Detector
+Cv::Features2d::FeatureDetector - Cv extension for Feature Detectors
 
 =head1 SYNOPSIS
-
-  use Cv::Features2d::FeatureDetector;
-  
-  my $surf = Cv::Features2d::FeatureDetector::SURF->new;
-  my $keypoints = $surf->detect($image, $mask);
 
 =cut
 
@@ -33,35 +28,24 @@ our @EXPORT_OK = ( );
 our %EXPORT_TAGS = ( 'all' => \@EXPORT_OK );
 our @EXPORT = ( );
 
-package Cv::Features2d::FeatureDetector::FAST;
+package Cv::Features2d::FastFeatureDetector;
 our @ISA = qw(Cv::Features2d::FeatureDetector);
-
-package Cv::Features2d::FeatureDetector::STAR;
+package Cv::Features2d::StarFeatureDetector;
 our @ISA = qw(Cv::Features2d::FeatureDetector);
-
-package Cv::Features2d::FeatureDetector::SIFT;
+package Cv::Features2d::SIFT;
 our @ISA = qw(Cv::Features2d::FeatureDetector);
-
-package Cv::Features2d::FeatureDetector::SURF;
+package Cv::Features2d::SURF;
 our @ISA = qw(Cv::Features2d::FeatureDetector);
-
-package Cv::Features2d::FeatureDetector::ORB;
+package Cv::Features2d::ORB;
 our @ISA = qw(Cv::Features2d::FeatureDetector);
-
-package Cv::Features2d::FeatureDetector::BRISK;
+package Cv::Features2d::BRISK;
 our @ISA = qw(Cv::Features2d::FeatureDetector);
-
-package Cv::Features2d::FeatureDetector::MSER;
+package Cv::Features2d::GoodFeaturesToTrackDetector;
 our @ISA = qw(Cv::Features2d::FeatureDetector);
-
-package Cv::Features2d::FeatureDetector::GFTT;
+package Cv::Features2d::MserFeatureDetector;
 our @ISA = qw(Cv::Features2d::FeatureDetector);
-
-package Cv::Features2d::FeatureDetector::Dense;
+package Cv::Features2d::DenseFeatureDetector;
 our @ISA = qw(Cv::Features2d::FeatureDetector);
-
-
-package Cv::Features2d::FeatureDetector;
 
 # ============================================================
 #  features2d. Feature Detection and Description
@@ -75,38 +59,14 @@ package Cv::Features2d::FeatureDetector;
 
 =item new
 
-  my $detector = Cv::Features2d::FeatureDetector->new('FAST', ...);
-  my $detector = Cv::Features2d::FeatureDetector->new('STAR', ...);
-  my $detector = Cv::Features2d::FeatureDetector->new('SIFT', ...);
-  my $detector = Cv::Features2d::FeatureDetector->new('SURF', ...);
-  my $detector = Cv::Features2d::FeatureDetector->new('ORB', ...);
-  my $detector = Cv::Features2d::FeatureDetector->new('BRISK', ...);
-  my $detector = Cv::Features2d::FeatureDetector->new('MSER', ...);
-  my $detector = Cv::Features2d::FeatureDetector->new('Dense', ...);
-  my $detector = Cv::Features2d::FeatureDetector->new('GFTT', ...);
-   or
-  my $detector = Cv::Features2d::FeatureDetector::FAST->new(...);
-  my $detector = Cv::Features2d::FeatureDetector::STAR->new(...);
-  my $detector = Cv::Features2d::FeatureDetector::SIFT->new(...);
-  my $detector = Cv::Features2d::FeatureDetector::SURF->new(...);
-  my $detector = Cv::Features2d::FeatureDetector::ORB->new(...);
-  my $detector = Cv::Features2d::FeatureDetector::BRISK->new(...);
-  my $detector = Cv::Features2d::FeatureDetector::MSER->new(...);
-  my $detector = Cv::Features2d::FeatureDetector::Dense->new(...);
-  my $detector = Cv::Features2d::FeatureDetector::GFTT->new(...);
+=item create
 
-=cut
-
-sub new {
-	join('::', splice(@_, 0, 2))->new(@_);
-}
+TBD
 
 =item detect
 
   my $keypoints = $detector->detect($image);
   my $keypoints = $detector->detect($image, $mask);
-
-=cut
 
 =back
 

@@ -9,6 +9,12 @@ Cv::Features2d - Cv extension for Features Detector
 =head1 SYNOPSIS
 
   use Cv::Features2d;
+  use Cv::Features2d::FeatureDetector;
+  
+  my $surf = Cv::Features2d::SURF->new;
+  my $keypoints = $surf->detect($image, $mask);
+  drawKeypoints($image, $keypoints)->show;
+  Cv->waitKey();
 
 =cut
 
@@ -18,6 +24,9 @@ use 5.008008;
 use strict;
 use warnings;
 use Cv ();
+use Cv::Features2d::FeatureDetector;
+# use Cv::Features2d::DescriptorExtractor;
+# use Cv::Features2d::DescriptorMatcher;
 
 our $VERSION = '0.01';
 
@@ -42,7 +51,9 @@ our @EXPORT = ( );
 
 =over
 
-=item
+=item drawKeypoints
+
+  my $image = drawKeypoints($image, $keypoints, $color, $flags);
 
 =cut
 

@@ -1,7 +1,6 @@
 Changes
 Features2d.xs
 lib/Cv/Features2d.pm
-lib/Cv/Features2d/DescriptorExtractor.pm
 lib/Cv/Features2d/FeatureDetector.pm
 Makefile.PL
 MANIFEST
@@ -9,7 +8,7 @@ MANIFEST.SKIP
 ppport.h
 README.md
 t/beaver.png
-t/DescriptorExtractor.t
-t/FeatureDetector.t
+t/detector.t
+t/Features2d.t
 t/pod-coverage.t
 typemap
