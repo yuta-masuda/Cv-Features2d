@@ -32,7 +32,7 @@ for (
 	isa_ok($detector, $class);
 	my $outImage = $image->clone;
 	my $t0 = gettimeofday();
-	my $keypoints = $detector->detect($outImage);
+	my $keypoints = $detector->detect($image);
 	my $ti = sprintf("$k: %.1f(ms)", (gettimeofday() - $t0) * 1000);
 	for (@$keypoints) {
 		my ($pt, $size, $angle, $response, $octave, $class_id) = @$_;
