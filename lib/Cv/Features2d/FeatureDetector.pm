@@ -28,28 +28,43 @@ our @EXPORT_OK = ( );
 our %EXPORT_TAGS = ( 'all' => \@EXPORT_OK );
 our @EXPORT = ( );
 
+
+# ============================================================
+#  Common Interfaces of Feature Detectors
+#    class FastFeatureDetector: public FeatureDetector
+#    class StarFeatureDetector: public FeatureDetector
+#    class MSER: public FeatureDetector
+#    class MserFeatureDetector : public FeatureDetector
+#    class GoodFeaturesToTrackDetector: public FeatureDetector
+#    class DenseFeatureDetector: public FeatureDetector
+#    class SimpleBlobDetector: public FeatureDetector
+# ============================================================
+
+{
 package Cv::Features2d::FastFeatureDetector;
 our @ISA = qw(Cv::Features2d::FeatureDetector);
+
 package Cv::Features2d::StarFeatureDetector;
 our @ISA = qw(Cv::Features2d::FeatureDetector);
-package Cv::Features2d::SIFT;
+
+package Cv::Features2d::MSER;
 our @ISA = qw(Cv::Features2d::FeatureDetector);
-package Cv::Features2d::SURF;
-our @ISA = qw(Cv::Features2d::FeatureDetector);
-package Cv::Features2d::ORB;
-our @ISA = qw(Cv::Features2d::FeatureDetector);
-package Cv::Features2d::BRISK;
-our @ISA = qw(Cv::Features2d::FeatureDetector);
-package Cv::Features2d::GoodFeaturesToTrackDetector;
-our @ISA = qw(Cv::Features2d::FeatureDetector);
+
 package Cv::Features2d::MserFeatureDetector;
 our @ISA = qw(Cv::Features2d::FeatureDetector);
+
+package Cv::Features2d::GoodFeaturesToTrackDetector;
+our @ISA = qw(Cv::Features2d::FeatureDetector);
+
 package Cv::Features2d::DenseFeatureDetector;
 our @ISA = qw(Cv::Features2d::FeatureDetector);
 
-# ============================================================
-#  features2d. Feature Detection and Description
-# ============================================================
+package Cv::Features2d::SimpleBlobDetector;
+our @ISA = qw(Cv::Features2d::FeatureDetector);
+
+package Cv::Features2d::FAST;
+our @ISA = qw(Cv::Features2d::FeatureDetector);
+}
 
 =head1 DESCRIPTION
 

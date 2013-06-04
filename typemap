@@ -9,6 +9,8 @@ FastFeatureDetector*				O_OBJECT
 const FastFeatureDetector*			O_OBJECT
 GoodFeaturesToTrackDetector*		O_OBJECT
 const GoodFeaturesToTrackDetector*	O_OBJECT
+MSER*								O_OBJECT
+const MSER*							O_OBJECT
 MserFeatureDetector*				O_OBJECT
 const MserFeatureDetector*			O_OBJECT
 StarFeatureDetector*				O_OBJECT
@@ -24,6 +26,7 @@ const ORB*							O_OBJECT
 BRISK*								O_OBJECT
 const BRISK*						O_OBJECT
 
+Feature2D*							O_OBJECT
 DescriptorExtractor*				O_OBJECT
 BriefDescriptorExtractor*			O_OBJECT
 
@@ -150,7 +153,15 @@ T_MatV
 
 T_KeyPointV
 	STMT_START {
-		AV* av = newAV(); int n = $var.size();
+		AV* av;
+		if (SvROK($arg) && SvTYPE(SvRV($arg)) == SVt_PVAV) {
+			av = (AV*)SvRV($arg);
+			av_clear(av);
+		} else {
+			av = newAV();
+			sv_setsv($arg, sv_2mortal(newRV_inc(sv_2mortal((SV*)av))));
+		}
+		int n = $var.size();
 		for (int i = 0; i < n; i++) {
 			AV* av_kpt = newAV();
 			AV* av_pt = newAV();
@@ -164,13 +175,19 @@ T_KeyPointV
 			av_push(av_kpt, newSViv(${var}[i].class_id));
 			av_push(av, newRV_inc(sv_2mortal((SV*)av_kpt)));
 		}
-		$arg = newRV((SV*)av);
-		sv_2mortal($arg);
 	} STMT_END;
 
 T_DMatchV
 	STMT_START {
-		AV* av = newAV(); int n = $var.size();
+		AV* av;
+		if (SvROK($arg) && SvTYPE(SvRV($arg)) == SVt_PVAV) {
+			av = (AV*)SvRV($arg);
+			av_clear(av);
+		} else {
+			av = newAV();
+			sv_setsv($arg, sv_2mortal(newRV_inc(sv_2mortal((SV*)av))));
+		}
+		int n = $var.size();
 		for (int i = 0; i < n; i++) {
 			AV* av_dmatch = newAV();
 			av_push(av_dmatch, newSViv(${var}[i].queryIdx));
@@ -179,13 +196,18 @@ T_DMatchV
 			av_push(av_dmatch, newSVnv(${var}[i].distance));
 			av_push(av, newRV_inc(sv_2mortal((SV*)av_dmatch)));
 		}
-		$arg = newRV((SV*)av);
-		sv_2mortal($arg);
 	} STMT_END;
 
 T_DMatchVV
 	STMT_START {
-		AV* av_vector2 = newAV();
+		AV* av;
+		if (SvROK($arg) && SvTYPE(SvRV($arg)) == SVt_PVAV) {
+			av = (AV*)SvRV($arg);
+			av_clear(av);
+		} else {
+			av = newAV();
+			sv_setsv($arg, sv_2mortal(newRV_inc(sv_2mortal((SV*)av))));
+		}
 		int n = $var.size();
 		for (int i = 0; i < n; i++) {
 			int m = ${var}[i].size();
@@ -198,8 +220,6 @@ T_DMatchVV
 				av_push(av_dmatch, newSVnv(${var}[i][j].distance));
 				av_push(av_vector, newRV_inc(sv_2mortal((SV*)av_dmatch)));
 			}
-			av_push(av_vector2, newRV_inc(sv_2mortal((SV*)av_vector)));
+			av_push(av, newRV_inc(sv_2mortal((SV*)av_vector)));
 		}
-		$arg = newRV((SV*)av_vector2);
-		sv_2mortal($arg);
 	} STMT_END;

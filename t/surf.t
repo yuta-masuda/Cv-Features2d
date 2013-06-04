@@ -19,9 +19,6 @@ if (1) {
 	my $gray = $img->cvtColor(CV_BGR2GRAY)->smooth(CV_GAUSSIAN, 5, 5);
 	$gray->show('gray') if $verbose;
 	my $params = cvSURFParams(my $hessianThreshold = 500, my $extended = 1);
-	is($params->[2], $hessianThreshold, 'hessianThreshold');
-	is($params->[0], $extended, 'extended');
-
 	my $storage = Cv->createMemStorage();
 	$gray->extractSURF(\0, my $surfPoint, \0, $storage, $params);
 	isa_ok($surfPoint, 'Cv::Seq::SURFPoint');

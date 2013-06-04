@@ -4,34 +4,23 @@
 
 =head1 NAME
 
-Cv::Features2d - Cv extension for Features Detector
+Cv::Features2d::DescriptorExtractor - Cv extension for Descriptor Extractors
 
 =head1 SYNOPSIS
 
-  use Cv::Features2d;
-  
-  my $surf = Cv::Features2d::Feature2D::SURF->new;
-  my $keypoints = $surf->detect($image, $mask);
-  drawKeypoints($image, $keypoints)->show;
-  Cv->waitKey();
+  use Cv::Features2d::DescriptorExtractor;
 
 =cut
 
-package Cv::Features2d;
+package Cv::Features2d::DescriptorExtractor;
 
 use 5.008008;
 use strict;
 use warnings;
 use Cv ();
-use Cv::Features2d::Feature2D;
-use Cv::Features2d::FeatureDetector;
-use Cv::Features2d::DescriptorExtractor;
-use Cv::Features2d::DescriptorMatcher;
+use Cv::Features2d;
 
 our $VERSION = '0.01';
-
-require XSLoader;
-XSLoader::load('Cv::Features2d', $VERSION);
 
 require Exporter;
 
@@ -41,6 +30,14 @@ our @EXPORT_OK = ( );
 our %EXPORT_TAGS = ( 'all' => \@EXPORT_OK );
 our @EXPORT = ( );
 
+# ============================================================
+#  
+# ============================================================
+
+{
+package Cv::Features2d::BriefDescriptorExtractor;
+our @ISA = qw(Cv::Features2d::DescriptorExtractor);
+}
 
 # ============================================================
 #  features2d. Feature Detection and Description
@@ -52,9 +49,21 @@ our @EXPORT = ( );
 
 =over
 
-=item drawKeypoints
+=item create
 
-  my $image = drawKeypoints($image, $keypoints, $color, $flags);
+=item compute
+
+  my $descriptor = $extractor->compute($image, $keypoints);
+
+=item descriptorSize
+
+  my $size = $extractor->descriptorSize();
+
+=item descriptorType
+
+  my $type = $extractor->descriptorType();
+
+=cut
 
 =back
 

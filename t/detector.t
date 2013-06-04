@@ -25,6 +25,7 @@ for (
 	{ 'BRISK' => [] },
 	{ 'GoodFeaturesToTrackDetector' => [] },
 	{ 'MserFeatureDetector' => [ 5, 60, 14400, 0.25, 0.2, 200, 1.01, 0.003, 5 ] },
+	{ 'MSER' => [ 5, 60, 14400, 0.25, 0.2, 200, 1.01, 0.003, 5 ] },
 	{ 'DenseFeatureDetector' => [] },
 	) {
 	my ($k, $args) = %$_; my $class = "Cv::Features2d::$k";
