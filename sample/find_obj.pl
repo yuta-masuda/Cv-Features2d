@@ -11,12 +11,13 @@ use Getopt::Long;
 use List::Util qw(sum);
 use Data::Dumper;
 
-my %opt = map { $_ => 0 } qw(surf sift orb);
+my %opt = map { $_ => 0 } qw(surf sift orb fast);
 GetOptions((map {("--$_" => \$opt{$_})} keys %opt)) && sum(values %opt) <= 1
 	|| die "usage: $0 --[".join('|', keys %opt)."] image1 image2\n";
 
 my $detector = $opt{sift} && Cv::Features2d::SIFT->new()
 	|| $opt{orb} && Cv::Features2d::ORB->new()
+	|| $opt{orb} && Cv::Features2d::FAST->new()
 	|| Cv::Features2d::SURF->new(500);
 
 my $fn1 = shift || join('/', dirname($0), "box.png");
