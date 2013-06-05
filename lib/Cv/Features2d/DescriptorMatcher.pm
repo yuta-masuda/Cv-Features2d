@@ -4,11 +4,10 @@
 
 =head1 NAME
 
-Cv::Features2d::DescriptorMatcher - Cv extension for Descriptor Matchers
+Cv::Features2d::DescriptorMatcher - Features2d. Common Interfaces of
+Descriptor Matchers
 
 =head1 SYNOPSIS
-
-  use Cv::Features2d::DescriptorMatcher;
 
 =cut
 
@@ -22,73 +21,16 @@ use Cv::Features2d;
 
 our $VERSION = '0.01';
 
-require Exporter;
-
-our @ISA = qw(Exporter);
-
-our @EXPORT_OK = ( );
-our %EXPORT_TAGS = ( 'all' => \@EXPORT_OK );
-our @EXPORT = ( );
-
-# ============================================================
-#
-# ============================================================
-
-{
-package Cv::Features2d::BFMatcher;
-our @ISA = qw(Cv::Features2d::DescriptorMatcher);
+for (qw(BFMatcher)) {
+	my $base = 'Cv::Features2d';
+	eval "package ${base}::$_; our \@ISA = qw(${base}::DescriptorMatcher)";
 }
-
-# ============================================================
-#  features2d. Feature Detection and Description
-# ============================================================
 
 =head1 DESCRIPTION
 
 =head2 METHOD
 
 =over
-
-=item create
-
-	my $descriptorMatcherType = "BruteForce";
-	my $descriptorMatcherType = "BruteForce-L1";
-	my $descriptorMatcherType = "BruteForce-Hamming";
-	my $descriptorMatcherType = "BruteForce-Hamming(2)";
-	my $descriptorMatcherType = "FlannBased";
-	my $matcher = $class->create($descriptorMatcherType);
-
-=item clone
-
-	$matcher->clone($emptyTrainData);
-
-=item clear
-
-	$matcher->clear();
-
-=item compute
-
-	my $descriptor = $extractor->compute($image, $keypoints);
-
-=item add
-
-	$matcher->add($descriptors);
-
-=item empty
-
-	$matcher->empty();
-
-=item getTrainDescriptors
-
-	$matcher->getTrainDescriptors();
-
-=item isMaskSupported
-
-	$matcher->isMaskSupported();
-
-=item train
-
-	$matcher->train();
 
 =item match
 
@@ -103,8 +45,6 @@ our @ISA = qw(Cv::Features2d::DescriptorMatcher);
 
 	my $matches = $matcher->radiusMatch($queryDescriptors, $trainDescriptors,
 										$maxDistance, $mask, $compactResult);
-
-=cut
 
 =back
 

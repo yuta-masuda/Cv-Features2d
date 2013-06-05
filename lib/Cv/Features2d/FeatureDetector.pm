@@ -4,7 +4,8 @@
 
 =head1 NAME
 
-Cv::Features2d::FeatureDetector - Cv extension for Feature Detectors
+Cv::Features2d::FeatureDetector - Features2d. Common Interfaces of
+Feature Detectors
 
 =head1 SYNOPSIS
 
@@ -20,50 +21,10 @@ use Cv::Features2d;
 
 our $VERSION = '0.01';
 
-require Exporter;
-
-our @ISA = qw(Exporter);
-
-our @EXPORT_OK = ( );
-our %EXPORT_TAGS = ( 'all' => \@EXPORT_OK );
-our @EXPORT = ( );
-
-
-# ============================================================
-#  Common Interfaces of Feature Detectors
-#    class FastFeatureDetector: public FeatureDetector
-#    class StarFeatureDetector: public FeatureDetector
-#    class MSER: public FeatureDetector
-#    class MserFeatureDetector : public FeatureDetector
-#    class GoodFeaturesToTrackDetector: public FeatureDetector
-#    class DenseFeatureDetector: public FeatureDetector
-#    class SimpleBlobDetector: public FeatureDetector
-# ============================================================
-
-{
-package Cv::Features2d::FastFeatureDetector;
-our @ISA = qw(Cv::Features2d::FeatureDetector);
-
-package Cv::Features2d::StarFeatureDetector;
-our @ISA = qw(Cv::Features2d::FeatureDetector);
-
-package Cv::Features2d::MSER;
-our @ISA = qw(Cv::Features2d::FeatureDetector);
-
-package Cv::Features2d::MserFeatureDetector;
-our @ISA = qw(Cv::Features2d::FeatureDetector);
-
-package Cv::Features2d::GoodFeaturesToTrackDetector;
-our @ISA = qw(Cv::Features2d::FeatureDetector);
-
-package Cv::Features2d::DenseFeatureDetector;
-our @ISA = qw(Cv::Features2d::FeatureDetector);
-
-package Cv::Features2d::SimpleBlobDetector;
-our @ISA = qw(Cv::Features2d::FeatureDetector);
-
-package Cv::Features2d::FAST;
-our @ISA = qw(Cv::Features2d::FeatureDetector);
+for (qw(FastFeatureDetector StarFeatureDetector MserFeatureDetector
+		GoodFeaturesToTrackDetector DenseFeatureDetector)) {
+	my $base = 'Cv::Features2d';
+	eval "package ${base}::$_; our \@ISA = qw(${base}::FeatureDetector)";
 }
 
 =head1 DESCRIPTION
@@ -71,12 +32,6 @@ our @ISA = qw(Cv::Features2d::FeatureDetector);
 =head2 METHOD
 
 =over
-
-=item new
-
-=item create
-
-TBD
 
 =item detect
 

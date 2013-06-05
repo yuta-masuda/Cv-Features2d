@@ -4,11 +4,10 @@
 
 =head1 NAME
 
-Cv::Features2d::DescriptorExtractor - Cv extension for Descriptor Extractors
+Cv::Features2d::DescriptorExtractor - Features2d.  Common Interfaces
+of Descriptor Extractors
 
 =head1 SYNOPSIS
-
-  use Cv::Features2d::DescriptorExtractor;
 
 =cut
 
@@ -22,34 +21,16 @@ use Cv::Features2d;
 
 our $VERSION = '0.01';
 
-require Exporter;
-
-our @ISA = qw(Exporter);
-
-our @EXPORT_OK = ( );
-our %EXPORT_TAGS = ( 'all' => \@EXPORT_OK );
-our @EXPORT = ( );
-
-# ============================================================
-#  
-# ============================================================
-
-{
-package Cv::Features2d::BriefDescriptorExtractor;
-our @ISA = qw(Cv::Features2d::DescriptorExtractor);
+for (qw(BriefDescriptorExtractor)) {
+	my $base = 'Cv::Features2d';
+	eval "package ${base}::$_; our \@ISA = qw(${base}::DescriptorExtractor)";
 }
-
-# ============================================================
-#  features2d. Feature Detection and Description
-# ============================================================
 
 =head1 DESCRIPTION
 
 =head2 METHOD
 
 =over
-
-=item create
 
 =item compute
 
@@ -62,8 +43,6 @@ our @ISA = qw(Cv::Features2d::DescriptorExtractor);
 =item descriptorType
 
   my $type = $extractor->descriptorType();
-
-=cut
 
 =back
 

@@ -33,15 +33,6 @@ MODULE = Cv::Features2d		PACKAGE = Cv::Features2d
 
 MODULE = Cv::Features2d		PACKAGE = Cv::Features2d::FeatureDetector
 
-FeatureDetector*
-create(const char* CLASS, const char* detectorType)
-INIT:
-	Perl_croak(aTHX_ "TBD: %s::create(\"%s\")\n", CLASS, detectorType);
-CODE:
-	RETVAL = FeatureDetector::create(detectorType);
-OUTPUT:
-	RETVAL
-
 KeyPointV
 FeatureDetector::detect(CvArr* image, CvArr* mask = NULL)
 CODE:
@@ -70,15 +61,6 @@ GoodFeaturesToTrackDetector::new(int maxCorners=1000, double qualityLevel=0.01, 
 
 void
 GoodFeaturesToTrackDetector::DESTROY()
-
-
-MODULE = Cv::Features2d		PACKAGE = Cv::Features2d::MSER
-
-MSER*
-MSER::new(int delta, int minArea, int maxArea, double maxVariation, double minDiversity, int maxEvolution, double areaThreshold, double minMargin, int edgeBlurSize)
-
-void
-MSER::DESTROY()
 
 
 MODULE = Cv::Features2d		PACKAGE = Cv::Features2d::MserFeatureDetector
@@ -119,16 +101,6 @@ DenseFeatureDetector::DESTROY()
 
 MODULE = Cv::Features2d		PACKAGE = Cv::Features2d::DescriptorExtractor
 
-DescriptorExtractor*
-create(const char* CLASS, const char* descriptorExtractorType)
-CODE:
-	RETVAL = DescriptorExtractor::create(descriptorExtractorType);
-OUTPUT:
-	RETVAL
-
-void
-DescriptorExtractor::DESTROY()
-
 CvMat*
 DescriptorExtractor::compute(CvArr* image, KeyPointV keypoints)
 CODE:
@@ -160,46 +132,6 @@ BriefDescriptorExtractor::DESTROY()
 # ============================================================
 
 MODULE = Cv::Features2d		PACKAGE = Cv::Features2d::DescriptorMatcher
-
-DescriptorMatcher*
-create(const char* CLASS, const char* descriptorMatcherType)
-CODE:
-	RETVAL = FlannBasedMatcher::create(descriptorMatcherType);
-OUTPUT:
-	RETVAL
-
-DescriptorMatcher*
-DescriptorMatcher::clone(bool emptyTrainData=false)
-INIT:
-	const char*	CLASS = (const char *)SvPV_nolen(ST(0));
-
-void
-DescriptorMatcher::DESTROY()
-
-void
-DescriptorMatcher::add(MatV descriptors)
-CODE:
-	THIS->add(descriptors);
-
-MatV
-DescriptorMatcher::getTrainDescriptors()
-CODE:
-	RETVAL = THIS->getTrainDescriptors();
-OUTPUT:
-	RETVAL
-
-void
-DescriptorMatcher::clear()
-
-bool
-DescriptorMatcher::empty()
-
-bool
-DescriptorMatcher::isMaskSupported()
-
-void
-DescriptorMatcher::train()
-
 
 DMatchV
 DescriptorMatcher::match(CvArr* queryDescriptors, CvArr* trainDescriptors, CvArr* mask = NULL)
@@ -258,47 +190,6 @@ BFMatcher::DESTROY()
 # ============================================================
 
 MODULE = Cv::Features2d		PACKAGE = Cv::Features2d::Feature2D
-
-Feature2D*
-create(const char* CLASS, const char* detectorType)
-INIT:
-	Perl_croak(aTHX_ "TBD: %s::create(\"%s\")\n", CLASS, detectorType);
-CODE:
-	RETVAL = Feature2D::create(detectorType);
-OUTPUT:
-	RETVAL
-
-void
-Feature2D::DESTROY()
-
-KeyPointV
-Feature2D::detect(CvArr* image, CvArr* mask = NULL)
-CODE:
-	if (mask) {
-		THIS->detect(cvarrToMat(image), RETVAL, cvarrToMat(mask));
-	} else {
-		THIS->detect(cvarrToMat(image), RETVAL);
-	}
-OUTPUT:
-	RETVAL
-
-# C++: void compute(const Mat& image, vector<KeyPoint>& keypoints, Mat& descriptors) const;
-# C++: void compute(const vector<Mat>& images, vector<vector<KeyPoint> >& keypoints, vector<Mat>& descriptors ) const;
-
-CvMat*
-Feature2D::compute(CvArr* image, KeyPointV keypoints)
-CODE:
-	Mat descriptors;
-	(*THIS)(cvarrToMat(image), noArray(), keypoints, descriptors, 1);
-	RETVAL = matToCvmat(descriptors);
-OUTPUT:
-	RETVAL
-
-int
-Feature2D::descriptorSize()
-
-int
-Feature2D::descriptorType()
 
 void
 Feature2D::detectAndCompute(OUTLIST KeyPointV keypoints, OUTLIST CvMat*descriptors, CvArr* image, CvArr* mask = NULL)
@@ -365,8 +256,6 @@ BRISK::DESTROY()
 # ============================================================
 
 MODULE = Cv::Features2d		PACKAGE = Cv::Features2d
-
-# C++: void drawKeypoints(const Mat& image, const vector<KeyPoint>& keypoints, Mat& outImage, const Scalar& color=Scalar::all(-1), int flags=DrawMatchesFlags::DEFAULT )
 
 CvMat*
 drawKeypoints(CvArr* image, KeyPointV keypoints, CvScalar color = cvScalarAll(-1), int flags=DrawMatchesFlags::DEFAULT)

@@ -8,9 +8,9 @@ Cv::Features2d - Cv extension for Features Detector
 
 =head1 SYNOPSIS
 
-  use Cv::Features2d;
+  use Cv::Features2d qw(SURF drawKeypoints);
   
-  my $surf = Cv::Features2d::Feature2D::SURF->new;
+  my $surf = SURF->new(500);
   my $keypoints = $surf->detect($image, $mask);
   drawKeypoints($image, $keypoints)->show;
   Cv->waitKey();
@@ -37,20 +37,30 @@ require Exporter;
 
 our @ISA = qw(Exporter);
 
-our @EXPORT_OK = ( );
+our @EXPORT_OK = (qw(drawKeypoints SIFT SURF ORB BRISK BFMatcher));
 our %EXPORT_TAGS = ( 'all' => \@EXPORT_OK );
 our @EXPORT = ( );
-
-
-# ============================================================
-#  features2d. Feature Detection and Description
-# ============================================================
 
 =head1 DESCRIPTION
 
 =head2 METHOD
 
 =over
+
+=item SIFT, SURF, ORB, BRISK
+
+=cut
+
+sub SIFT  { qq(Cv::Features2d::SIFT) }
+sub SURF  { qq(Cv::Features2d::SURF) }
+sub ORB   { qq(Cv::Features2d::ORB) }
+sub BRISK { qq(Cv::Features2d::BRISK) }
+
+=item BFMatcher
+
+=cut
+
+sub BFMatcher { qq(Cv::Features2d::BFMatcher) }
 
 =item drawKeypoints
 

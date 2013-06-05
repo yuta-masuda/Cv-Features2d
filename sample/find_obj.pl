@@ -5,20 +5,20 @@ use strict;
 use warnings;
 use lib qw(blib/lib blib/arch);
 use Cv;
-use Cv::Features2d;
+use Cv::Features2d qw(:all);
 use File::Basename;
 use Getopt::Long;
 use List::Util qw(sum);
-use Data::Dumper;
+# use Data::Dumper;
 
-my %opt = map { $_ => 0 } qw(surf sift orb fast);
+my %opt = map { $_ => 0 } qw(surf sift orb brisk);
 GetOptions((map {("--$_" => \$opt{$_})} keys %opt)) && sum(values %opt) <= 1
 	|| die "usage: $0 --[".join('|', keys %opt)."] image1 image2\n";
 
-my $detector = $opt{sift} && Cv::Features2d::SIFT->new()
-	|| $opt{orb} && Cv::Features2d::ORB->new()
-	|| $opt{orb} && Cv::Features2d::FAST->new()
-	|| Cv::Features2d::SURF->new(500);
+my $detector = $opt{sift} && SIFT->new()
+	|| $opt{orb} && ORB->new()
+	|| $opt{brisk} && BRISK->new()
+	|| SURF->new(500);
 
 my $fn1 = shift || join('/', dirname($0), "box.png");
 my $fn2 = shift || join('/', dirname($0), "box_in_scene.png");
@@ -38,28 +38,29 @@ printf "detect and compute: %gms\n", $t / (Cv->getTickFrequency() * 1000.0);
 sub filter_matches {
 	my ($kp1, $kp2, $matches, $ratio) = @_;
 	$ratio ||= 0.75;
-    my @q1; my @q2;
+    my @q1; my @q2; my %kp_pairs;
     for (@$matches) {
 		next unless @$_ == 2;
 		my ($a, $b) = @$_;
 		my %a = (queryIdx => $a->[0], trainIdx => $a->[1], distance => $a->[3]);
 		my %b = (queryIdx => $b->[0], trainIdx => $b->[1], distance => $b->[3]);
 		if ($a{distance} < $b{distance} * $ratio) {
-			push(@q1, $kp1->[$a{queryIdx}]->[0]);
-			push(@q2, $kp2->[$a{trainIdx}]->[0]);
+			my ($k, $v) = ($kp1->[$a{queryIdx}], $kp2->[$a{trainIdx}]);
+			push(@q1, $k->[0]);
+			push(@q2, $v->[0]);
+			$kp_pairs{$k} = $v;
 		}
 	}
-    (\@q1, \@q2);
+    (\@q1, \@q2, \%kp_pairs);
 }
 
 
-my $matcher = Cv::Features2d::BFMatcher->new;
+my $matcher = BFMatcher->new;
 my $dmatch = $matcher->knnMatch($desc1, $desc2, 2);
-my ($p1, $p2) = filter_matches($kp1, $kp2, $dmatch);
+my ($p1, $p2, $kp_pairs) = filter_matches($kp1, $kp2, $dmatch);
 
 my $image = $img2->cvtColor(CV_GRAY2BGR);
-$image->circle($_, 3, [map { 64 + int rand 255 - 64 } 1..3], 1, CV_AA)
-	for @$p2;
+$image = drawKeypoints($image, [values %$kp_pairs]);
 
 if (@$p2 >= 4) {
     Cv->findHomography(
@@ -68,8 +69,8 @@ if (@$p2 >= 4) {
 	my ($h, $w) = $img1->getDims;
 	my $corners = Cv::Mat->new(
 		[], CV_32FC2, [0, 0], [$w, 0], [$w, $h], [0, $h]);
-	my @corner = @{$corners->PerspectiveTransform($corners->new, $H)};
-	$image->polyLine([\@corner], -1, [ 100, 200, 200 ], 2, CV_AA);
+	my @corners = @{$corners->perspectiveTransform($corners->new, $H)};
+	$image->polyLine([\@corners], -1, [ 100, 200, 200 ], 2, CV_AA);
 }
 
 $image->show;
