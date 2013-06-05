@@ -11,7 +11,7 @@ Cv::Features2d - Cv extension for Features Detector
   use Cv::Features2d qw(SURF drawKeypoints);
   
   my $surf = SURF(500);
-  my $keypoints = $surf->detect($image, $mask);
+  my $keypoints = $surf->detect($image);
   drawKeypoints($image, $keypoints)->show;
   Cv->waitKey();
 
@@ -58,9 +58,18 @@ sub BRISK { Cv::Features2d::BRISK->new(@_) }
 
 =item BFMatcher
 
+  my $detector = SIFT();
+  my $matcher = BFMatcher();
+  my ($kp1, $desc1) = $detector->detectAndCompute($img1);
+  my ($kp2, $desc2) = $detector->detectAndCompute($img2);
+  my $dmatch = $matcher->knnMatch($desc1, $desc2, 2);
+  ...
+
+see sample/find_obj.pl
+
 =cut
 
-sub BFMatcher { qq(Cv::Features2d::BFMatcher) }
+sub BFMatcher { Cv::Features2d::BFMatcher->new(@_) }
 
 =item drawKeypoints
 

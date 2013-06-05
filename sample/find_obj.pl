@@ -54,7 +54,7 @@ sub filter_matches {
 }
 
 
-my $matcher = BFMatcher->new;
+my $matcher = BFMatcher();
 my $dmatch = $matcher->knnMatch($desc1, $desc2, 2);
 my ($p1, $p2, $kp_pairs) = filter_matches($kp1, $kp2, $dmatch);
 
