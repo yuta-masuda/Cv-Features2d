@@ -49,6 +49,21 @@ our @EXPORT = ( );
 
 =item SIFT, SURF, ORB, BRISK
 
+  my $detector = SIFT();
+    or
+  my $detector = SURF(500);
+  my $detector = ORB();
+  my $detector = BRISK();
+  
+  my ($kp1, $desc1) = $detector->detectAndCompute($img1);
+  my ($kp2, $desc2) = $detector->detectAndCompute($img2);
+
+L<SIFT()|http://docs.opencv.org/search.html?q=SIFT>,
+L<SURF()|http://docs.opencv.org/search.html?q=SURF>,
+L<ORB()|http://docs.opencv.org/search.html?q=ORB>,
+L<BRISK()|http://docs.opencv.org/search.html?q=BRISK>,
+...
+
 =cut
 
 sub SIFT  { Cv::Features2d::SIFT->new(@_) }
@@ -58,14 +73,13 @@ sub BRISK { Cv::Features2d::BRISK->new(@_) }
 
 =item BFMatcher
 
-  my $detector = SIFT();
   my $matcher = BFMatcher();
-  my ($kp1, $desc1) = $detector->detectAndCompute($img1);
-  my ($kp2, $desc2) = $detector->detectAndCompute($img2);
   my $dmatch = $matcher->knnMatch($desc1, $desc2, 2);
-  ...
 
 see sample/find_obj.pl
+
+L<BFMatcher()|http://docs.opencv.org/search.html?q=BFMatcher>,
+...
 
 =cut
 
