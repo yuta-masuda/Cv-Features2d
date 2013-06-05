@@ -11,14 +11,13 @@ use Getopt::Long;
 use List::Util qw(sum);
 # use Data::Dumper;
 
-my %opt = map { $_ => 0 } qw(surf sift orb brisk);
+my %opt = map { $_ => 0 } qw(surf sift orb);
 GetOptions((map {("--$_" => \$opt{$_})} keys %opt)) && sum(values %opt) <= 1
 	|| die "usage: $0 --[".join('|', keys %opt)."] image1 image2\n";
 
-my $detector = $opt{sift} && SIFT->new()
-	|| $opt{orb} && ORB->new()
-	|| $opt{brisk} && BRISK->new()
-	|| SURF->new(500);
+my $detector = $opt{sift} && SIFT()
+	|| $opt{orb} && ORB()
+	|| SURF(500);
 
 my $fn1 = shift || join('/', dirname($0), "box.png");
 my $fn2 = shift || join('/', dirname($0), "box_in_scene.png");

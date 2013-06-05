@@ -10,7 +10,7 @@ Cv::Features2d - Cv extension for Features Detector
 
   use Cv::Features2d qw(SURF drawKeypoints);
   
-  my $surf = SURF->new(500);
+  my $surf = SURF(500);
   my $keypoints = $surf->detect($image, $mask);
   drawKeypoints($image, $keypoints)->show;
   Cv->waitKey();
@@ -51,10 +51,10 @@ our @EXPORT = ( );
 
 =cut
 
-sub SIFT  { qq(Cv::Features2d::SIFT) }
-sub SURF  { qq(Cv::Features2d::SURF) }
-sub ORB   { qq(Cv::Features2d::ORB) }
-sub BRISK { qq(Cv::Features2d::BRISK) }
+sub SIFT  { Cv::Features2d::SIFT->new(@_) }
+sub SURF  { Cv::Features2d::SURF->new(@_) }
+sub ORB   { Cv::Features2d::ORB->new(@_) }
+sub BRISK { Cv::Features2d::BRISK->new(@_) }
 
 =item BFMatcher
 
