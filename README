@@ -1,0 +1,25 @@
+Cv-Features2d version 0.01
+==========================
+
+OpenCV 2.x features2d for Cv.
+
+
+INSTALLATION
+
+  $ perl Makefile.PL
+  $ make
+  $ make test
+  $ make install
+
+DEPENDENCIES
+
+This module requires these other modules and libraries:
+
+  Cv
+
+COPYRIGHT AND LICENCE
+
+Copyright (c) 2013 by MASUDA Yuta.
+
+All rights reserved. This program is free software; you can
+redistribute it and/or modify it under the same terms as Perl itself.
