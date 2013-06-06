@@ -94,7 +94,7 @@ sub FlannBasedMatcher { Cv::Features2d::DescriptorMatcher::FlannBasedMatcher->ne
 
 =cut
 
-# *Cv::Arr::drawKeypoints = sub { drawKeypoints(@_); $_[0]; };
+*Cv::Arr::drawKeypoints = sub { drawKeypoints(@_); $_[0]; }; # XXXXX
 
 =back
 
