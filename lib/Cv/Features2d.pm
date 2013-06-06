@@ -37,7 +37,8 @@ require Exporter;
 
 our @ISA = qw(Exporter);
 
-our @EXPORT_OK = (qw(drawKeypoints SIFT SURF ORB BRISK BFMatcher));
+our @EXPORT_OK = (qw(drawKeypoints SIFT SURF ORB BRISK BFMatcher FlannBasedMatcher));
+# our @EXPORT_OK = (qw(drawKeypoints));
 our %EXPORT_TAGS = ( 'all' => \@EXPORT_OK );
 our @EXPORT = ( );
 
@@ -66,12 +67,12 @@ L<BRISK()|http://docs.opencv.org/search.html?q=BRISK>,
 
 =cut
 
-sub SIFT  { Cv::Features2d::SIFT->new(@_) }
-sub SURF  { Cv::Features2d::SURF->new(@_) }
-sub ORB   { Cv::Features2d::ORB->new(@_) }
-sub BRISK { Cv::Features2d::BRISK->new(@_) }
+sub SIFT  { Cv::Features2d::Feature2D::SIFT->new(@_) }
+sub SURF  { Cv::Features2d::Feature2D::SURF->new(@_) }
+sub ORB   { Cv::Features2d::Feature2D::ORB->new(@_) }
+sub BRISK { Cv::Features2d::Feature2D::BRISK->new(@_) }
 
-=item BFMatcher
+=item BFMatcher, FlannBasedMatcher
 
   my $matcher = BFMatcher();
   my $dmatch = $matcher->knnMatch($desc1, $desc2, 2);
@@ -79,11 +80,13 @@ sub BRISK { Cv::Features2d::BRISK->new(@_) }
 see sample/find_obj.pl
 
 L<BFMatcher()|http://docs.opencv.org/search.html?q=BFMatcher>,
+L<FlannBasedMatcher()|http://docs.opencv.org/search.html?q=FlannBasedMatcher>,
 ...
 
 =cut
 
-sub BFMatcher { Cv::Features2d::BFMatcher->new(@_) }
+sub BFMatcher { Cv::Features2d::DescriptorMatcher::BFMatcher->new(@_) }
+sub FlannBasedMatcher { Cv::Features2d::DescriptorMatcher::FlannBasedMatcher->new(@_) }
 
 =item drawKeypoints
 

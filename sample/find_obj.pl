@@ -11,12 +11,15 @@ use Getopt::Long;
 use List::Util qw(sum);
 # use Data::Dumper;
 
-my %opt = map { $_ => 0 } qw(surf sift orb);
-GetOptions((map {("--$_" => \$opt{$_})} keys %opt)) && sum(values %opt) <= 1
-	|| die "usage: $0 --[".join('|', keys %opt)."] image1 image2\n";
+my %feature2d = map { $_ => 0 } qw(surf sift orb);
+my $flann = 0;
 
-my $detector = $opt{sift} && SIFT()
-	|| $opt{orb} && ORB()
+GetOptions((map {("--$_" => \$feature2d{$_})} keys %feature2d),
+		   "--flann" => \$flann) && sum(values %feature2d) <= 1
+	|| die "usage: $0 --[".join('|', keys %feature2d)."] --flann image1 image2\n";
+
+my $detector = $feature2d{sift} && SIFT()
+	|| $feature2d{orb} && ORB()
 	|| SURF(500);
 
 my $fn1 = shift || join('/', dirname($0), "box.png");
@@ -54,7 +57,7 @@ sub filter_matches {
 }
 
 
-my $matcher = BFMatcher();
+my $matcher = $flann? FlannBasedMatcher() : BFMatcher();
 my $dmatch = $matcher->knnMatch($desc1, $desc2, 2);
 my ($p1, $p2, $kp_pairs) = filter_matches($kp1, $kp2, $dmatch);
 

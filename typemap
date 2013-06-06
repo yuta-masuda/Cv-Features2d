@@ -17,6 +17,7 @@ StarFeatureDetector*				O_OBJECT
 const StarFeatureDetector*			O_OBJECT
 DenseFeatureDetector*				O_OBJECT
 const DenseFeatureDetector*			O_OBJECT
+
 SIFT*								O_OBJECT
 const SIFT*							O_OBJECT
 SURF*								O_OBJECT
@@ -33,6 +34,11 @@ BriefDescriptorExtractor*			O_OBJECT
 DescriptorMatcher*					O_OBJECT
 BFMatcher*							O_OBJECT
 FlannBasedMatcher*					O_OBJECT
+
+FlannBasedMatcher*					O_OBJECT
+IndexParams*						O_OBJECT
+SearchParams*						O_OBJECT
+
 
 MatV								T_MatV
 KeyPointV							T_KeyPointV

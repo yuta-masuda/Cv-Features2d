@@ -17,17 +17,19 @@ my $image = cvLoadImage(dirname($0) . "/beaver.png");
 my $font = Cv->InitFont(CV_FONT_NORMAL, (0.5) x 2, 0, 1, CV_AA);
 
 for (
-	{ 'FastFeatureDetector' => [] },
-	{ 'StarFeatureDetector' => [] },
-	{ 'SIFT' => [] },
-	{ 'SURF' => [ 500 ] },
-	{ 'ORB' => [] },
-	{ 'BRISK' => [] },
-	{ 'GoodFeaturesToTrackDetector' => [] },
-	{ 'MserFeatureDetector' => [ 5, 60, 14400, 0.25, 0.2, 200, 1.01, 0.003, 5 ] },
-	{ 'DenseFeatureDetector' => [] },
+	{ 'Cv::Features2d::Feature2D::SIFT' => [] },
+	{ 'Cv::Features2d::Feature2D::SURF' => [ 500 ] },
+	{ 'Cv::Features2d::Feature2D::ORB' => [] },
+	{ 'Cv::Features2d::Feature2D::BRISK' => [] },
+	{ 'Cv::Features2d::FeatureDetector::FastFeatureDetector' => [] },
+	{ 'Cv::Features2d::FeatureDetector::StarFeatureDetector' => [] },
+	{ 'Cv::Features2d::FeatureDetector::GoodFeaturesToTrackDetector' => [] },
+	{ 'Cv::Features2d::FeatureDetector::MserFeatureDetector' =>
+		  [ 5, 60, 14400, 0.25, 0.2, 200, 1.01, 0.003, 5 ] },
+	{ 'Cv::Features2d::FeatureDetector::DenseFeatureDetector' => [] },
 	) {
-	my ($k, $args) = %$_; my $class = "Cv::Features2d::$k";
+	my ($class, $args) = %$_;
+	my $k = (split('::', $class))[-1];
 	my $detector = $class->new(@$args);
 	isa_ok($detector, $class);
 	my $outImage = $image->clone;

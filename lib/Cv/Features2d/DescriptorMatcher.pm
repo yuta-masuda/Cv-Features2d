@@ -21,9 +21,9 @@ use Cv::Features2d;
 
 our $VERSION = '0.01';
 
-for (qw(BFMatcher)) {
-	my $base = 'Cv::Features2d';
-	eval "package ${base}::$_; our \@ISA = qw(${base}::DescriptorMatcher)";
+for (qw(BFMatcher FlannBasedMatcher)) {
+	my $base = __PACKAGE__;
+	eval "package ${base}::$_; our \@ISA = qw(${base})";
 }
 
 =head1 DESCRIPTION

@@ -23,8 +23,8 @@ our $VERSION = '0.01';
 
 for (qw(FastFeatureDetector StarFeatureDetector MserFeatureDetector
 		GoodFeaturesToTrackDetector DenseFeatureDetector)) {
-	my $base = 'Cv::Features2d';
-	eval "package ${base}::$_; our \@ISA = qw(${base}::FeatureDetector)";
+	my $base = __PACKAGE__;
+	eval "package ${base}::$_; our \@ISA = qw(${base})";
 }
 
 =head1 DESCRIPTION

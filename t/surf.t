@@ -4,6 +4,7 @@ use strict;
 use warnings;
 use Test::More qw(no_plan);
 # use Test::More tests => 13;
+use Test::Exception;
 BEGIN { use_ok('Cv') }
 BEGIN { use_ok('Cv::Features2d', ':all') }
 
@@ -36,7 +37,7 @@ if (1) {
 		};
 	}
 
-	my $surf = SURF(
+	my $surf = Cv::Features2d::Feature2D::SURF->new(
 		$params->[2],			# hessianThreshold
 		$params->[3],			# nOctaves
 		$params->[4],			# nOctaveLayers
@@ -64,4 +65,10 @@ if (1) {
 		$img->show;
 		Cv->waitKey(1000);
 	}
+}
+
+
+if (1) {
+	lives_ok { Cv::Features2d::Feature2D::SURF->new(500) };
+	lives_ok { SURF(500) };
 }

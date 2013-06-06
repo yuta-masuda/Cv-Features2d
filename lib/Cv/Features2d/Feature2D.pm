@@ -25,8 +25,8 @@ our $VERSION = '0.01';
 our @ISA = qw(Cv::Features2d::FeatureDetector Cv::Features2d::DescriptorExtractor);
 
 for (qw(SIFT SURF ORB BRISK)) {
-	my $base = 'Cv::Features2d';
-	eval "package ${base}::$_; our \@ISA = qw(${base}::Feature2D)";
+	my $base = __PACKAGE__;
+	eval "package ${base}::$_; our \@ISA = qw(${base})";
 }
 
 =head1 DESCRIPTION

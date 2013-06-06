@@ -11,6 +11,9 @@ typedef vector<KeyPoint> KeyPointV;
 typedef vector<DMatch> DMatchV;
 typedef vector<vector<DMatch> > DMatchVV;
 
+typedef flann::IndexParams	IndexParams;
+typedef flann::SearchParams SearchParams;
+
 static CvMat* matToCvmat(Mat& var)
 {
 #if 0
@@ -45,7 +48,7 @@ OUTPUT:
 	RETVAL
 
 
-MODULE = Cv::Features2d		PACKAGE = Cv::Features2d::FastFeatureDetector
+MODULE = Cv::Features2d		PACKAGE = Cv::Features2d::FeatureDetector::FastFeatureDetector
 
 FastFeatureDetector*
 FastFeatureDetector::new(int threshold=1, bool nonmaxSuppression=true)
@@ -54,7 +57,7 @@ void
 FastFeatureDetector::DESTROY()
 
 
-MODULE = Cv::Features2d		PACKAGE = Cv::Features2d::GoodFeaturesToTrackDetector
+MODULE = Cv::Features2d		PACKAGE = Cv::Features2d::FeatureDetector::GoodFeaturesToTrackDetector
 
 GoodFeaturesToTrackDetector*
 GoodFeaturesToTrackDetector::new(int maxCorners=1000, double qualityLevel=0.01, double minDistance=1., int blockSize=3, bool useHarrisDetector=false, double k=0.04 )
@@ -63,7 +66,7 @@ void
 GoodFeaturesToTrackDetector::DESTROY()
 
 
-MODULE = Cv::Features2d		PACKAGE = Cv::Features2d::MserFeatureDetector
+MODULE = Cv::Features2d		PACKAGE = Cv::Features2d::FeatureDetector::MserFeatureDetector
 
 MserFeatureDetector*
 MserFeatureDetector::new(int delta, int minArea, int maxArea, double maxVariation, double minDiversity, int maxEvolution, double areaThreshold, double minMargin, int edgeBlurSize)
@@ -72,7 +75,7 @@ void
 MserFeatureDetector::DESTROY()
 
 
-MODULE = Cv::Features2d		PACKAGE = Cv::Features2d::StarFeatureDetector
+MODULE = Cv::Features2d		PACKAGE = Cv::Features2d::FeatureDetector::StarFeatureDetector
 
 StarFeatureDetector*
 StarFeatureDetector::new(int maxSize=16, int responseThreshold=30, int lineThresholdProjected = 10, int lineThresholdBinarized=8, int suppressNonmaxSize=5)
@@ -83,7 +86,7 @@ StarFeatureDetector::DESTROY()
 
 #if _CV_VERSION() >= _VERSION(2,4,0)
 
-MODULE = Cv::Features2d		PACKAGE = Cv::Features2d::DenseFeatureDetector
+MODULE = Cv::Features2d		PACKAGE = Cv::Features2d::FeatureDetector::DenseFeatureDetector
 
 DenseFeatureDetector*
 DenseFeatureDetector::new(float initFeatureScale=1.f, int featureScaleLevels=1, float featureScaleMul=0.1f, int initXyStep=6, int initImgBound=0, bool varyXyStepWithScale=true, bool varyImgBoundWithScale=false)
@@ -92,7 +95,6 @@ void
 DenseFeatureDetector::DESTROY()
 
 #endif
-
 
 
 # ============================================================
@@ -117,7 +119,7 @@ int
 DescriptorExtractor::descriptorType()
 
 
-MODULE = Cv::Features2d		PACKAGE = Cv::Features2d::BriefDescriptorExtractor
+MODULE = Cv::Features2d		PACKAGE = Cv::Features2d::DescriptorExtractor::BriefDescriptorExtractor
 
 BriefDescriptorExtractor*
 BriefDescriptorExtractor::new(int bytes = 32)
@@ -175,7 +177,7 @@ OUTPUT:
 	RETVAL
 
 
-MODULE = Cv::Features2d		PACKAGE = Cv::Features2d::BFMatcher
+MODULE = Cv::Features2d		PACKAGE = Cv::Features2d::DescriptorMatcher::BFMatcher
 
 BFMatcher*
 BFMatcher::new(int normType=NORM_L2, bool crossCheck=false)
@@ -183,6 +185,18 @@ BFMatcher::new(int normType=NORM_L2, bool crossCheck=false)
 void
 BFMatcher::DESTROY()
 
+
+MODULE = Cv::Features2d		PACKAGE = Cv::Features2d::DescriptorMatcher::FlannBasedMatcher
+
+FlannBasedMatcher*
+FlannBasedMatcher::new(IndexParams* indexParams = new flann::KDTreeIndexParams(), SearchParams* searchParams = new flann::SearchParams())
+INIT:
+	if (items > 1) {
+		Perl_croak(aTHX_ "can't use params in FlannBasedMatcher::new");
+	}
+
+void
+FlannBasedMatcher::DESTROY()
 
 
 # ============================================================
@@ -205,7 +219,7 @@ CODE:
 
 #if _CV_VERSION() >= _VERSION(2,4,0)
 
-MODULE = Cv::Features2d		PACKAGE = Cv::Features2d::SIFT
+MODULE = Cv::Features2d		PACKAGE = Cv::Features2d::Feature2D::SIFT
 
 SIFT*
 SIFT::new(int nfeatures=0, int nOctaveLayers=3, double contrastThreshold=0.04, double edgeThreshold=10, double sigma=1.6)
@@ -216,7 +230,7 @@ SIFT::DESTROY()
 #endif
 
 
-MODULE = Cv::Features2d		PACKAGE = Cv::Features2d::SURF
+MODULE = Cv::Features2d		PACKAGE = Cv::Features2d::Feature2D::SURF
 
 SURF*
 SURF::new(double hessianThreshold, int nOctaves=4, int nOctaveLayers=2, bool extended=true, bool upright=false)
@@ -227,7 +241,7 @@ SURF::DESTROY()
 
 #if _CV_VERSION() >= _VERSION(2,4,0)
 
-MODULE = Cv::Features2d		PACKAGE = Cv::Features2d::ORB
+MODULE = Cv::Features2d		PACKAGE = Cv::Features2d::Feature2D::ORB
 
 ORB*
 ORB::new(int nfeatures=500, float scaleFactor=1.2f, int nlevels=8, int edgeThreshold=31, int firstLevel=0, int WTA_K=2, int scoreType=ORB::HARRIS_SCORE, int patchSize=31)
@@ -240,7 +254,7 @@ ORB::DESTROY()
 
 #if _CV_VERSION() >= _VERSION(2,4,0)
 
-MODULE = Cv::Features2d		PACKAGE = Cv::Features2d::BRISK
+MODULE = Cv::Features2d		PACKAGE = Cv::Features2d::Feature2D::BRISK
 
 BRISK*
 BRISK::new(int thresh=30, int octaves=3, float patternScale=1.0f)
