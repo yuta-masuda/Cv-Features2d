@@ -19,7 +19,7 @@ use warnings;
 use Cv ();
 use Cv::Features2d;
 
-our $VERSION = '0.01';
+our $VERSION = '0.02';
 
 for (qw(BFMatcher FlannBasedMatcher)) {
 	my $base = __PACKAGE__;

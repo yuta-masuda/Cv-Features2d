@@ -1,5 +1,7 @@
 Revision history for Perl extension Cv::Features2d
 
-0.01 - 2013-06-06
+0.02 - 2013-06-07
+     * fixed some bugs
 
+0.01 - 2013-06-06
      * first release
