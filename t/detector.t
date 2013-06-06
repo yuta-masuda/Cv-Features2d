@@ -32,7 +32,8 @@ for (
 	my $k = (split('::', $class))[-1];
 	my $detector = $class->new(@$args);
 	isa_ok($detector, $class);
-	my $outImage = $image->clone;
+	my $outImage1 = $image->clone;
+	my $outImage2 = $image->clone;
 	my $t0 = gettimeofday();
 	my $keypoints = $detector->detect($image);
 	my $ti = sprintf("$k: %.1f(ms)", (gettimeofday() - $t0) * 1000);
@@ -42,15 +43,15 @@ for (
 		my $color = [ map { 32 + int rand 255 - 32 } 1 .. 3 ];
 		my ($x0, $y0) = @$pt;
 		my ($x1, $y1) = ($x0 + $size * cos($angle), $y0 + $size * sin($angle));
-		$outImage->line([$x0, $y0], [$x1, $y1], $color, 2, CV_AA);
+		$outImage1->line([$x0, $y0], [$x1, $y1], $color, 2, CV_AA);
 	}
 	my ($x, $y) = (10, $image->height - 10);
-	$outImage->putText($ti, [ $x-1, $y-1 ], $font, cvScalarAll(250));
-	$outImage->putText($ti, [ $x+1, $y+1 ], $font, cvScalarAll(50));
-	$outImage->putText($ti, [ $x+0, $y+0 ], $font, [100, 150, 250]);
-	my $outImage2 = Cv::Features2d::drawKeypoints($image, $keypoints);
+	$outImage1->putText($ti, [ $x-1, $y-1 ], $font, cvScalarAll(250));
+	$outImage1->putText($ti, [ $x+1, $y+1 ], $font, cvScalarAll(50));
+	$outImage1->putText($ti, [ $x+0, $y+0 ], $font, [100, 150, 250]);
+	Cv::Features2d::drawKeypoints($outImage2, $keypoints);
 	if ($verbose) {
-		$outImage->show('keypoints');
+		$outImage1->show('keypoints');
 		$outImage2->show('drawKeypoints');
 		Cv->waitKey(1000);
 	}
