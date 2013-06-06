@@ -27,7 +27,6 @@ static CvMat* matToCvmat(Mat& var)
 #endif
 }
 
-
 MODULE = Cv::Features2d		PACKAGE = Cv::Features2d
 
 # ============================================================
@@ -191,9 +190,9 @@ MODULE = Cv::Features2d		PACKAGE = Cv::Features2d::DescriptorMatcher::FlannBased
 FlannBasedMatcher*
 FlannBasedMatcher::new(IndexParams* indexParams = new flann::KDTreeIndexParams(), SearchParams* searchParams = new flann::SearchParams())
 INIT:
-	if (items > 1) {
-		Perl_croak(aTHX_ "can't use params in FlannBasedMatcher::new");
-	}
+{
+	// TODO: parse parameters
+}
 
 void
 FlannBasedMatcher::DESTROY()

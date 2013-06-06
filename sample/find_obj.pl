@@ -11,16 +11,21 @@ use Getopt::Long;
 use List::Util qw(sum);
 # use Data::Dumper;
 
-my %feature2d = map { $_ => 0 } qw(surf sift orb);
-my $flann = 0;
+my %opt = map { $_ => 0 } qw(surf sift orb);
+my $opt_flann = 0;
+my $verbose = 0;
 
-GetOptions((map {("--$_" => \$feature2d{$_})} keys %feature2d),
-		   "--flann" => \$flann) && sum(values %feature2d) <= 1
-	|| die "usage: $0 --[".join('|', keys %feature2d)."] --flann image1 image2\n";
+GetOptions((map {("--$_" => \$opt{$_})} keys %opt), "--flann" => \$opt_flann,
+		   "--verbose" => \$verbose) && sum(values %opt) <= 1
+	|| die "usage: $0 --[".join('|', keys %opt)."] --flann image1 image2\n";
 
-my $detector = $feature2d{sift} && SIFT()
-	|| $feature2d{orb} && ORB()
+my $detector = $opt{sift} && SIFT()
+	|| $opt{orb} && ORB()
 	|| SURF(500);
+my $matcher = $opt_flann && FlannBasedMatcher()
+	|| BFMatcher();
+print STDERR "detector = ", ref $detector, "\n" if $verbose;
+print STDERR "matcher = ", ref $matcher, "\n" if $verbose;
 
 my $fn1 = shift || join('/', dirname($0), "box.png");
 my $fn2 = shift || join('/', dirname($0), "box_in_scene.png");
@@ -57,7 +62,6 @@ sub filter_matches {
 }
 
 
-my $matcher = $flann? FlannBasedMatcher() : BFMatcher();
 my $dmatch = $matcher->knnMatch($desc1, $desc2, 2);
 my ($p1, $p2, $kp_pairs) = filter_matches($kp1, $kp2, $dmatch);
 
