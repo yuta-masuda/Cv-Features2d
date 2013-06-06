@@ -12,7 +12,8 @@ Cv::Features2d - Cv extension for Features Detector
   
   my $surf = SURF(500);
   my $keypoints = $surf->detect($image);
-  drawKeypoints($image, $keypoints)->show;
+  drawKeypoints($image, $keypoints);
+  $image->show;
   Cv->waitKey();
 
 =cut
@@ -38,7 +39,6 @@ require Exporter;
 our @ISA = qw(Exporter);
 
 our @EXPORT_OK = (qw(drawKeypoints SIFT SURF ORB BRISK BFMatcher FlannBasedMatcher));
-# our @EXPORT_OK = (qw(drawKeypoints));
 our %EXPORT_TAGS = ( 'all' => \@EXPORT_OK );
 our @EXPORT = ( );
 
@@ -90,7 +90,11 @@ sub FlannBasedMatcher { Cv::Features2d::DescriptorMatcher::FlannBasedMatcher->ne
 
 =item drawKeypoints
 
-  my $image = drawKeypoints($image, $keypoints, $color, $flags);
+  drawKeypoints($image, $keypoints, $color, $flags);
+
+=cut
+
+# *Cv::Arr::drawKeypoints = sub { drawKeypoints(@_); $_[0]; };
 
 =back
 

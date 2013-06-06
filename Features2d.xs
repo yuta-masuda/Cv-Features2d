@@ -270,11 +270,8 @@ BRISK::DESTROY()
 
 MODULE = Cv::Features2d		PACKAGE = Cv::Features2d
 
-CvMat*
+void
 drawKeypoints(CvArr* image, KeyPointV keypoints, CvScalar color = cvScalarAll(-1), int flags=DrawMatchesFlags::DEFAULT)
 CODE:
-	Mat outImage;
+	Mat outImage = cvarrToMat(image);
 	drawKeypoints(cvarrToMat(image), keypoints, outImage, color, flags);
-	RETVAL = matToCvmat(outImage);
-OUTPUT:
-	RETVAL

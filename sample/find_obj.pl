@@ -66,7 +66,7 @@ my $dmatch = $matcher->knnMatch($desc1, $desc2, 2);
 my ($p1, $p2, $kp_pairs) = filter_matches($kp1, $kp2, $dmatch);
 
 my $image = $img2->cvtColor(CV_GRAY2BGR);
-$image = drawKeypoints($image, [values %$kp_pairs]);
+drawKeypoints($image, [values %$kp_pairs]);
 
 if (@$p2 >= 4) {
     Cv->findHomography(
