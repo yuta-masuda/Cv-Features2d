@@ -13,3 +13,13 @@ if (1) {
 	Cv::Features2d->import(':all');
 	can_ok(__PACKAGE__, @all);
 }
+
+if (2) {
+	lives_ok { SIFT() };
+	lives_ok { SURF(500) };
+	lives_ok { ORB() };
+	lives_ok { BRISK() };
+	lives_ok { BFMatcher() };
+	lives_ok { FlannBasedMatcher() };
+	lives_ok { Cv::Mat->new([240, 320], CV_8UC1)->drawKeypoints([]) };
+}
