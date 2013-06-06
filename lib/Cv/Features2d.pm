@@ -106,7 +106,8 @@ None by default.
 
 =head1 SEE ALSO
 
-http://github.com/obuk/Cv-Olive
+http://github.com/yuta-masuda/Cv-Feature2d
+
 
 =head1 AUTHOR
 
