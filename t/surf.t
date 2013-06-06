@@ -5,7 +5,7 @@ use warnings;
 use Test::More qw(no_plan);
 # use Test::More tests => 13;
 BEGIN { use_ok('Cv') }
-BEGIN { use_ok('Cv::Features2d') }
+BEGIN { use_ok('Cv::Features2d', ':all') }
 
 my $verbose = Cv->hasGUI;
 
@@ -36,7 +36,7 @@ if (1) {
 		};
 	}
 
-	my $surf = Cv::Features2d::SURF->new(
+	my $surf = SURF(
 		$params->[2],			# hessianThreshold
 		$params->[3],			# nOctaves
 		$params->[4],			# nOctaveLayers
