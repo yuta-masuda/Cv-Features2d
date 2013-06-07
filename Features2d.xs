@@ -11,9 +11,6 @@ typedef vector<KeyPoint> KeyPointV;
 typedef vector<DMatch> DMatchV;
 typedef vector<vector<DMatch> > DMatchVV;
 
-typedef flann::IndexParams	IndexParams;
-typedef flann::SearchParams SearchParams;
-
 static CvMat* matToCvmat(Mat& var)
 {
 #if 0
@@ -27,7 +24,134 @@ static CvMat* matToCvmat(Mat& var)
 #endif
 }
 
+static flann::IndexParams* xsIndexParams(HV* hv)
+{
+	const int verbose = 0;
+	flann::IndexParams* p = new flann::IndexParams();
+	HE* he; hv_iterinit(hv);
+	while (he = hv_iternext(hv)) {
+			SV* sv = hv_iterval(hv, he); int t = SvTYPE(sv);
+		I32 len; char* key = hv_iterkey(he, &len);
+		if (t == SVt_PV) {
+			if (verbose)
+				fprintf(stderr, "p.String: %s, %s\n", key, SvPV_nolen(sv));
+			p->setString(key, SvPV_nolen(sv));
+		} else if (t == SVt_IV) {
+			if (strcmp(key, "algorithm") == 0) {
+				if (verbose) fprintf(stderr, "p.Algorithm: %d\n", SvIV(sv));
+				p->setAlgorithm(SvIV(sv));
+			} else {
+				if (verbose) fprintf(stderr, "p.Int: %s, %d\n", key, SvIV(sv));
+				p->setInt(key, SvIV(sv));
+			}
+		} else if (t == SVt_NV) {
+			if (verbose) fprintf(stderr, "p.Double: %s, %g\n", key, SvNV(sv));
+			p->setDouble(key, SvNV(sv));
+		} else {
+			const char* names[] = {
+				"SVt_NULL",
+				"SVt_BIND",
+				"SVt_IV",
+				"SVt_NV",
+				/* RV was here, before it was merged with IV.  */
+				"SVt_PV",
+				"SVt_PVIV",
+				"SVt_PVNV",
+				"SVt_PVMG",
+				"SVt_REGEXP",
+				/* PVBM was here, before BIND replaced it.  */
+				"SVt_PVGV",
+				"SVt_PVLV",
+				"SVt_PVAV",
+				"SVt_PVHV",
+				"SVt_PVCV",
+				"SVt_PVFM",
+				"SVt_PVIO",
+			};
+			const char* name = "unknown";
+			if (t < SVt_LAST) name = names[t];
+			fprintf(stderr, "p.unknown: %s, (%s)\n", key, name);
+		}
+	}
+	return p;
+}
+
+
 MODULE = Cv::Features2d		PACKAGE = Cv::Features2d
+
+# ============================================================
+#  Drawing Function of Keypoints and Matches
+# ============================================================
+
+MODULE = Cv::Features2d		PACKAGE = Cv::Features2d
+
+void
+drawKeypoints(CvArr* image, KeyPointV keypoints, CvScalar color = cvScalarAll(-1), int flags=DrawMatchesFlags::DEFAULT)
+CODE:
+	Mat outImage = cvarrToMat(image);
+	drawKeypoints(cvarrToMat(image), keypoints, outImage, color, flags);
+
+
+# ============================================================
+#  Feature Detection and Description
+# ============================================================
+
+MODULE = Cv::Features2d		PACKAGE = Cv::Features2d::Feature2D
+
+void
+Feature2D::detectAndCompute(OUTLIST KeyPointV keypoints, OUTLIST CvMat*descriptors, CvArr* image, CvArr* mask = NULL)
+CODE:
+	Mat _descriptors;
+	(*THIS)(cvarrToMat(image), mask? cvarrToMat(mask) : noArray(), keypoints, _descriptors);
+	descriptors = matToCvmat(_descriptors);
+
+
+#if _CV_VERSION() >= _VERSION(2,4,0)
+
+MODULE = Cv::Features2d		PACKAGE = Cv::Features2d::Feature2D::SIFT
+
+SIFT*
+SIFT::new(int nfeatures=0, int nOctaveLayers=3, double contrastThreshold=0.04, double edgeThreshold=10, double sigma=1.6)
+
+void
+SIFT::DESTROY()
+
+#endif
+
+
+MODULE = Cv::Features2d		PACKAGE = Cv::Features2d::Feature2D::SURF
+
+SURF*
+SURF::new(double hessianThreshold, int nOctaves=4, int nOctaveLayers=2, bool extended=true, bool upright=false)
+
+void
+SURF::DESTROY()
+
+
+#if _CV_VERSION() >= _VERSION(2,4,0)
+
+MODULE = Cv::Features2d		PACKAGE = Cv::Features2d::Feature2D::ORB
+
+ORB*
+ORB::new(int nfeatures=500, float scaleFactor=1.2f, int nlevels=8, int edgeThreshold=31, int firstLevel=0, int WTA_K=2, int scoreType=ORB::HARRIS_SCORE, int patchSize=31)
+
+void
+ORB::DESTROY()
+
+#endif
+
+
+#if _CV_VERSION() >= _VERSION(2,4,0)
+
+MODULE = Cv::Features2d		PACKAGE = Cv::Features2d::Feature2D::BRISK
+
+BRISK*
+BRISK::new(int thresh=30, int octaves=3, float patternScale=1.0f)
+
+void
+BRISK::DESTROY()
+
+#endif
 
 # ============================================================
 #  Common Interfaces of Feature Detectors
@@ -148,33 +272,20 @@ OUTPUT:
 DMatchVV
 DescriptorMatcher::knnMatch(CvArr* queryDescriptors, CvArr* trainDescriptors, int k, CvMat* mask = NULL, bool compactResult=false)
 CODE:
-	if (mask) {
-		THIS->knnMatch(
+	THIS->knnMatch(
 			cvarrToMat(queryDescriptors), cvarrToMat(trainDescriptors),
-			RETVAL, k, cvarrToMat(mask), compactResult);
-	} else {
-		THIS->knnMatch(
-			cvarrToMat(queryDescriptors), cvarrToMat(trainDescriptors),
-			RETVAL, k, Mat(), compactResult);
-	}
+			RETVAL, k, mask? cvarrToMat(mask): Mat(), compactResult);
 OUTPUT:
 	RETVAL
 
 DMatchVV
 DescriptorMatcher::radiusMatch(CvArr* queryDescriptors, CvArr* trainDescriptors, float maxDistance, CvArr* mask = NULL, bool compactResult=false)
 CODE:
-	if (mask) {
-		THIS->radiusMatch(
-			cvarrToMat(queryDescriptors), cvarrToMat(trainDescriptors),
-			RETVAL, maxDistance, cvarrToMat(mask), compactResult);
-	} else {
-		THIS->radiusMatch(
-			cvarrToMat(queryDescriptors), cvarrToMat(trainDescriptors),
-			RETVAL, maxDistance, cvarrToMat(mask), compactResult);
-	}
+	THIS->radiusMatch(
+		cvarrToMat(queryDescriptors), cvarrToMat(trainDescriptors),
+		RETVAL, maxDistance, mask? cvarrToMat(mask) : Mat(), compactResult);
 OUTPUT:
 	RETVAL
-
 
 MODULE = Cv::Features2d		PACKAGE = Cv::Features2d::DescriptorMatcher::BFMatcher
 
@@ -188,90 +299,16 @@ BFMatcher::DESTROY()
 MODULE = Cv::Features2d		PACKAGE = Cv::Features2d::DescriptorMatcher::FlannBasedMatcher
 
 FlannBasedMatcher*
-FlannBasedMatcher::new(IndexParams* indexParams = new flann::KDTreeIndexParams(), SearchParams* searchParams = new flann::SearchParams())
+FlannBasedMatcher::new(HV* indexParams = NO_INIT, HV* searchParams = NO_INIT)
 INIT:
-{
-	// TODO: parse parameters
-}
+	flann::IndexParams* _indexParams = (items >= 2)?
+		xsIndexParams(indexParams) : new flann::KDTreeIndexParams();
+	flann::SearchParams* _searchParams = (items >= 3)? (flann::SearchParams*)
+		xsIndexParams(searchParams) : new flann::SearchParams();
+C_ARGS:	_indexParams, _searchParams
 
 void
 FlannBasedMatcher::DESTROY()
 
 
-# ============================================================
-#  Feature Detection and Description
-# ============================================================
-
-MODULE = Cv::Features2d		PACKAGE = Cv::Features2d::Feature2D
-
-void
-Feature2D::detectAndCompute(OUTLIST KeyPointV keypoints, OUTLIST CvMat*descriptors, CvArr* image, CvArr* mask = NULL)
-CODE:
-	Mat _descriptors;
-	if (mask) {
-		(*THIS)(cvarrToMat(image), cvarrToMat(mask), keypoints, _descriptors);
-	} else {
-		(*THIS)(cvarrToMat(image), noArray(), keypoints, _descriptors);
-	}
-	descriptors = matToCvmat(_descriptors);
-
-
-#if _CV_VERSION() >= _VERSION(2,4,0)
-
-MODULE = Cv::Features2d		PACKAGE = Cv::Features2d::Feature2D::SIFT
-
-SIFT*
-SIFT::new(int nfeatures=0, int nOctaveLayers=3, double contrastThreshold=0.04, double edgeThreshold=10, double sigma=1.6)
-
-void
-SIFT::DESTROY()
-
-#endif
-
-
-MODULE = Cv::Features2d		PACKAGE = Cv::Features2d::Feature2D::SURF
-
-SURF*
-SURF::new(double hessianThreshold, int nOctaves=4, int nOctaveLayers=2, bool extended=true, bool upright=false)
-
-void
-SURF::DESTROY()
-
-
-#if _CV_VERSION() >= _VERSION(2,4,0)
-
-MODULE = Cv::Features2d		PACKAGE = Cv::Features2d::Feature2D::ORB
-
-ORB*
-ORB::new(int nfeatures=500, float scaleFactor=1.2f, int nlevels=8, int edgeThreshold=31, int firstLevel=0, int WTA_K=2, int scoreType=ORB::HARRIS_SCORE, int patchSize=31)
-
-void
-ORB::DESTROY()
-
-#endif
-
-
-#if _CV_VERSION() >= _VERSION(2,4,0)
-
-MODULE = Cv::Features2d		PACKAGE = Cv::Features2d::Feature2D::BRISK
-
-BRISK*
-BRISK::new(int thresh=30, int octaves=3, float patternScale=1.0f)
-
-void
-BRISK::DESTROY()
-
-#endif
-
-
-# ============================================================
-#  Drawing Function of Keypoints and Matches
-# ============================================================
-
 MODULE = Cv::Features2d		PACKAGE = Cv::Features2d
-
-void
-drawKeypoints(CvArr* image, KeyPointV keypoints, CvScalar color = cvScalarAll(-1), int flags=DrawMatchesFlags::DEFAULT)
-CODE:
-	Mat outImage = cvarrToMat(image);
-	drawKeypoints(cvarrToMat(image), keypoints, outImage, color, flags);

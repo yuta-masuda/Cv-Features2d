@@ -22,7 +22,14 @@ GetOptions((map {("--$_" => \$opt{$_})} keys %opt), "--flann" => \$opt_flann,
 my $detector = $opt{sift} && SIFT()
 	|| $opt{orb} && ORB()
 	|| SURF(500);
-my $matcher = $opt_flann && FlannBasedMatcher()
+my $matcher = $opt{orb} && FlannBasedMatcher({
+		algorithm => 6,
+		table_number => 6,
+		key_size => 12,
+		multi_probe_level => 1, })
+	|| $opt_flann && FlannBasedMatcher({
+		algorithm => 1,
+		trees => 5, })
 	|| BFMatcher();
 print STDERR "detector = ", ref $detector, "\n" if $verbose;
 print STDERR "matcher = ", ref $matcher, "\n" if $verbose;
