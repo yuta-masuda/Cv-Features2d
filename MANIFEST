@@ -14,6 +14,7 @@ sample/find_obj.pl
 t/beaver.png
 t/detector.t
 t/features2d.t
+t/indexparams.t
 t/pod-coverage.t
 t/surf.t
 typemap
