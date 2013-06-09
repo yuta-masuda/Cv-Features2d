@@ -33,3 +33,15 @@ WriteMakefile(
 	INC => '-I.',
 	XSOPT => '-C++ -hiertype',
 );
+
+sub MY::postamble {
+	"
+
+cover:
+	cover -delete
+	-HARNESS_PERL_SWITCHES=-MDevel::Cover make test
+	cover
+	find cover_db -type d |xargs chmod +rx
+
+";
+}

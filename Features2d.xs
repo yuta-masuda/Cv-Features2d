@@ -24,56 +24,89 @@ static CvMat* matToCvmat(Mat& var)
 #endif
 }
 
-static flann::IndexParams* xsIndexParams(HV* hv)
+
+static flann::IndexParams* xsIndexParams(HV* hv, const char *var)
 {
-	const int verbose = 0;
 	flann::IndexParams* p = new flann::IndexParams();
 	HE* he; hv_iterinit(hv);
 	while (he = hv_iternext(hv)) {
-			SV* sv = hv_iterval(hv, he); int t = SvTYPE(sv);
+		SV* sv = hv_iterval(hv, he); int t = SvTYPE(sv);
 		I32 len; char* key = hv_iterkey(he, &len);
-		if (t == SVt_PV) {
-			if (verbose)
-				fprintf(stderr, "p.String: %s, %s\n", key, SvPV_nolen(sv));
+		char* opt = strchr(key, ':'); char key2[strlen(key)+1];
+		if (opt && strlen(opt) >= 2) {
+			strcpy(key2, key);
+			key2[opt - key] = '\0';
+			key = key2;
+			opt++; // colon
+			while (*opt && isspace(*opt)) opt++;
+		}
+		if (opt && *opt) {
+			if (*opt == 'a') {
+				p->setString(key, SvPV_nolen(sv));
+			} else if (*opt == 'i') {
+				p->setInt(key, SvIV(sv));
+			} else if (*opt == 'd') {
+				p->setDouble(key, SvNV(sv));
+			} else if (*opt == 'f') {
+				p->setFloat(key, SvNV(sv));
+			} else if (*opt == 'b') {
+				p->setBool(key, SvIV(sv));
+			} else {
+				Perl_croak(aTHX_ "can't set %s[\"%s\"] using \"%s\"",
+							var, key, opt);
+			}
+		} else if (t == SVt_PV) {
 			p->setString(key, SvPV_nolen(sv));
 		} else if (t == SVt_IV) {
 			if (strcmp(key, "algorithm") == 0) {
-				if (verbose) fprintf(stderr, "p.Algorithm: %d\n", SvIV(sv));
 				p->setAlgorithm(SvIV(sv));
 			} else {
-				if (verbose) fprintf(stderr, "p.Int: %s, %d\n", key, SvIV(sv));
 				p->setInt(key, SvIV(sv));
 			}
 		} else if (t == SVt_NV) {
-			if (verbose) fprintf(stderr, "p.Double: %s, %g\n", key, SvNV(sv));
 			p->setDouble(key, SvNV(sv));
 		} else {
-			const char* names[] = {
-				"SVt_NULL",
-				"SVt_BIND",
-				"SVt_IV",
-				"SVt_NV",
-				/* RV was here, before it was merged with IV.  */
-				"SVt_PV",
-				"SVt_PVIV",
-				"SVt_PVNV",
-				"SVt_PVMG",
-				"SVt_REGEXP",
-				/* PVBM was here, before BIND replaced it.  */
-				"SVt_PVGV",
-				"SVt_PVLV",
-				"SVt_PVAV",
-				"SVt_PVHV",
-				"SVt_PVCV",
-				"SVt_PVFM",
-				"SVt_PVIO",
+			const char* svt_names[] = {
+				"SVt_NULL", "SVt_BIND", "SVt_IV", "SVt_NV", "SVt_PV",
+				"SVt_PVIV", "SVt_PVNV", "SVt_PVMG", "SVt_REGEXP",
+				"SVt_PVGV", "SVt_PVLV", "SVt_PVAV", "SVt_PVHV",
+				"SVt_PVCV", "SVt_PVFM", "SVt_PVIO",
 			};
-			const char* name = "unknown";
-			if (t < SVt_LAST) name = names[t];
-			fprintf(stderr, "p.unknown: %s, (%s)\n", key, name);
+			if (t < SVt_LAST)
+				Perl_croak(aTHX_ "can't set %s[\"%s\"] for %s",
+					var, key, svt_names[t]);
+			else
+				Perl_croak(aTHX_ "can't set %s[\"%s\"] (sv error)", var, key);
 		}
 	}
 	return p;
+}
+
+
+static void dumpIndexParams(flann::IndexParams* p, const char* varName)
+{
+	SV* sv_verbose = get_sv("Cv::IndexParams::VERBOSE", 0);
+	int verbose = SvOK(sv_verbose) && SvIV(sv_verbose);
+	if (!verbose) return;
+	SV* sv_delim = get_sv(";", 0);
+	const char* delim = SvOK(sv_delim) && SvPOK(sv_delim)?
+		SvPV_nolen(sv_delim) : "\x1c";
+	std::vector<std::string> names;
+	std::vector<int> types;
+	std::vector<std::string> strValues;
+	std::vector<double> numValues;
+	p->getAll(names, types, strValues, numValues);
+	int n = names.size();
+	assert(n == types.size());
+	assert(n == strValues.size());
+	assert(n == numValues.size());
+	for (int i = 0; i < names.size(); i++) {
+		warn("%s%s%d=%s%s%d%s%s%s%g\n", varName, delim, i,
+			names[i].c_str(), delim,
+			types[i], delim,
+			strValues[i].c_str(), delim,
+			numValues[i]);
+	}
 }
 
 
@@ -162,11 +195,7 @@ MODULE = Cv::Features2d		PACKAGE = Cv::Features2d::FeatureDetector
 KeyPointV
 FeatureDetector::detect(CvArr* image, CvArr* mask = NULL)
 CODE:
-	if (mask) {
-		THIS->detect(cvarrToMat(image), RETVAL, cvarrToMat(mask));
-	} else {
-		THIS->detect(cvarrToMat(image), RETVAL);
-	}
+	THIS->detect(cvarrToMat(image), RETVAL, mask? cvarrToMat(mask) : Mat());
 OUTPUT:
 	RETVAL
 
@@ -261,11 +290,9 @@ MODULE = Cv::Features2d		PACKAGE = Cv::Features2d::DescriptorMatcher
 DMatchV
 DescriptorMatcher::match(CvArr* queryDescriptors, CvArr* trainDescriptors, CvArr* mask = NULL)
 CODE:
-	if (mask) {
-		THIS->match(cvarrToMat(queryDescriptors), cvarrToMat(trainDescriptors), RETVAL, cvarrToMat(mask));
-	} else {
-		THIS->match(cvarrToMat(queryDescriptors), cvarrToMat(trainDescriptors), RETVAL);
-	}
+	THIS->match(
+		cvarrToMat(queryDescriptors), cvarrToMat(trainDescriptors),
+		RETVAL, mask? cvarrToMat(mask): Mat());
 OUTPUT:
 	RETVAL
 
@@ -273,8 +300,8 @@ DMatchVV
 DescriptorMatcher::knnMatch(CvArr* queryDescriptors, CvArr* trainDescriptors, int k, CvMat* mask = NULL, bool compactResult=false)
 CODE:
 	THIS->knnMatch(
-			cvarrToMat(queryDescriptors), cvarrToMat(trainDescriptors),
-			RETVAL, k, mask? cvarrToMat(mask): Mat(), compactResult);
+		cvarrToMat(queryDescriptors), cvarrToMat(trainDescriptors),
+		RETVAL, k, mask? cvarrToMat(mask): Mat(), compactResult);
 OUTPUT:
 	RETVAL
 
@@ -302,9 +329,13 @@ FlannBasedMatcher*
 FlannBasedMatcher::new(HV* indexParams = NO_INIT, HV* searchParams = NO_INIT)
 INIT:
 	flann::IndexParams* _indexParams = (items >= 2)?
-		xsIndexParams(indexParams) : new flann::KDTreeIndexParams();
-	flann::SearchParams* _searchParams = (items >= 3)? (flann::SearchParams*)
-		xsIndexParams(searchParams) : new flann::SearchParams();
+		xsIndexParams(indexParams, "indexParams") :
+		new flann::KDTreeIndexParams();
+	flann::SearchParams* _searchParams = (items >= 3)?
+		(flann::SearchParams*) xsIndexParams(searchParams, "searchParams") :
+		new flann::SearchParams();
+	dumpIndexParams(_indexParams, "indexParams");
+	dumpIndexParams(_searchParams, "searchParams");
 C_ARGS:	_indexParams, _searchParams
 
 void
