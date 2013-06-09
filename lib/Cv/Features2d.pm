@@ -117,8 +117,9 @@ put the letter d/f/i/b for type after the name.
      f    |    float
      i    |    int
      b    |    bool
+     a    |    string
 
-If there is not type letter, the type of IndexParams is mapped from
+If there is no type letter, the type of IndexParams is mapped from
 sv-type.
 
   sv-type | type of IndexParams
@@ -126,6 +127,8 @@ sv-type.
     NV    |    double
     IV    |    int
     PV    |    string
+
+please see the samples in t/indexparam.t and sample/find_obj.pl.
 
 =cut
 
