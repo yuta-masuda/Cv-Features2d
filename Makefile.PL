@@ -32,6 +32,9 @@ WriteMakefile(
 	%Cv::Config::MM,
 	INC => '-I.',
 	XSOPT => '-C++ -hiertype',
+	clean => {
+		FILES => [ '*.tmp', '_Inline', 'cover_db', ]
+	},
 );
 
 sub MY::postamble {
