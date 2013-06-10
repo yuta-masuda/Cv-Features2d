@@ -120,9 +120,12 @@ MODULE = Cv::Features2d		PACKAGE = Cv::Features2d
 
 void
 drawKeypoints(CvArr* image, KeyPointV keypoints, CvScalar color = cvScalarAll(-1), int flags=DrawMatchesFlags::DEFAULT)
-CODE:
+INIT:
 	Mat outImage = cvarrToMat(image);
-	drawKeypoints(cvarrToMat(image), keypoints, outImage, color, flags);
+C_ARGS:
+	cvarrToMat(image), keypoints, outImage, color, flags
+POSTCALL:
+	XSRETURN(1);
 
 CvMat*
 drawMatches(CvArr* img1, KeyPointV keypoints1, CvArr* img2, KeyPointV keypoints2, DMatchV matches1to2, CvScalar matchColor = cvScalarAll(-1), CvScalar singlePointColor = cvScalarAll(-1), tiny* matchesMask = NULL, int flags = DrawMatchesFlags::DEFAULT)

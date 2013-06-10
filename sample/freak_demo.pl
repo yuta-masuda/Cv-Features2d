@@ -12,7 +12,7 @@ use List::Util qw(sum);
 # use Data::Dumper;
 
 my %detector = map { $_ => 0 } qw(surf sift orb brisk);
-my %extractor = map { $_ => 0 } qw(freak brief);
+my %extractor = map { $_ => 0 } qw(freak);
 my $verbose = 0;
 
 GetOptions(
@@ -23,15 +23,13 @@ GetOptions(
 			"] image1 image2\n");
 
 $detector{surf} = 1 unless sum(values %detector) > 0;
-$extractor{freak} = 1 unless sum(values %extractor) > 0;
 
 my $detector = $detector{sift} && SIFT()
 	|| $detector{orb} && ORB()
 	|| $detector{brisk} && BRISK()
 	|| $detector{surf} && SURF(2000, 4);
 
-my $extractor = $extractor{brief} && BriefDescriptorExtractor()
-	|| $extractor{freak} && FREAK();
+my $extractor = FREAK();
 
 use constant NORM_L1 => 2;
 use constant NORM_L2 => 4;
@@ -65,6 +63,6 @@ printf "detect and compute: %gms\n", $t / (Cv->getTickFrequency() * 1000.0);
 
 my $matches = $matcher->match($desc1, $desc2);
 my $imgMatch = drawMatches($img1, $kp1, $img2, $kp2, $matches);
-# Cv->namedWindow("matches", CV_WINDOW_KEEPRATIO);
+Cv->namedWindow("matches", CV_WINDOW_KEEPRATIO);
 $imgMatch->show('matches');
 Cv->waitKey;

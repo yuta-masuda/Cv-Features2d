@@ -9,12 +9,13 @@ Cv::Features2d - Cv extension for OpenCV Features Detector
 =head1 SYNOPSIS
 
   use Cv::Features2d qw(SURF drawKeypoints);
-  
+  my $gray = Cv->loadImage(shift, CV_LOAD_IMAGE_GRAYSCALE);
   my $surf = SURF(500);
-  my $keypoints = $surf->detect($image);
-  drawKeypoints($image, $keypoints);
-  $image->show;
-  Cv->waitKey();
+  my $keypoints = $surf->detect($gray);
+  my $color = $gray->cvtColor(CV_GRAY2BGR);
+  drawKeypoints($color, $keypoints);
+  $color->show;
+  Cv->waitKey;
 
 =cut
 
@@ -78,6 +79,11 @@ sub BRISK { Cv::Features2d::Feature2D::BRISK->new(@_) }
 
 =item FREAK
 
+  my $extractor = FREAK();
+
+L<FREAK()|http://docs.opencv.org/search.html?q=FREAK> is a
+constructor of Descriptor Extractors.
+
 =cut
 
 sub FREAK { Cv::Features2d::DescriptorExtractor::FREAK->new(@_) }
@@ -89,6 +95,10 @@ sub FREAK { Cv::Features2d::DescriptorExtractor::FREAK->new(@_) }
 
 L<BFMatcher()|http://docs.opencv.org/search.html?q=BFMatcher> is a
 constructor of Descriptor Matchers.
+
+=cut
+
+sub BFMatcher { Cv::Features2d::DescriptorMatcher::BFMatcher->new(@_) }
 
 =item FlannBasedMatcher
 
@@ -140,17 +150,17 @@ Please see the samples in t/indexparam.t and sample/find_obj.pl.
 
 =cut
 
-sub BFMatcher { Cv::Features2d::DescriptorMatcher::BFMatcher->new(@_) }
 sub FlannBasedMatcher { Cv::Features2d::DescriptorMatcher::FlannBasedMatcher->new(@_) }
 
 =item drawKeypoints, drawMatches
 
   drawKeypoints($image, $keypoints, $color, $flags);
+  my $image = drawMatches($img1, $keypoints1, $img2, $keypoints2);
 
 =cut
 
-*Cv::Arr::drawKeypoints = sub { drawKeypoints(@_); $_[0]; }; # XXXXX
-*Cv::Arr::drawMatches = sub { drawMatches(@_); $_[0]; }; # XXXXX
+*Cv::Arr::drawKeypoints = \&drawKeypoints;
+*Cv::Arr::drawMatches = \&drawMatches;
 
 =back
 
