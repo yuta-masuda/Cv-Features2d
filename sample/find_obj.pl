@@ -11,26 +11,36 @@ use Getopt::Long;
 use List::Util qw(sum);
 # use Data::Dumper;
 
-my %opt = map { $_ => 0 } qw(surf sift orb);
-my $opt_flann = 0;
+my %detector = map { $_ => 0 } qw(surf sift orb brisk);
+my %matcher = map { $_ => 0 } qw(flann bf);
 my $verbose = 0;
 
-GetOptions((map {("--$_" => \$opt{$_})} keys %opt), "--flann" => \$opt_flann,
-		   "--verbose" => \$verbose) && sum(values %opt) <= 1
-	|| die "usage: $0 --[".join('|', keys %opt)."] --flann image1 image2\n";
+GetOptions(
+	(map {("--$_" => \$detector{$_})} keys %detector),
+	(map {("--$_" => \$matcher{$_})} keys %matcher),
+	"--verbose" => \$verbose)
+	or die ("usage: $0 --[", join('|', (keys %detector), (keys %matcher)),
+			"] image1 image2\n");
 
-my $detector = $opt{sift} && SIFT()
-	|| $opt{orb} && ORB()
-	|| SURF(500);
-my $matcher = $opt{orb} && FlannBasedMatcher({
-		algorithm => 6,
-		table_number => 6,
-		key_size => 12,
-		multi_probe_level => 1, })
-	|| $opt_flann && FlannBasedMatcher({
-		algorithm => 1,
-		trees => 5, })
-	|| BFMatcher();
+$detector{surf} = 1 unless sum(values %detector) > 0;
+$matcher{bf} = 1 unless sum(values %matcher) > 0;
+
+my $detector =
+	$detector{sift} && SIFT()
+	|| $detector{orb} && ORB()
+	|| $detector{surf} && SURF(500);
+my $matcher =
+	$matcher{flann} && FlannBasedMatcher(
+		$detector{orb} && {
+			algorithm => 6,
+			table_number => 6,
+			key_size => 12,
+			multi_probe_level => 1,
+		} || {
+			algorithm => 1,
+			trees => 5,
+		})
+	|| $matcher{bf} && BFMatcher();
 print STDERR "detector = ", ref $detector, "\n" if $verbose;
 print STDERR "matcher = ", ref $matcher, "\n" if $verbose;
 
@@ -87,5 +97,4 @@ if (@$p2 >= 4) {
 }
 
 $image->show;
-
 Cv->waitKey;

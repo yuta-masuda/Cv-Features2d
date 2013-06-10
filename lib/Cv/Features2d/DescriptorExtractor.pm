@@ -21,7 +21,7 @@ use Cv::Features2d;
 
 our $VERSION = '0.02';
 
-for (qw(BriefDescriptorExtractor)) {
+for (qw(BriefDescriptorExtractor FREAK)) {
 	my $base = __PACKAGE__;
 	eval "package ${base}::$_; our \@ISA = qw(${base})";
 }

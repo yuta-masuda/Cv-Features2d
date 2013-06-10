@@ -38,7 +38,9 @@ require Exporter;
 
 our @ISA = qw(Exporter);
 
-our @EXPORT_OK = (qw(drawKeypoints SIFT SURF ORB BRISK BFMatcher FlannBasedMatcher));
+our @EXPORT_OK = (qw(drawKeypoints drawMatches),
+				  qw(SIFT SURF ORB BRISK), qw(FREAK),
+				  qw(BFMatcher FlannBasedMatcher));
 our %EXPORT_TAGS = ( 'all' => \@EXPORT_OK );
 our @EXPORT = ( );
 
@@ -73,6 +75,12 @@ sub SIFT  { Cv::Features2d::Feature2D::SIFT->new(@_) }
 sub SURF  { Cv::Features2d::Feature2D::SURF->new(@_) }
 sub ORB   { Cv::Features2d::Feature2D::ORB->new(@_) }
 sub BRISK { Cv::Features2d::Feature2D::BRISK->new(@_) }
+
+=item FREAK
+
+=cut
+
+sub FREAK { Cv::Features2d::DescriptorExtractor::FREAK->new(@_) }
 
 =item BFMatcher
 
@@ -127,18 +135,21 @@ sv-type.
     IV    |    int
     PV    |    string
 
+Please see the samples in t/indexparam.t and sample/find_obj.pl.
+
 =cut
 
 sub BFMatcher { Cv::Features2d::DescriptorMatcher::BFMatcher->new(@_) }
 sub FlannBasedMatcher { Cv::Features2d::DescriptorMatcher::FlannBasedMatcher->new(@_) }
 
-=item drawKeypoints
+=item drawKeypoints, drawMatches
 
   drawKeypoints($image, $keypoints, $color, $flags);
 
 =cut
 
 *Cv::Arr::drawKeypoints = sub { drawKeypoints(@_); $_[0]; }; # XXXXX
+*Cv::Arr::drawMatches = sub { drawMatches(@_); $_[0]; }; # XXXXX
 
 =back
 

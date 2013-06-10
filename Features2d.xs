@@ -124,6 +124,17 @@ CODE:
 	Mat outImage = cvarrToMat(image);
 	drawKeypoints(cvarrToMat(image), keypoints, outImage, color, flags);
 
+CvMat*
+drawMatches(CvArr* img1, KeyPointV keypoints1, CvArr* img2, KeyPointV keypoints2, DMatchV matches1to2, CvScalar matchColor = cvScalarAll(-1), CvScalar singlePointColor = cvScalarAll(-1), tiny* matchesMask = NULL, int flags = DrawMatchesFlags::DEFAULT)
+INIT:
+	vector<char> _matchesMask = matchesMask?
+		cvarrToMat(matchesMask) : vector<char>();
+CODE:
+	Mat outImg;
+	drawMatches(cvarrToMat(img1), keypoints1, cvarrToMat(img2), keypoints2, matches1to2, outImg, matchColor, singlePointColor, _matchesMask, flags);
+	RETVAL = matToCvmat(outImg);
+OUTPUT:
+	RETVAL
 
 # ============================================================
 #  Feature Detection and Description
@@ -279,6 +290,16 @@ BriefDescriptorExtractor::new(int bytes = 32)
 void
 BriefDescriptorExtractor::DESTROY()
 
+
+MODULE = Cv::Features2d		PACKAGE = Cv::Features2d::DescriptorExtractor::FREAK
+
+# C++: FREAK::FREAK(bool orientationNormalized=true, bool scaleNormalized=true, float patternScale=22.0f, int nOctaves=4, const vector<int>& selectedPairs=vector<int>())
+
+FREAK*
+FREAK::new(bool orientationNormalized = true, bool scaleNormalized = true, float patternScale = 22.0f, int nOctaves = 4)
+
+void
+FREAK::DESTROY()
 
 
 # ============================================================
