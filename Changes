@@ -1,7 +1,8 @@
 Revision history for Perl extension Cv::Features2d
 
-0.02 - 2013-06-07
+0.02 - 2013-06-09
      * fixed some bugs
+     * added flann::IndexParams for FlannBasedMatcher
 
 0.01 - 2013-06-06
      * first release
