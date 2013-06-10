@@ -11,7 +11,7 @@ use Getopt::Long;
 use List::Util qw(sum);
 # use Data::Dumper;
 
-my %detector = map { $_ => 0 } qw(surf sift orb brisk);
+my %detector = map { $_ => 0 } qw(surf sift orb);
 my %matcher = map { $_ => 0 } qw(flann bf);
 my $verbose = 0;
 
@@ -29,6 +29,10 @@ my $detector =
 	$detector{sift} && SIFT()
 	|| $detector{orb} && ORB()
 	|| $detector{surf} && SURF(500);
+
+use constant NORM_L2 => 4;
+use constant NORM_HAMMING => 6;
+
 my $matcher =
 	$matcher{flann} && FlannBasedMatcher(
 		$detector{orb} && {
@@ -40,7 +44,11 @@ my $matcher =
 			algorithm => 1,
 			trees => 5,
 		})
-	|| $matcher{bf} && BFMatcher();
+	|| $matcher{bf} && BFMatcher(
+		$detector{orb} && NORM_HAMMING
+		|| NORM_L2
+	);
+
 print STDERR "detector = ", ref $detector, "\n" if $verbose;
 print STDERR "matcher = ", ref $matcher, "\n" if $verbose;
 
