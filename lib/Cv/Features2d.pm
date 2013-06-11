@@ -30,7 +30,7 @@ use Cv::Features2d::FeatureDetector;
 use Cv::Features2d::DescriptorExtractor;
 use Cv::Features2d::DescriptorMatcher;
 
-our $VERSION = '0.02';
+our $VERSION = '0.03';
 
 require XSLoader;
 XSLoader::load('Cv::Features2d', $VERSION);

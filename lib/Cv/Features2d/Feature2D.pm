@@ -20,7 +20,7 @@ use Cv ();
 use Cv::Features2d::FeatureDetector;
 use Cv::Features2d::DescriptorExtractor;
 
-our $VERSION = '0.02';
+our $VERSION = '0.03';
 
 our @ISA = qw(Cv::Features2d::FeatureDetector Cv::Features2d::DescriptorExtractor);
 

@@ -1,6 +1,7 @@
 Changes
 Features2d.xs
 lib/Cv/Features2d.pm
+lib/Cv/Features2d.pm.rej
 lib/Cv/Features2d/DescriptorExtractor.pm
 lib/Cv/Features2d/DescriptorMatcher.pm
 lib/Cv/Features2d/Feature2D.pm
@@ -11,6 +12,7 @@ MANIFEST.SKIP
 ppport.h
 README
 sample/find_obj.pl
+sample/freak_demo.pl
 t/beaver.png
 t/detector.t
 t/features2d.t
