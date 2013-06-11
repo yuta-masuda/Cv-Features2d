@@ -39,13 +39,36 @@ require Exporter;
 
 our @ISA = qw(Exporter);
 
-our @EXPORT_OK = (qw(drawKeypoints drawMatches),
-				  qw(SIFT SURF ORB BRISK), qw(FREAK),
-				  qw(BFMatcher FlannBasedMatcher));
+our @EXPORT_OK = ();
 our %EXPORT_TAGS = ( 'all' => \@EXPORT_OK );
 our @EXPORT = ( );
 
+for (classes(__PACKAGE__ . "::")) {
+	s/::$//;
+	if ($_->can('new')) {
+		my $name = (split('::', $_))[-1];
+		eval "sub $name { ${_}->new(\@_) }";
+		push(@EXPORT_OK, $name);
+	}
+}
+
+sub classes {
+	my @list = ();
+	for my $h (@_) {
+		my $r = eval "\\%$h";
+		if (ref $r eq 'HASH') {
+			push(@list, classes(map "$h$_", grep /::$/, keys %$r), $h);
+		}
+	}
+	@list;
+}
+
+*Cv::Arr::drawKeypoints = \&drawKeypoints;
+*Cv::Arr::drawMatches = \&drawMatches;
+
 { package Cv::IndexParams; our $VERBOSE = 0 }
+
+=cut
 
 =head1 DESCRIPTION
 
@@ -70,23 +93,12 @@ L<BRISK()|http://docs.opencv.org/search.html?q=BRISK> are the
 constructors defined in the class of Feature2D.  Please refer to the
 OpenCV reference for more information.
 
-=cut
-
-sub SIFT  { Cv::Features2d::Feature2D::SIFT->new(@_) }
-sub SURF  { Cv::Features2d::Feature2D::SURF->new(@_) }
-sub ORB   { Cv::Features2d::Feature2D::ORB->new(@_) }
-sub BRISK { Cv::Features2d::Feature2D::BRISK->new(@_) }
-
 =item FREAK
 
   my $extractor = FREAK();
 
 L<FREAK()|http://docs.opencv.org/search.html?q=FREAK> is a
 constructor of Descriptor Extractors.
-
-=cut
-
-sub FREAK { Cv::Features2d::DescriptorExtractor::FREAK->new(@_) }
 
 =item BFMatcher
 
@@ -95,10 +107,6 @@ sub FREAK { Cv::Features2d::DescriptorExtractor::FREAK->new(@_) }
 
 L<BFMatcher()|http://docs.opencv.org/search.html?q=BFMatcher> is a
 constructor of Descriptor Matchers.
-
-=cut
-
-sub BFMatcher { Cv::Features2d::DescriptorMatcher::BFMatcher->new(@_) }
 
 =item FlannBasedMatcher
 
@@ -148,19 +156,10 @@ sv-type.
 
 Please see the samples in t/indexparam.t and sample/find_obj.pl.
 
-=cut
-
-sub FlannBasedMatcher { Cv::Features2d::DescriptorMatcher::FlannBasedMatcher->new(@_) }
-
 =item drawKeypoints, drawMatches
 
   drawKeypoints($image, $keypoints, $color, $flags);
   my $image = drawMatches($img1, $keypoints1, $img2, $keypoints2);
-
-=cut
-
-*Cv::Arr::drawKeypoints = \&drawKeypoints;
-*Cv::Arr::drawMatches = \&drawMatches;
 
 =back
 

@@ -56,3 +56,17 @@ for (
 		Cv->waitKey(1000);
 	}
 }
+
+if (1) {
+	Cv::Features2d->import(qw(:all));
+	lives_ok { SIFT() };
+	lives_ok { SURF(500) };
+	lives_ok { ORB() };
+	lives_ok { BRISK() };
+	lives_ok { FastFeatureDetector() };
+	lives_ok { StarFeatureDetector() };
+	lives_ok { GoodFeaturesToTrackDetector() };
+	lives_ok { MserFeatureDetector(
+				   5, 60, 14400, 0.25, 0.2, 200, 1.01, 0.003, 5) };
+	lives_ok { DenseFeatureDetector() };
+}
