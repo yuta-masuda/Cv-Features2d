@@ -39,7 +39,7 @@ require Exporter;
 
 our @ISA = qw(Exporter);
 
-our @EXPORT_OK = ();
+our @EXPORT_OK = (qw(drawKeypoints drawMatches));
 our %EXPORT_TAGS = ( 'all' => \@EXPORT_OK );
 our @EXPORT = ( );
 

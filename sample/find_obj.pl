@@ -93,7 +93,7 @@ my ($p1, $p2, $kp_pairs) = filter_matches($kp1, $kp2, $dmatch);
 my $image = $img2->cvtColor(CV_GRAY2BGR);
 drawKeypoints($image, [values %$kp_pairs]);
 
-if (0 && @$p2 >= 4) {
+if (@$p2 >= 4) {
     Cv->findHomography(
 		Cv::Mat->new([], CV_32FC2, $p1), Cv::Mat->new([], CV_32FC2, $p2),
 		my $H = Cv::Mat->new([3, 3], CV_64F), CV_RANSAC, 5);
