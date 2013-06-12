@@ -22,4 +22,6 @@ if (2) {
 	lives_ok { BFMatcher() };
 	lives_ok { FlannBasedMatcher() };
 	lives_ok { Cv::Mat->new([240, 320], CV_8UC1)->drawKeypoints([]) };
+	lives_ok { BriefDescriptorExtractor() };
+	lives_ok { FREAK() };
 }

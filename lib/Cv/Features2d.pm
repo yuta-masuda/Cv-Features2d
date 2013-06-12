@@ -43,8 +43,7 @@ our @EXPORT_OK = (qw(drawKeypoints drawMatches));
 our %EXPORT_TAGS = ( 'all' => \@EXPORT_OK );
 our @EXPORT = ( );
 
-for (classes(__PACKAGE__ . "::")) {
-	s/::$//;
+for (classes(__PACKAGE__)) {
 	if ($_->can('new')) {
 		my $name = (split('::', $_))[-1];
 		eval "sub $name { ${_}->new(\@_) }";
@@ -54,11 +53,13 @@ for (classes(__PACKAGE__ . "::")) {
 
 sub classes {
 	my @list = ();
-	for my $h (@_) {
-		my $r = eval "\\%$h";
-		if (ref $r eq 'HASH') {
-			push(@list, classes(map "$h$_", grep /::$/, keys %$r), $h);
+	for my $base (@_) {
+		for (keys %{eval "\\%${base}::"}) {
+			if (/^(\w+)::$/) {
+				push(@list, &classes("${base}::$1"));
+			}
 		}
+		push(@list, $base);
 	}
 	@list;
 }
