@@ -175,7 +175,7 @@ None by default.
 
 =head1 SEE ALSO
 
-http://github.com/yuta-masuda/Cv-Feature2d
+http://github.com/yuta-masuda/Cv-Features2d
 
 
 =head1 AUTHOR
