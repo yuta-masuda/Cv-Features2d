@@ -133,9 +133,9 @@ To define LshIndexParams (one of IndexParams).
   };
 
 IndexParams stores the key-value pairs. The type of the value stored
-in the IndexParams is more detailed than Perl.  There are double,
+in the IndexParams is more detailed than Perl SV.  There are double,
 float, int, bool, and string.  To clarify the type of them, you can
-put the letter d/f/i/b for type after the name.
+put a letter with colon after the name.  The letter is as following.
 
   letter  | type of IndexParams
  ------------------------------------
