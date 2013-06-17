@@ -26,7 +26,7 @@ use strict;
 use warnings;
 use Cv ();
 
-our $VERSION = '0.02';
+our $VERSION = '0.04';
 
 require XSLoader;
 XSLoader::load('Cv::Features2d', $VERSION);

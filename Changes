@@ -1,5 +1,8 @@
 Revision history for Perl extension Cv::Features2d
 
+0.04 - 2013-06-19
+     * integrated Cv::Features2d::* into Cv::Features2d
+
 0.03 - 2013-06-12
      * fixed @EXPORT_OK
 
