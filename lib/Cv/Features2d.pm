@@ -60,11 +60,6 @@ sub classes {
 	@list;
 }
 
-*Cv::Arr::drawKeypoints = \&drawKeypoints;
-*Cv::Arr::drawMatches = \&drawMatches;
-
-{ package Cv::IndexParams; our $VERBOSE = 0 }
-
 =head1 DESCRIPTION
 
 =head2 METHOD
@@ -92,6 +87,19 @@ Feature2D inherits from FeatureDetector and DescriptorExtractor.  So
 the object can call methods of DescriptorExtractor and
 FeatureDetector.
 
+=cut
+
+{
+	package Cv::Features2d::FeatureDetector;
+	package Cv::Features2d::DescriptorExtractor;
+	package Cv::Features2d::Feature2D;
+	our @ISA = qw(Cv::Features2d::FeatureDetector Cv::Features2d::DescriptorExtractor);
+	for (qw(SIFT SURF ORB BRISK)) {
+		my $base = __PACKAGE__;
+		eval "package ${base}::$_; our \@ISA = qw(${base})";
+	}
+}
+
 =item FastFeatureDetector, StarFeatureDetector, MserFeatureDetector,
 	GoodFeaturesToTrackDetector, DenseFeatureDetector
 
@@ -111,6 +119,17 @@ are constructors of DenseFeatureDetector.
 
   my $kp = $detector->detect($img, $mask);
 
+=cut
+
+{
+	package Cv::Features2d::FeatureDetector;
+	for (qw(FastFeatureDetector StarFeatureDetector MserFeatureDetector
+		GoodFeaturesToTrackDetector DenseFeatureDetector)) {
+		my $base = __PACKAGE__;
+		eval "package ${base}::$_; our \@ISA = qw(${base})";
+	}
+}
+
 =item FREAK
 
   my $extractor = FREAK();
@@ -119,6 +138,16 @@ L<FREAK()|http://docs.opencv.org/search.html?q=FREAK> is a
 constructor of Descriptor Extractors.
 
   my $desc = $extractor->compute($img, $kp);
+
+=cut
+
+{
+	package Cv::Features2d::DescriptorExtractor;
+	for (qw(BriefDescriptorExtractor FREAK)) {
+		my $base = __PACKAGE__;
+		eval "package ${base}::$_; our \@ISA = qw(${base})";
+	}
+}
 
 =item BFMatcher, FlannBasedMatcher
 
@@ -175,56 +204,32 @@ sv-type.
 
 Please see the samples in t/indexparam.t and sample/find_obj.pl.
 
-=item drawKeypoints, drawMatches
-
-  drawKeypoints($image, $keypoints, $color, $flags);
-  my $image = drawMatches($img1, $keypoints1, $img2, $keypoints2);
-
-=back
-
 =cut
 
 {
-	package Cv::Features2d::FeatureDetector;
-
-	for (qw(FastFeatureDetector StarFeatureDetector MserFeatureDetector
-		GoodFeaturesToTrackDetector DenseFeatureDetector)) {
-		my $base = __PACKAGE__;
-		eval "package ${base}::$_; our \@ISA = qw(${base})";
-	}
-}
-
-{
-	package Cv::Features2d::DescriptorExtractor;
-
-	for (qw(BriefDescriptorExtractor FREAK)) {
-		my $base = __PACKAGE__;
-		eval "package ${base}::$_; our \@ISA = qw(${base})";
-	}
-}
-
-{
+	package Cv::IndexParams;
+	our $VERBOSE = 0;
 	package Cv::Features2d::DescriptorMatcher;
-
 	for (qw(BFMatcher FlannBasedMatcher)) {
 		my $base = __PACKAGE__;
 		eval "package ${base}::$_; our \@ISA = qw(${base})";
 	}
 }
 
-{
-	package Cv::Features2d::Feature2D;
+=item drawKeypoints, drawMatches
 
-	our @ISA = qw(Cv::Features2d::FeatureDetector Cv::Features2d::DescriptorExtractor);
+  drawKeypoints($image, $keypoints, $color, $flags);
+  my $image = drawMatches($img1, $keypoints1, $img2, $keypoints2);
 
-	for (qw(SIFT SURF ORB BRISK)) {
-		my $base = __PACKAGE__;
-		eval "package ${base}::$_; our \@ISA = qw(${base})";
-	}
-}
+=cut
+
+*Cv::Arr::drawKeypoints = \&drawKeypoints;
+*Cv::Arr::drawMatches = \&drawMatches;
 
 1;
 __END__
+
+=back
 
 =head2 EXPORT
 
