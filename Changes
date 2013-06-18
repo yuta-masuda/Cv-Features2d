@@ -2,9 +2,11 @@ Revision history for Perl extension Cv::Features2d
 
 0.04 - 2013-06-19
      * integrated Cv::Features2d::* into Cv::Features2d
+     * added sample/freak_demo.pl
 
 0.03 - 2013-06-12
      * fixed @EXPORT_OK
+     * added short names for constructors
 
 0.02 - 2013-06-09
      * fixed some bugs
