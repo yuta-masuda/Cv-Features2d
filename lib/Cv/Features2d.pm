@@ -66,7 +66,7 @@ sub classes {
 
 =over
 
-=item SIFT, SURF, ORB, BRISK
+=item SIFT(), SURF(), ORB(), BRISK()
 
   my $f2d = SIFT();
   my $f2d = SURF(500);
@@ -79,9 +79,14 @@ L<ORB()|http://docs.opencv.org/search.html?q=ORB>, and
 L<BRISK()|http://docs.opencv.org/search.html?q=BRISK> are constructors
 of Feature2D.
 
+=over
+
+=item detectAndCompute()
+
   my ($kp, $desc) = $f2d->detectAndCompute($img, $mask);
-  my $kp = $f2d->detect($img, $mask);
-  my $desc = $f2d->compute($img, $kp);
+  my ($kp, $desc) = $f2d->detectAndCompute($img);
+
+=back
 
 Feature2D inherits from FeatureDetector and DescriptorExtractor.  So
 the object can call methods of DescriptorExtractor and
@@ -100,8 +105,8 @@ FeatureDetector.
 	}
 }
 
-=item FastFeatureDetector, StarFeatureDetector, MserFeatureDetector,
-	GoodFeaturesToTrackDetector, DenseFeatureDetector
+=item FastFeatureDetector(), StarFeatureDetector(), MserFeatureDetector(),
+	GoodFeaturesToTrackDetector(), DenseFeatureDetector()
 
   my $detector = FastFeatureDetector();
   my $detector = StarFeatureDetector();
@@ -117,7 +122,14 @@ and
 L<DenseFeatureDetector()|http://docs.opencv.org/search.html?q=DenseFeatureDetector>
 are constructors of DenseFeatureDetector.
 
+=over
+
+=item detect()
+
+=back
+
   my $kp = $detector->detect($img, $mask);
+  my $kp = $detector->detect($img);
 
 =cut
 
@@ -130,12 +142,20 @@ are constructors of DenseFeatureDetector.
 	}
 }
 
-=item FREAK
+=item FREAK(), BriefDescriptorExtractor()
 
   my $extractor = FREAK();
+  my $extractor = BriefDescriptorExtractor();
 
-L<FREAK()|http://docs.opencv.org/search.html?q=FREAK> is a
-constructor of Descriptor Extractors.
+L<FREAK()|http://docs.opencv.org/search.html?q=FREAK> and
+L<BriefDescriptorExtractor()|http://docs.opencv.org/search.html?q=BriefDescriptorExtractor>
+are constructors of Descriptor Extractors.
+
+=over
+
+=item compute()
+
+=back
 
   my $desc = $extractor->compute($img, $kp);
 
@@ -149,12 +169,18 @@ constructor of Descriptor Extractors.
 	}
 }
 
-=item BFMatcher, FlannBasedMatcher
+=item BFMatcher(), FlannBasedMatcher()
 
   my $matcher = BFMatcher();
 
 L<BFMatcher()|http://docs.opencv.org/search.html?q=BFMatcher> is a
 constructor of Descriptor Matchers.
+
+=over
+
+=item match(), knnMatch(), radiusMatch()
+
+=back
 
   my $matches = $matcher->match($desc, $desc2, $mask);
   my $matches = $matcher->knnMatch($desc, $desc2, $k, $mask, $compact);
@@ -164,6 +190,7 @@ L<FlannBasedMatcher()|http://docs.opencv.org/search.html?q=FlannBasedMatcher>
 is a also constructor.  The parameters are hashrefs as follows:
 
   my $matcher = FlannBasedMatcher($indexParams, $searchParams);
+
   my $matcher = FlannBasedMatcher(
     my $indexParams = {
       algorithm => 6,
@@ -172,7 +199,7 @@ is a also constructor.  The parameters are hashrefs as follows:
       multi_probe_level => 1,
     });
 
-To define LshIndexParams (one of IndexParams).
+To define SearchParams (one of IndexParams).
 
   my $searchParams = {
     'checks:i' => 32,       # int
@@ -214,7 +241,7 @@ Please see the samples in t/indexparam.t and sample/find_obj.pl.
 		my $base = __PACKAGE__;
 		eval "package ${base}::$_; our \@ISA = qw(${base})";
 	}
-}
+} 
 
 =item drawKeypoints, drawMatches
 

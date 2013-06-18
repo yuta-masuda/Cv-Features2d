@@ -23,4 +23,5 @@ t/ref*.pm
 *.rej
 *.skip
 *.tmp
+*.TRY
 *~

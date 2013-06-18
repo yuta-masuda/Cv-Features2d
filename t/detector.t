@@ -6,7 +6,7 @@ use Test::More qw(no_plan);
 # use Test::More;
 use Test::Exception;
 BEGIN { use_ok('Cv') }
-BEGIN { use_ok('Cv::Features2d') }
+BEGIN { use_ok('Cv::Features2d', qw(:all)) }
 
 my $verbose = Cv->hasGUI;
 
@@ -16,26 +16,25 @@ my $image = cvLoadImage(dirname($0) . "/beaver.png");
 
 my $font = Cv->InitFont(CV_FONT_NORMAL, (0.5) x 2, 0, 1, CV_AA);
 
-for (
-	{ 'Cv::Features2d::Feature2D::SIFT' => [] },
-	{ 'Cv::Features2d::Feature2D::SURF' => [ 500 ] },
-	{ 'Cv::Features2d::Feature2D::ORB' => [] },
-	{ 'Cv::Features2d::Feature2D::BRISK' => [] },
-	{ 'Cv::Features2d::FeatureDetector::FastFeatureDetector' => [] },
-	{ 'Cv::Features2d::FeatureDetector::StarFeatureDetector' => [] },
-	{ 'Cv::Features2d::FeatureDetector::GoodFeaturesToTrackDetector' => [] },
-	{ 'Cv::Features2d::FeatureDetector::MserFeatureDetector' =>
-		  [ 5, 60, 14400, 0.25, 0.2, 200, 1.01, 0.003, 5 ] },
-	{ 'Cv::Features2d::FeatureDetector::DenseFeatureDetector' => [] },
+for my $detector (
+	# Feature2D
+	SIFT(),
+	SURF(500),
+	ORB(),
+	BRISK(),
+	# FeatureDetector
+	FastFeatureDetector(),
+	StarFeatureDetector(),
+	GoodFeaturesToTrackDetector(),
+	MserFeatureDetector(5, 60, 14400, 0.25, 0.2, 200, 1.01, 0.003, 5),
+	DenseFeatureDetector(),
 	) {
-	my ($class, $args) = %$_;
-	my $k = (split('::', $class))[-1];
-	my $detector = $class->new(@$args);
-	isa_ok($detector, $class);
+	isa_ok($detector, 'Cv::Features2d::FeatureDetector');
 	my $outImage1 = $image->clone;
 	my $outImage2 = $image->clone;
 	my $t0 = gettimeofday();
 	my $keypoints = $detector->detect($image);
+	my $k = (split('::', ref $detector))[-1];
 	my $ti = sprintf("$k: %.1f(ms)", (gettimeofday() - $t0) * 1000);
 	for (@$keypoints) {
 		my ($pt, $size, $angle, $response, $octave, $class_id) = @$_;
@@ -49,24 +48,10 @@ for (
 	$outImage1->putText($ti, [ $x-1, $y-1 ], $font, cvScalarAll(250));
 	$outImage1->putText($ti, [ $x+1, $y+1 ], $font, cvScalarAll(50));
 	$outImage1->putText($ti, [ $x+0, $y+0 ], $font, [100, 150, 250]);
-	Cv::Features2d::drawKeypoints($outImage2, $keypoints);
+	drawKeypoints($outImage2, $keypoints);
 	if ($verbose) {
 		$outImage1->show('keypoints');
 		$outImage2->show('drawKeypoints');
 		Cv->waitKey(1000);
 	}
-}
-
-if (1) {
-	Cv::Features2d->import(qw(:all));
-	lives_ok { SIFT() };
-	lives_ok { SURF(500) };
-	lives_ok { ORB() };
-	lives_ok { BRISK() };
-	lives_ok { FastFeatureDetector() };
-	lives_ok { StarFeatureDetector() };
-	lives_ok { GoodFeaturesToTrackDetector() };
-	lives_ok { MserFeatureDetector(
-				   5, 60, 14400, 0.25, 0.2, 200, 1.01, 0.003, 5) };
-	lives_ok { DenseFeatureDetector() };
 }
