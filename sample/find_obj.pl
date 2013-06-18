@@ -4,7 +4,7 @@
 use strict;
 use warnings;
 use lib qw(blib/lib blib/arch);
-use Cv;
+use Cv 0.30;
 use Cv::Features2d qw(:all);
 use File::Basename;
 use Getopt::Long;
@@ -93,15 +93,12 @@ my ($p1, $p2, $kp_pairs) = filter_matches($kp1, $kp2, $dmatch);
 my $image = $img2->cvtColor(CV_GRAY2BGR);
 drawKeypoints($image, [values %$kp_pairs]);
 
-if (0 && @$p2 >= 4) {
-    Cv->findHomography(
-		Cv::Mat->new([], CV_32FC2, $p1), Cv::Mat->new([], CV_32FC2, $p2),
-		my $H = Cv::Mat->new([3, 3], CV_64F), CV_RANSAC, 5);
+if (@$p2 >= 4) {
 	my ($h, $w) = $img1->getDims;
-	my $corners = Cv::Mat->new(
-		[], CV_32FC2, [0, 0], [$w, 0], [$w, $h], [0, $h]);
-	my @corners = @{$corners->perspectiveTransform($corners->new, $H)};
-	$image->polyLine([\@corners], -1, [ 100, 200, 200 ], 2, CV_AA);
+	my $corners = Cv->perspectiveTransform(
+		[[0, 0], [$w, 0], [$w, $h], [0, $h]],
+		Cv->findHomography($p1, $p2, CV_RANSAC, 5));
+	$image->polyLine([$corners], -1, [ 100, 200, 200 ], 2, CV_AA);
 }
 
 $image->show;

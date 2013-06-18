@@ -1,10 +1,6 @@
 Changes
 Features2d.xs
 lib/Cv/Features2d.pm
-lib/Cv/Features2d/DescriptorExtractor.pm
-lib/Cv/Features2d/DescriptorMatcher.pm
-lib/Cv/Features2d/Feature2D.pm
-lib/Cv/Features2d/FeatureDetector.pm
 Makefile.PL
 MANIFEST
 MANIFEST.SKIP

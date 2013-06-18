@@ -10,6 +10,7 @@ lib/Cv/pp.h
 lib/Cv/sv.h
 lib/Cv/typemap
 pm_to_blib
+sample/*png
 t/flipbook
 t/ref*.pm
 *.a
@@ -22,4 +23,5 @@ t/ref*.pm
 *.rej
 *.skip
 *.tmp
+*.TRY
 *~
