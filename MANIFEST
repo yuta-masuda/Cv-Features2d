@@ -10,8 +10,10 @@ sample/find_obj.pl
 sample/freak_demo.pl
 t/beaver.png
 t/detector.t
+t/extractor.t
 t/features2d.t
 t/indexparams.t
+t/matcher.t
 t/pod-coverage.t
 t/surf.t
 typemap
