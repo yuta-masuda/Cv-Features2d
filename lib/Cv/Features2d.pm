@@ -83,14 +83,12 @@ of Feature2D.
 
 =item detectAndCompute()
 
+=back
+
   my ($kp, $desc) = $f2d->detectAndCompute($img, $mask);
   my ($kp, $desc) = $f2d->detectAndCompute($img);
 
-=back
-
-Feature2D inherits from FeatureDetector and DescriptorExtractor.  So
-the object can call methods of DescriptorExtractor and
-FeatureDetector.
+Feature2D inherits from FeatureDetector and DescriptorExtractor.
 
 =cut
 
@@ -120,7 +118,7 @@ L<MserFeatureDetector()|http://docs.opencv.org/search.html?q=MserFeatureDetector
 L<GoodFeaturesToTrackDetector()|http://docs.opencv.org/search.html?q=GoodFeaturesToTrackDetector>,
 and
 L<DenseFeatureDetector()|http://docs.opencv.org/search.html?q=DenseFeatureDetector>
-are constructors of DenseFeatureDetector.
+are constructors of FeatureDetector.
 
 =over
 
@@ -149,7 +147,7 @@ are constructors of DenseFeatureDetector.
 
 L<FREAK()|http://docs.opencv.org/search.html?q=FREAK> and
 L<BriefDescriptorExtractor()|http://docs.opencv.org/search.html?q=BriefDescriptorExtractor>
-are constructors of Descriptor Extractors.
+are constructors of DescriptorExtractor.
 
 =over
 
@@ -174,7 +172,7 @@ are constructors of Descriptor Extractors.
   my $matcher = BFMatcher();
 
 L<BFMatcher()|http://docs.opencv.org/search.html?q=BFMatcher> is a
-constructor of Descriptor Matchers.
+constructor of DescriptorMatcher.
 
 =over
 
