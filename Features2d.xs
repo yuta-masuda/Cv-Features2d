@@ -152,6 +152,14 @@ CODE:
 	(*THIS)(cvarrToMat(image), mask? cvarrToMat(mask) : noArray(), keypoints, _descriptors);
 	descriptors = matToCvmat(_descriptors);
 
+CvMat*
+Feature2D::compute(CvArr* image, KeyPointV keypoints, CvArr* mask = NULL)
+CODE:
+	Mat _descriptors;
+	(*THIS)(cvarrToMat(image), mask? cvarrToMat(mask) : noArray(), keypoints, _descriptors, true);
+	RETVAL = matToCvmat(_descriptors);
+OUTPUT:
+	RETVAL
 
 #if _CV_VERSION() >= _VERSION(2,4,0)
 
