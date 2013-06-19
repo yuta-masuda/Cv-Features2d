@@ -17,7 +17,7 @@ sub capture (&) {
 	open(STDERR_COPY, '>&STDERR');
 	local *STDERR;
 	open(STDERR, ">$tmp");
-	eval { &$subr };
+	&$subr;
 	my %cap;
 	for (`cat $tmp`) {
 		# print STDERR_COPY $_;
@@ -76,4 +76,30 @@ if (1) {
 	is($p{searchParams}{'eps:d'}, 0.0, "$sp.eps");
 	is($p{searchParams}{'sorted:b'}, 1, "$sp.sorted");
 	is($p{searchParams}{'hw:a'}, 'hello, world', "$sp.hw");
+}
+
+if (1) {
+	my %indexParams = (
+		algorithm => 6,
+		'table_number:x' => 6,
+		key_size => 12,
+		multi_probe_level => 1,
+		);
+	throws_ok {
+		FlannBasedMatcher(\%indexParams);
+	} qr/can't use "x" indexParams/;
+}
+
+if (1) {
+	my %indexParams = (
+		algorithm => 6,
+		table_number => 6,
+		key_size => [1],
+		multi_probe_level => 1,
+		);
+	throws_ok {
+		my %p = FlannBasedMatcher(\%indexParams);
+		use Data::Dumper;
+		print STDERR Data::Dumper->Dump([\%p], [qw(*p)]);
+	} qr/can't use ref-sv to set indexParams/;
 }

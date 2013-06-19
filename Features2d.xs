@@ -52,9 +52,11 @@ static flann::IndexParams* xsIndexParams(HV* hv, const char *var)
 			} else if (*opt == 'b') {
 				p->setBool(key, SvIV(sv));
 			} else {
-				Perl_croak(aTHX_ "can't set %s[\"%s\"] using \"%s\"",
-							var, key, opt);
+				Perl_croak(aTHX_ "can't use \"%s\" to set %s[\"%s\"]",
+							opt, var, key);
 			}
+		} else if (SvROK(sv)) {
+			Perl_croak(aTHX_ "can't use ref-sv to set %s[\"%s\"]", var, key);
 		} else if (t == SVt_PV) {
 			p->setString(key, SvPV_nolen(sv));
 		} else if (t == SVt_IV) {
@@ -73,10 +75,10 @@ static flann::IndexParams* xsIndexParams(HV* hv, const char *var)
 				"SVt_PVCV", "SVt_PVFM", "SVt_PVIO",
 			};
 			if (t < SVt_LAST)
-				Perl_croak(aTHX_ "can't set %s[\"%s\"] for %s",
-					var, key, svt_names[t]);
+				Perl_croak(aTHX_ "can't %s to set %s[\"%s\"]",
+					svt_names[t], var, key);
 			else
-				Perl_croak(aTHX_ "can't set %s[\"%s\"] (sv error)", var, key);
+				Perl_croak(aTHX_ "can't happen to set %s[\"%s\"]", var, key);
 		}
 	}
 	return p;
@@ -153,10 +155,10 @@ CODE:
 	descriptors = matToCvmat(_descriptors);
 
 CvMat*
-Feature2D::compute(CvArr* image, KeyPointV keypoints, CvArr* mask = NULL)
+Feature2D::compute(CvArr* image, KeyPointV keypoints)
 CODE:
 	Mat _descriptors;
-	(*THIS)(cvarrToMat(image), mask? cvarrToMat(mask) : noArray(), keypoints, _descriptors, true);
+	(*THIS)(cvarrToMat(image), noArray(), keypoints, _descriptors, true);
 	RETVAL = matToCvmat(_descriptors);
 OUTPUT:
 	RETVAL
