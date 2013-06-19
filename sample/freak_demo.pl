@@ -12,7 +12,7 @@ use List::Util qw(sum);
 # use Data::Dumper;
 
 my %detector = map { $_ => 0 } qw(surf sift orb brisk);
-my %extractor = map { $_ => 0 } qw(freak);
+my %extractor = map { $_ => 0 } qw(freak brief);
 my $verbose = 0;
 
 GetOptions(
@@ -29,7 +29,9 @@ my $detector = $detector{sift} && SIFT()
 	|| $detector{brisk} && BRISK()
 	|| $detector{surf} && SURF(2000, 4);
 
-my $extractor = FREAK();
+my $extractor = $extractor{brief} && BriefDescriptorExtractor()
+	|| $extractor{freak} && FREAK()
+	|| $detector;
 
 use constant NORM_L1 => 2;
 use constant NORM_L2 => 4;

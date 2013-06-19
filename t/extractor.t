@@ -11,6 +11,7 @@ BEGIN { use_ok('Cv::Features2d', qw(:all)) }
 for my $extractor (
 	# DescriptorExtractor
 	FREAK(),
+	BriefDescriptorExtractor(),
 	# Feature2D
 	SIFT(),
 	SURF(500),
@@ -20,4 +21,3 @@ for my $extractor (
 	isa_ok($extractor, 'Cv::Features2d::DescriptorExtractor');
 	can_ok($extractor, qw(compute));
 }
-
