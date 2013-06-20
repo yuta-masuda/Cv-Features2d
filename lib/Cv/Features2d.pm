@@ -166,7 +166,7 @@ are constructors of DescriptorExtractor.
 	sub new {
 		my ($class, $type) = @_;
 		$type = (split('::', ref $type))[-1] if ref $type;
-		$type =~ s/(^opponent|descriptorextractor$)//g;
+		$type =~ s/(^opponent|descriptorextractor$)//ig;
 		$class->create(uc $type);
 	}
 }
