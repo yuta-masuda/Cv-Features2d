@@ -87,7 +87,7 @@ if (1) {
 		);
 	throws_ok {
 		FlannBasedMatcher(\%indexParams);
-	} qr/can't use "x" indexParams/;
+	} qr/can't use "x" to set indexParams/;
 }
 
 if (1) {

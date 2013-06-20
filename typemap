@@ -20,6 +20,7 @@ BRISK*								O_OBJECT
 DescriptorExtractor*				O_OBJECT
 BriefDescriptorExtractor*			O_OBJECT
 FREAK*								O_OBJECT
+OpponentColorDescriptorExtractor*	O_OBJECT
 
 DescriptorMatcher*					O_OBJECT
 BFMatcher*							O_OBJECT

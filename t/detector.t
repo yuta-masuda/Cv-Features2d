@@ -30,6 +30,11 @@ for my $detector (
 	DenseFeatureDetector(),
 	) {
 	isa_ok($detector, 'Cv::Features2d::FeatureDetector');
+	if ($detector->isa('Cv::Features2d::Feature2D')) {
+		can_ok($detector, qw(detect detectAndCompute compute));
+	} else {
+		can_ok($detector, qw(detect));
+	}
 	my $outImage1 = $image->clone;
 	my $outImage2 = $image->clone;
 	my $t0 = gettimeofday();

@@ -314,6 +314,19 @@ FREAK::new(bool orientationNormalized = true, bool scaleNormalized = true, float
 void
 FREAK::DESTROY()
 
+MODULE = Cv::Features2d		PACKAGE = Cv::Features2d::DescriptorExtractor::OpponentColorDescriptorExtractor
+
+DescriptorExtractor*
+create(const char* CLASS, const char* descriptorExtractorType)
+CODE:
+	RETVAL = new OpponentColorDescriptorExtractor(
+					DescriptorExtractor::create(descriptorExtractorType)
+				);
+OUTPUT:
+	RETVAL
+
+void
+DescriptorExtractor::DESTROY()
 
 # ============================================================
 #  Common Interfaces of Descriptor Matchers

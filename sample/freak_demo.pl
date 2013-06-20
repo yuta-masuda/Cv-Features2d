@@ -12,7 +12,7 @@ use List::Util qw(sum);
 # use Data::Dumper;
 
 my %detector = map { $_ => 0 } qw(surf sift orb brisk);
-my %extractor = map { $_ => 0 } qw(freak brief);
+my %extractor = map { $_ => 0 } qw(freak brief opponent);
 my $verbose = 0;
 
 GetOptions(
@@ -30,8 +30,11 @@ my $detector = $detector{sift} && SIFT()
 	|| $detector{surf} && SURF(2000, 4);
 
 my $extractor = $extractor{brief} && BriefDescriptorExtractor()
-	|| $extractor{freak} && FREAK()
-	|| $detector;
+	|| $extractor{freak} && FREAK();
+if ($extractor{opponent}) {
+	$extractor = OpponentColorDescriptorExtractor($extractor || $detector);
+}
+$extractor ||= $detector;
 
 use constant NORM_L1 => 2;
 use constant NORM_L2 => 4;
@@ -43,14 +46,17 @@ my $matcher = $detector{sift} && BFMatcher(NORM_L2)
 	|| $detector{orb} && BFMatcher(NORM_HAMMING)
 	|| $detector{brisk} && BFMatcher(NORM_HAMMING);
 
-print STDERR "detector = ", ref $detector, "\n" if $verbose;
-print STDERR "extractor = ", ref $extractor, "\n" if $verbose;
-print STDERR "matcher = ", ref $matcher, "\n" if $verbose;
+if ($verbose) {
+	warn "# $_: ", (split('::', ref eval "\$$_"))[-1], "\n"
+		for qw(detector extractor matcher);
+}
 
+my $color_or_grayscale = $extractor =~ /opponent/i?
+	CV_LOAD_IMAGE_COLOR : CV_LOAD_IMAGE_GRAYSCALE;
 my $fn1 = shift || join('/', dirname($0), "box.png");
 my $fn2 = shift || join('/', dirname($0), "box_in_scene.png");
-my $img1 = Cv->loadImage($fn1, CV_LOAD_IMAGE_GRAYSCALE);
-my $img2 = Cv->loadImage($fn2, CV_LOAD_IMAGE_GRAYSCALE);
+my $img1 = Cv->loadImage($fn1, $color_or_grayscale);
+my $img2 = Cv->loadImage($fn2, $color_or_grayscale);
 die "Can not load $fn1 and/or $fn2\n" unless $img1 && $img2;
 
 my $t = Cv->getTickCount();

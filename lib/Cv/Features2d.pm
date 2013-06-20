@@ -140,13 +140,15 @@ are constructors of FeatureDetector.
 	}
 }
 
-=item FREAK(), BriefDescriptorExtractor()
+=item FREAK(), BriefDescriptorExtractor(), OpponentColorDescriptorExtractor()
 
   my $extractor = FREAK();
   my $extractor = BriefDescriptorExtractor();
+  my $extractor = OpponentColorDescriptorExtractor("ORB"); # SIFT, SURF, ORB, BRISK, BRIEF
 
-L<FREAK()|http://docs.opencv.org/search.html?q=FREAK> and
-L<BriefDescriptorExtractor()|http://docs.opencv.org/search.html?q=BriefDescriptorExtractor>
+L<FREAK()|http://docs.opencv.org/search.html?q=FREAK>,
+L<BriefDescriptorExtractor()|http://docs.opencv.org/search.html?q=BriefDescriptorExtractor> and
+L<OpponentColorDescriptorExtractor()|http://docs.opencv.org/search.html?q=OpponentColorDescriptorExtractor>
 are constructors of DescriptorExtractor.
 
 =over
@@ -160,8 +162,18 @@ are constructors of DescriptorExtractor.
 =cut
 
 {
+	package Cv::Features2d::DescriptorExtractor::OpponentColorDescriptorExtractor;
+	sub new {
+		my ($class, $type) = @_;
+		$type = (split('::', ref $type))[-1] if ref $type;
+		$type =~ s/(^opponent|descriptorextractor$)//g;
+		$class->create(uc $type);
+	}
+}
+
+{
 	package Cv::Features2d::DescriptorExtractor;
-	for (qw(BriefDescriptorExtractor FREAK)) {
+	for (qw(BriefDescriptorExtractor FREAK OpponentColorDescriptorExtractor)) {
 		my $base = __PACKAGE__;
 		eval "package ${base}::$_; our \@ISA = qw(${base})";
 	}

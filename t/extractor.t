@@ -17,6 +17,8 @@ for my $extractor (
 	SURF(500),
 	ORB(),
 	BRISK(),
+	# OpponentColorDescriptorExtractor
+	(map OpponentColorDescriptorExtractor($_), qw(SIFT SURF ORB BRISK BRIEF)),
 	) {
 	isa_ok($extractor, 'Cv::Features2d::DescriptorExtractor');
 	can_ok($extractor, qw(compute));
