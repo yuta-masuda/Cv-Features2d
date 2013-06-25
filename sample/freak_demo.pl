@@ -8,7 +8,6 @@ use Cv;
 use Cv::Features2d qw(:all);
 use File::Basename;
 use Getopt::Long;
-use List::Util qw(sum);
 # use Data::Dumper;
 
 my %detector = map { $_ => 0 } qw(surf sift orb brisk);
@@ -22,12 +21,10 @@ GetOptions(
 	or die ("usage: $0 --[", join('|', (keys %detector), (keys %extractor)),
 			"] image1 image2\n");
 
-$detector{surf} = 1 unless sum(values %detector) > 0;
-
 my $detector = $detector{sift} && SIFT()
 	|| $detector{orb} && ORB()
 	|| $detector{brisk} && BRISK()
-	|| $detector{surf} && SURF(2000, 4);
+	|| SURF(2000, 4);
 
 my $extractor = $extractor{brief} && BriefDescriptorExtractor()
 	|| $extractor{freak} && FREAK();
@@ -41,10 +38,8 @@ use constant NORM_L2 => 4;
 use constant NORM_HAMMING => 6;
 use constant NORM_HAMMING2 => 7;
 
-my $matcher = $detector{sift} && BFMatcher(NORM_L2)
-	|| $detector{surf} && BFMatcher(NORM_L2)
-	|| $detector{orb} && BFMatcher(NORM_HAMMING)
-	|| $detector{brisk} && BFMatcher(NORM_HAMMING);
+my $matcher = $detector =~ /SIFT|SURF/i && BFMatcher(NORM_L2)
+	|| BFMatcher(NORM_HAMMING);
 
 if ($verbose) {
 	warn "# $_: ", (split('::', ref eval "\$$_"))[-1], "\n"

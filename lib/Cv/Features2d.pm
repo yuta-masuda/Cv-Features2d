@@ -26,7 +26,7 @@ use strict;
 use warnings;
 use Cv ();
 
-our $VERSION = '0.04';
+our $VERSION = '0.05';
 
 require XSLoader;
 XSLoader::load('Cv::Features2d', $VERSION);
@@ -66,29 +66,26 @@ sub classes {
 
 =over
 
-=item SIFT(), SURF(), ORB(), BRISK()
+=item
+L<SIFT()|http://docs.opencv.org/search.html?q=SIFT>,
+L<SURF()|http://docs.opencv.org/search.html?q=SURF>,
+L<ORB()|http://docs.opencv.org/search.html?q=ORB>,
+L<BRISK()|http://docs.opencv.org/search.html?q=BRISK>
 
   my $f2d = SIFT();
   my $f2d = SURF(500);
   my $f2d = ORB();
   my $f2d = BRISK();
 
-L<SIFT()|http://docs.opencv.org/search.html?q=SIFT>,
-L<SURF()|http://docs.opencv.org/search.html?q=SURF>,
-L<ORB()|http://docs.opencv.org/search.html?q=ORB>, and
-L<BRISK()|http://docs.opencv.org/search.html?q=BRISK> are constructors
-of Feature2D.
-
 =over
 
-=item detectAndCompute()
+=item
+L<detectAndCompute()|http://docs.opencv.org/search.html?q=detectAndCompute>
 
 =back
 
   my ($kp, $desc) = $f2d->detectAndCompute($img, $mask);
   my ($kp, $desc) = $f2d->detectAndCompute($img);
-
-Feature2D inherits from FeatureDetector and DescriptorExtractor.
 
 =cut
 
@@ -103,8 +100,12 @@ Feature2D inherits from FeatureDetector and DescriptorExtractor.
 	}
 }
 
-=item FastFeatureDetector(), StarFeatureDetector(), MserFeatureDetector(),
-	GoodFeaturesToTrackDetector(), DenseFeatureDetector()
+=item
+L<FastFeatureDetector()|http://docs.opencv.org/search.html?q=FastFeatureDetector>,
+L<StarFeatureDetector()|http://docs.opencv.org/search.html?q=StarFeatureDetector>,
+L<MserFeatureDetector()|http://docs.opencv.org/search.html?q=MserFeatureDetector>,
+L<GoodFeaturesToTrackDetector()|http://docs.opencv.org/search.html?q=GoodFeaturesToTrackDetector>,
+L<DenseFeatureDetector()|http://docs.opencv.org/search.html?q=DenseFeatureDetector>
 
   my $detector = FastFeatureDetector();
   my $detector = StarFeatureDetector();
@@ -112,17 +113,10 @@ Feature2D inherits from FeatureDetector and DescriptorExtractor.
   my $detector = GoodFeaturesToTrackDetector();
   my $detector = DenseFeatureDetector();
 
-L<FastFeatureDetector()|http://docs.opencv.org/search.html?q=FastFeatureDetector>,
-L<StarFeatureDetector()|http://docs.opencv.org/search.html?q=StarFeatureDetector>,
-L<MserFeatureDetector()|http://docs.opencv.org/search.html?q=MserFeatureDetector>,
-L<GoodFeaturesToTrackDetector()|http://docs.opencv.org/search.html?q=GoodFeaturesToTrackDetector>,
-and
-L<DenseFeatureDetector()|http://docs.opencv.org/search.html?q=DenseFeatureDetector>
-are constructors of FeatureDetector.
-
 =over
 
-=item detect()
+=item
+L<detect()|http://docs.opencv.org/search.html?q=FeatureDetector::detect>
 
 =back
 
@@ -140,20 +134,19 @@ are constructors of FeatureDetector.
 	}
 }
 
-=item FREAK(), BriefDescriptorExtractor(), OpponentColorDescriptorExtractor()
+=item
+L<FREAK()|http://docs.opencv.org/search.html?q=FREAK>,
+L<BriefDescriptorExtractor()|http://docs.opencv.org/search.html?q=BriefDescriptorExtractor>,
+L<OpponentColorDescriptorExtractor()|http://docs.opencv.org/search.html?q=OpponentColorDescriptorExtractor>
 
   my $extractor = FREAK();
   my $extractor = BriefDescriptorExtractor();
   my $extractor = OpponentColorDescriptorExtractor("ORB"); # SIFT, SURF, ORB, BRISK, BRIEF
 
-L<FREAK()|http://docs.opencv.org/search.html?q=FREAK>,
-L<BriefDescriptorExtractor()|http://docs.opencv.org/search.html?q=BriefDescriptorExtractor> and
-L<OpponentColorDescriptorExtractor()|http://docs.opencv.org/search.html?q=OpponentColorDescriptorExtractor>
-are constructors of DescriptorExtractor.
-
 =over
 
-=item compute()
+=item
+L<compute()|http://docs.opencv.org/search.html?q=DescriptorExtractor::compute>
 
 =back
 
@@ -179,16 +172,17 @@ are constructors of DescriptorExtractor.
 	}
 }
 
-=item BFMatcher(), FlannBasedMatcher()
+=item
+L<BFMatcher()|http://docs.opencv.org/search.html?q=BFMatcher>
 
   my $matcher = BFMatcher();
 
-L<BFMatcher()|http://docs.opencv.org/search.html?q=BFMatcher> is a
-constructor of DescriptorMatcher.
-
 =over
 
-=item match(), knnMatch(), radiusMatch()
+=item
+L<match()|http://docs.opencv.org/search.html?q=DescriptorMatcher::match>,
+L<knnMatch()|http://docs.opencv.org/search.html?q=DescriptorMatcher::knnMatch>,
+L<radiusMatch()|http://docs.opencv.org/search.html?q=DescriptorMatcher::radiusMatch>
 
 =back
 
@@ -196,10 +190,12 @@ constructor of DescriptorMatcher.
   my $matches = $matcher->knnMatch($desc, $desc2, $k, $mask, $compact);
   my $matches = $matcher->radiusMatch($desc, $desc2, $maxDist, $mask, $compact);
 
+=item
 L<FlannBasedMatcher()|http://docs.opencv.org/search.html?q=FlannBasedMatcher>
-is a also constructor.  The parameters are hashrefs as follows:
 
   my $matcher = FlannBasedMatcher($indexParams, $searchParams);
+
+The parameters are hashrefs as follows:
 
   my $matcher = FlannBasedMatcher(
     my $indexParams = {
@@ -253,7 +249,9 @@ Please see the samples in t/indexparam.t and sample/find_obj.pl.
 	}
 } 
 
-=item drawKeypoints, drawMatches
+=item
+L<drawKeypoints()|http://docs.opencv.org/search.html?q=drawKeypoints>,
+L<drawMatches()|http://docs.opencv.org/search.html?q=drawMatches>
 
   drawKeypoints($image, $keypoints, $color, $flags);
   my $image = drawMatches($img1, $keypoints1, $img2, $keypoints2);

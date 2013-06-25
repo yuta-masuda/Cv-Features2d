@@ -304,6 +304,8 @@ void
 BriefDescriptorExtractor::DESTROY()
 
 
+#if _CV_VERSION() >= _VERSION(2,4,2)
+
 MODULE = Cv::Features2d		PACKAGE = Cv::Features2d::DescriptorExtractor::FREAK
 
 # C++: FREAK::FREAK(bool orientationNormalized=true, bool scaleNormalized=true, float patternScale=22.0f, int nOctaves=4, const vector<int>& selectedPairs=vector<int>())
@@ -313,6 +315,10 @@ FREAK::new(bool orientationNormalized = true, bool scaleNormalized = true, float
 
 void
 FREAK::DESTROY()
+
+#endif
+
+#if _CV_VERSION() >= _VERSION(2,2,0)
 
 MODULE = Cv::Features2d		PACKAGE = Cv::Features2d::DescriptorExtractor::OpponentColorDescriptorExtractor
 
@@ -327,6 +333,8 @@ OUTPUT:
 
 void
 DescriptorExtractor::DESTROY()
+
+#endif
 
 # ============================================================
 #  Common Interfaces of Descriptor Matchers
@@ -369,6 +377,28 @@ BFMatcher::new(int normType=NORM_L2, bool crossCheck=false)
 void
 BFMatcher::DESTROY()
 
+#if 1 // v0.05
+
+void
+BFMatcher::add(CvArr* descriptors)
+C_ARGS:	cvarrToMat(descriptors)
+
+MatV
+BFMatcher::getTrainDescriptors()
+
+void
+BFMatcher::clear()
+
+bool
+BFMatcher::empty()
+
+bool
+BFMatcher::isMaskSupported()
+
+void
+BFMatcher::train()
+
+#endif
 
 MODULE = Cv::Features2d		PACKAGE = Cv::Features2d::DescriptorMatcher::FlannBasedMatcher
 
@@ -388,5 +418,27 @@ C_ARGS:	_indexParams, _searchParams
 void
 FlannBasedMatcher::DESTROY()
 
+#if 1 // v0.05
+
+void
+FlannBasedMatcher::add(CvArr* descriptors)
+C_ARGS:	cvarrToMat(descriptors)
+
+MatV
+FlannBasedMatcher::getTrainDescriptors()
+
+void
+FlannBasedMatcher::clear()
+
+bool
+FlannBasedMatcher::empty()
+
+bool
+FlannBasedMatcher::isMaskSupported()
+
+void
+FlannBasedMatcher::train()
+
+#endif
 
 MODULE = Cv::Features2d		PACKAGE = Cv::Features2d

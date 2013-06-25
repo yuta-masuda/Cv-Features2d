@@ -8,7 +8,6 @@ use Cv 0.30;
 use Cv::Features2d qw(:all);
 use File::Basename;
 use Getopt::Long;
-use List::Util qw(sum);
 # use Data::Dumper;
 
 my %detector = map { $_ => 0 } qw(surf sift orb);
@@ -16,26 +15,23 @@ my %matcher = map { $_ => 0 } qw(flann bf);
 my $verbose = 0;
 
 GetOptions(
-	(map {("--$_" => \$detector{$_})} keys %detector),
-	(map {("--$_" => \$matcher{$_})} keys %matcher),
-	"--verbose" => \$verbose)
+	(map {($_ => \$detector{$_})} keys %detector),
+	(map {($_ => \$matcher{$_})} keys %matcher),
+	verbose => \$verbose)
 	or die ("usage: $0 --[", join('|', (keys %detector), (keys %matcher)),
 			"] image1 image2\n");
-
-$detector{surf} = 1 unless sum(values %detector) > 0;
-$matcher{bf} = 1 unless sum(values %matcher) > 0;
 
 my $detector =
 	$detector{sift} && SIFT()
 	|| $detector{orb} && ORB()
-	|| $detector{surf} && SURF(500);
+	|| SURF(500);
 
 use constant NORM_L2 => 4;
 use constant NORM_HAMMING => 6;
 
 my $matcher =
 	$matcher{flann} && FlannBasedMatcher(
-		$detector{orb} && {
+		$detector =~ /orb/i && {
 			algorithm => 6,
 			table_number => 6,
 			key_size => 12,
@@ -44,10 +40,7 @@ my $matcher =
 			algorithm => 1,
 			trees => 5,
 		})
-	|| $matcher{bf} && BFMatcher(
-		$detector{orb} && NORM_HAMMING
-		|| NORM_L2
-	);
+	|| BFMatcher($detector =~ /orb/i && NORM_HAMMING || NORM_L2);
 
 print STDERR "detector = ", ref $detector, "\n" if $verbose;
 print STDERR "matcher = ", ref $matcher, "\n" if $verbose;
