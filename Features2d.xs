@@ -8,6 +8,7 @@
 
 typedef vector<Mat> MatV;
 typedef vector<KeyPoint> KeyPointV;
+typedef vector<vector<KeyPoint> > KeyPointVV;
 typedef vector<DMatch> DMatchV;
 typedef vector<vector<DMatch> > DMatchVV;
 
@@ -216,10 +217,32 @@ BRISK::DESTROY()
 
 MODULE = Cv::Features2d		PACKAGE = Cv::Features2d::FeatureDetector
 
+# FeatureDetector::detect
+# Detects keypoints in an image (first variant) or image set (second variant).
+# 
+# void detect(
+# 		const Mat& image,
+# 		vector<KeyPoint>& keypoints,
+# 		const Mat& mask=Mat() ) const;
+# 
+# void detect(
+# 		const vector<Mat>& images,
+# 		vector<vector<KeyPoint> >& keypoints,
+# 		const vector<Mat>& masks=vector<Mat>() ) const;
+
+# Detects keypoints in an image (first variant)
 KeyPointV
-FeatureDetector::detect(CvArr* image, CvArr* mask = NULL)
+FeatureDetector::detect1(CvArr* image, CvArr* mask = NULL)
 CODE:
 	THIS->detect(cvarrToMat(image), RETVAL, mask? cvarrToMat(mask) : Mat());
+OUTPUT:
+	RETVAL
+
+# Detects keypoints in image set (second variant)
+KeyPointVV
+FeatureDetector::detect2(MatV image, MatV mask = vector<Mat>())
+CODE:
+	THIS->detect(image, RETVAL, mask);
 OUTPUT:
 	RETVAL
 
@@ -377,29 +400,6 @@ BFMatcher::new(int normType=NORM_L2, bool crossCheck=false)
 void
 BFMatcher::DESTROY()
 
-#if 1 // v0.05
-
-void
-BFMatcher::add(CvArr* descriptors)
-C_ARGS:	cvarrToMat(descriptors)
-
-MatV
-BFMatcher::getTrainDescriptors()
-
-void
-BFMatcher::clear()
-
-bool
-BFMatcher::empty()
-
-bool
-BFMatcher::isMaskSupported()
-
-void
-BFMatcher::train()
-
-#endif
-
 MODULE = Cv::Features2d		PACKAGE = Cv::Features2d::DescriptorMatcher::FlannBasedMatcher
 
 FlannBasedMatcher*
@@ -417,28 +417,5 @@ C_ARGS:	_indexParams, _searchParams
 
 void
 FlannBasedMatcher::DESTROY()
-
-#if 1 // v0.05
-
-void
-FlannBasedMatcher::add(CvArr* descriptors)
-C_ARGS:	cvarrToMat(descriptors)
-
-MatV
-FlannBasedMatcher::getTrainDescriptors()
-
-void
-FlannBasedMatcher::clear()
-
-bool
-FlannBasedMatcher::empty()
-
-bool
-FlannBasedMatcher::isMaskSupported()
-
-void
-FlannBasedMatcher::train()
-
-#endif
 
 MODULE = Cv::Features2d		PACKAGE = Cv::Features2d
