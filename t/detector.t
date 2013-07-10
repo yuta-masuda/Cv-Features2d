@@ -73,4 +73,10 @@ for my $detector (
 		$outImage2->show('drawKeypoints');
 		Cv->waitKey(1000);
 	}
+
+	my $mask = $image->new(CV_8UC1)->zero;
+	$mask->rectangle([0, 0], [ $mask->width/2, $mask->height/2 ],
+					 cvScalarAll(255), -1);
+	my $quarter = $detector->detect($image, $mask);
+	cmp_ok(scalar @$quarter, '<=', @$keypoints);
 }

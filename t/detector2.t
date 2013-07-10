@@ -40,4 +40,11 @@ for my $detector (
 	) {
 	my $kvv = $detector->detect([($image) x 10]);
 	is(scalar @$kvv, 10);
+
+	my $mask = $image->new(CV_8UC1)->zero;
+	$mask->rectangle([0, 0], [ $mask->width/2, $mask->height/2 ],
+					 cvScalarAll(255), -1);
+
+	my $kvv2 = $detector->detect([($image) x 5], [($mask) x 5]);
+	is(scalar @$kvv2, 5);
 }
