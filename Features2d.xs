@@ -125,6 +125,7 @@ void
 drawKeypoints(CvArr* image, KeyPointV keypoints, CvScalar color = cvScalarAll(-1), int flags=DrawMatchesFlags::DEFAULT)
 INIT:
 	Mat outImage = cvarrToMat(image);
+	flags |= DrawMatchesFlags::DRAW_OVER_OUTIMG;
 C_ARGS:
 	cvarrToMat(image), keypoints, outImage, color, flags
 POSTCALL:
@@ -278,18 +279,6 @@ DenseFeatureDetector::DESTROY()
 # ============================================================
 
 MODULE = Cv::Features2d		PACKAGE = Cv::Features2d::DescriptorExtractor
-
-
-# DescriptorExtractor::compute
-# Computes the descriptors for a set of keypoints detected in an image
-#  (first variant) or image set (second variant).
-#
-# void compute(const Mat& image,
-#              vector<KeyPoint>& keypoints,
-#              Mat& descriptors) const
-# void compute(const vector<Mat>& images,
-#              vector<vector<KeyPoint>>& keypoints,
-#              vector<Mat>& descriptors) const
 
 CvMat*
 DescriptorExtractor::compute(CvArr* image, KeyPointV keypoints)

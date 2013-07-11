@@ -37,7 +37,7 @@ for my $detector (
 	ORB(),
 	BRISK(),
 	# FeatureDetector
-	FastFeatureDetector(),
+	FastFeatureDetector(10, 0),
 	StarFeatureDetector(),
 	GoodFeaturesToTrackDetector(),
 	MserFeatureDetector(5, 60, 14400, 0.25, 0.2, 200, 1.01, 0.003, 5),
@@ -50,10 +50,10 @@ for my $detector (
 		can_ok($detector, qw(detect));
 	}
 	my $outImage1 = $image->clone;
-	my $outImage2 = $image->clone;
 	my $t0 = gettimeofday();
 	my $keypoints = $detector->detect($image);
 	my $k = (split('::', ref $detector))[-1];
+	diag($k) unless @$keypoints;
 	my $ti = sprintf("$k: %.1f(ms)", (gettimeofday() - $t0) * 1000);
 	for (@$keypoints) {
 		my ($pt, $size, $angle, $response, $octave, $class_id) = @$_;
@@ -67,10 +67,18 @@ for my $detector (
 	$outImage1->putText($ti, [ $x-1, $y-1 ], $font, cvScalarAll(250));
 	$outImage1->putText($ti, [ $x+1, $y+1 ], $font, cvScalarAll(50));
 	$outImage1->putText($ti, [ $x+0, $y+0 ], $font, [100, 150, 250]);
-	drawKeypoints($outImage2, $keypoints);
+
+	my $outImage2 = drawKeypoints($image->clone, $keypoints);
 	if ($verbose) {
 		$outImage1->show('keypoints');
 		$outImage2->show('drawKeypoints');
+		Cv->waitKey(1000);
+	}
+
+	my $outImage3 = $image->clone;
+	$outImage3->drawKeypoints($keypoints, cvScalarAll(-1), 4);
+	if ($verbose) {
+		$outImage3->show('drawKeypoints');
 		Cv->waitKey(1000);
 	}
 
