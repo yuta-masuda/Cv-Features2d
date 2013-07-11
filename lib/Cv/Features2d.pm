@@ -127,11 +127,6 @@ L<detect()|http://docs.opencv.org/search.html?q=FeatureDetector::detect>
 
 {
 	package Cv::Features2d::FeatureDetector;
-
-	sub detect {
-		if (ref $_[1] eq 'ARRAY') { goto &detect2 } else { goto &detect1 }
-	}
-
 	for (qw(FastFeatureDetector StarFeatureDetector MserFeatureDetector
 		GoodFeaturesToTrackDetector DenseFeatureDetector)) {
 		my $base = __PACKAGE__;

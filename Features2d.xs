@@ -217,35 +217,12 @@ BRISK::DESTROY()
 
 MODULE = Cv::Features2d		PACKAGE = Cv::Features2d::FeatureDetector
 
-# FeatureDetector::detect
-# Detects keypoints in an image (first variant) or image set (second variant).
-# 
-# void detect(
-# 		const Mat& image,
-# 		vector<KeyPoint>& keypoints,
-# 		const Mat& mask=Mat() ) const;
-# 
-# void detect(
-# 		const vector<Mat>& images,
-# 		vector<vector<KeyPoint> >& keypoints,
-# 		const vector<Mat>& masks=vector<Mat>() ) const;
-
-# Detects keypoints in an image (first variant)
 KeyPointV
-FeatureDetector::detect1(CvArr* image, CvArr* mask = NULL)
+FeatureDetector::detect(CvArr* image, CvArr* mask = NULL)
 CODE:
 	THIS->detect(cvarrToMat(image), RETVAL, mask? cvarrToMat(mask) : Mat());
 OUTPUT:
 	RETVAL
-
-# Detects keypoints in image set (second variant)
-KeyPointVV
-FeatureDetector::detect2(MatV image, MatV mask = vector<Mat>())
-CODE:
-	THIS->detect(image, RETVAL, mask);
-OUTPUT:
-	RETVAL
-
 
 MODULE = Cv::Features2d		PACKAGE = Cv::Features2d::FeatureDetector::FastFeatureDetector
 
@@ -301,6 +278,18 @@ DenseFeatureDetector::DESTROY()
 # ============================================================
 
 MODULE = Cv::Features2d		PACKAGE = Cv::Features2d::DescriptorExtractor
+
+
+# DescriptorExtractor::compute
+# Computes the descriptors for a set of keypoints detected in an image
+#  (first variant) or image set (second variant).
+#
+# void compute(const Mat& image,
+#              vector<KeyPoint>& keypoints,
+#              Mat& descriptors) const
+# void compute(const vector<Mat>& images,
+#              vector<vector<KeyPoint>>& keypoints,
+#              vector<Mat>& descriptors) const
 
 CvMat*
 DescriptorExtractor::compute(CvArr* image, KeyPointV keypoints)

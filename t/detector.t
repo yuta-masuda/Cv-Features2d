@@ -79,11 +79,4 @@ for my $detector (
 					 cvScalarAll(255), -1);
 	my $quarter = $detector->detect($image, $mask);
 	cmp_ok(scalar @$quarter, '<=', @$keypoints);
-
-	# Detects keypoints in image set (second variant)
-	my $kvv = $detector->detect([($image) x 10]);
-	is(scalar @$kvv, 10);
-
-	my $kvv2 = $detector->detect([($image) x 5], [($mask) x 5]);
-	is(scalar @$kvv2, 5);
 }
