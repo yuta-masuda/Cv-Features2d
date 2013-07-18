@@ -35,7 +35,9 @@ require Exporter;
 
 our @ISA = qw(Exporter);
 
-our @EXPORT_OK = (qw(drawKeypoints drawMatches));
+our @EXPORT_OK = (qw(drawKeypoints drawMatches),
+				  qw(GridAdaptedFeatureDetector PyramidAdaptedFeatureDetector),
+	);
 our %EXPORT_TAGS = ( 'all' => \@EXPORT_OK );
 our @EXPORT = ( );
 
@@ -105,13 +107,18 @@ L<FastFeatureDetector()|http://docs.opencv.org/search.html?q=FastFeatureDetector
 L<StarFeatureDetector()|http://docs.opencv.org/search.html?q=StarFeatureDetector>,
 L<MserFeatureDetector()|http://docs.opencv.org/search.html?q=MserFeatureDetector>,
 L<GoodFeaturesToTrackDetector()|http://docs.opencv.org/search.html?q=GoodFeaturesToTrackDetector>,
-L<DenseFeatureDetector()|http://docs.opencv.org/search.html?q=DenseFeatureDetector>
+L<DenseFeatureDetector()|http://docs.opencv.org/search.html?q=DenseFeatureDetector>,
+L<GridAdaptedFeatureDetector()|http://docs.opencv.org/search.html?q=GridAdaptedFeatureDetector>,
+L<PyramidAdaptedFeatureDetector()|http://docs.opencv.org/search.html?q=PyramidAdaptedFeatureDetector>
 
   my $detector = FastFeatureDetector();
   my $detector = StarFeatureDetector();
   my $detector = MserFeatureDetector();
   my $detector = GoodFeaturesToTrackDetector();
   my $detector = DenseFeatureDetector();
+ 
+  my $detector = GridAdaptedFeatureDetector(FastFeatureDetector());
+  my $detector = PyramidAdaptedFeatureDetector(FastFeatureDetector());
 
 =over
 

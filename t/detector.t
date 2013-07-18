@@ -29,6 +29,10 @@ sub chessboard {
 }
 
 my $font = Cv->InitFont(CV_FONT_NORMAL, (0.4) x 2, 0, 1, CV_AA);
+if ($verbose) {
+	Cv->namedWindow('keypoints', 0);
+	Cv->namedWindow('drawKeypoints', 0);
+}
 
 for my $detector (
 	# Feature2D
@@ -52,9 +56,9 @@ for my $detector (
 	my $outImage1 = $image->clone;
 	my $t0 = gettimeofday();
 	my $keypoints = $detector->detect($image);
-	my $k = (split('::', ref $detector))[-1];
-	diag($k) unless @$keypoints;
-	my $ti = sprintf("$k: %.1f(ms)", (gettimeofday() - $t0) * 1000);
+	(my $name = (split('::', ref $detector))[-1]) =~ s/FeatureDetector//g;
+	diag($name) unless @$keypoints;
+	my $ti = sprintf("$name: %.1f(ms)", (gettimeofday() - $t0) * 1000);
 	for (@$keypoints) {
 		my ($pt, $size, $angle, $response, $octave, $class_id) = @$_;
 		$angle *= CV_PI / 180;
@@ -66,7 +70,7 @@ for my $detector (
 	my ($x, $y) = (10, $image->height - 10);
 	$outImage1->putText($ti, [ $x-1, $y-1 ], $font, cvScalarAll(250));
 	$outImage1->putText($ti, [ $x+1, $y+1 ], $font, cvScalarAll(50));
-	$outImage1->putText($ti, [ $x+0, $y+0 ], $font, [100, 150, 250]);
+	$outImage1->putText($ti, [ $x+0, $y+0 ], $font, [100, 220, 220]);
 
 	my $outImage2 = drawKeypoints($image->clone, $keypoints);
 	if ($verbose) {

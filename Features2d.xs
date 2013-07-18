@@ -113,6 +113,21 @@ static void dumpIndexParams(flann::IndexParams* p, const char* varName)
 }
 
 
+static SV *unbless(SV * rv)
+{
+    SV* sv = SvRV(rv);
+    if (SvREADONLY(sv)) Perl_croak(aTHX_ "%s", PL_no_modify);
+    SvREFCNT_dec(SvSTASH(sv));
+    SvSTASH(sv) = NULL;
+    SvOBJECT_off(sv);
+    if (SvTYPE(sv) != SVt_PVIO) PL_sv_objcount--;
+    SvAMAGIC_off(rv);
+#ifdef SvUNMAGIC
+    SvUNMAGIC(sv);
+#endif
+    return rv;
+}
+
 MODULE = Cv::Features2d		PACKAGE = Cv::Features2d
 
 # ============================================================
@@ -142,6 +157,31 @@ CODE:
 	RETVAL = matToCvmat(outImg);
 OUTPUT:
 	RETVAL
+
+
+#if _CV_VERSION() >= _VERSION(2,3,0)
+
+GridAdaptedFeatureDetector*
+GridAdaptedFeatureDetector(FeatureDetector* detector, int maxTotalKeypoints, int gridRows=4, int gridCols=4)
+INIT:
+    char* CLASS = (char*)sv_reftype(SvRV(ST(0)), TRUE);
+CODE:
+	unbless(ST(0));
+	RETVAL = new GridAdaptedFeatureDetector(detector, maxTotalKeypoints, gridRows, gridCols);
+OUTPUT:
+	RETVAL
+
+PyramidAdaptedFeatureDetector*
+PyramidAdaptedFeatureDetector(FeatureDetector* detector, int levels=2);
+INIT:
+    char* CLASS = (char*)sv_reftype(SvRV(ST(0)), TRUE);
+CODE:
+	unbless(ST(0));
+	RETVAL = new PyramidAdaptedFeatureDetector(detector, levels);
+OUTPUT:
+	RETVAL
+
+#endif
 
 # ============================================================
 #  Feature Detection and Description

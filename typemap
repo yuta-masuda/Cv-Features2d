@@ -10,6 +10,8 @@ MSER*								O_OBJECT
 MserFeatureDetector*				O_OBJECT
 StarFeatureDetector*				O_OBJECT
 DenseFeatureDetector*				O_OBJECT
+GridAdaptedFeatureDetector*			O_OBJECT
+PyramidAdaptedFeatureDetector*		O_OBJECT
 
 Feature2D*							O_OBJECT
 SIFT*								O_OBJECT
