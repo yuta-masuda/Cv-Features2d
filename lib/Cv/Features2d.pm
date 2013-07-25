@@ -141,6 +141,32 @@ L<detect()|http://docs.opencv.org/search.html?q=FeatureDetector::detect>
 	}
 }
 
+{
+	package Cv::Features2d;
+	sub GridAdaptedFeatureDetector {
+		my $detector = shift;
+		my $maxTotalKeypoints = shift;
+		my $type = $detector;
+		$type = (split('::', ref $type))[-1] if ref $type;
+		$type =~ s/(FeatureDetector$)//ig;
+		# warn "Cv::Features2d::FeatureDetector->create('Grid\U$type')\n";
+		my $self = Cv::Features2d::FeatureDetector->create("Grid\U$type");
+		$self->set("maxTotalKeypoints", $maxTotalKeypoints);
+		$self->set("gridRows", shift || 4);
+		$self->set("gridCols", shift || 4);
+		$self;
+	}
+	sub PyramidAdaptedFeatureDetector {
+		my $detector = shift;
+		my $type = $detector;
+		$type = (split('::', ref $type))[-1] if ref $type;
+		$type =~ s/(FeatureDetector$)//ig;
+		my $self = Cv::Features2d::FeatureDetector->create("Pyramid\U$type");
+		$self->set("gridRows", shift || 2);
+		$self;
+	}
+}
+
 =item
 L<FREAK()|http://docs.opencv.org/search.html?q=FREAK>,
 L<BriefDescriptorExtractor()|http://docs.opencv.org/search.html?q=BriefDescriptorExtractor>,

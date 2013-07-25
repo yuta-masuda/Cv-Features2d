@@ -101,5 +101,5 @@ if (1) {
 		my %p = FlannBasedMatcher(\%indexParams);
 		use Data::Dumper;
 		print STDERR Data::Dumper->Dump([\%p], [qw(*p)]);
-	} qr/can't use ref-sv to set indexParams/;
+	} qr/can't use ref to set indexParams/;
 }

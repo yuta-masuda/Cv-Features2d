@@ -10,7 +10,7 @@ use File::Basename;
 use Getopt::Long;
 # use Data::Dumper;
 
-my %detector = map { $_ => 0 } qw(surf sift orb brisk);
+my %detector = map { $_ => 0 } qw(surf sift orb brisk grid pyramid);
 my %extractor = map { $_ => 0 } qw(freak brief opponent);
 my $verbose = 0;
 
@@ -25,6 +25,12 @@ my $detector = $detector{sift} && SIFT()
 	|| $detector{orb} && ORB()
 	|| $detector{brisk} && BRISK()
 	|| SURF(2000, 4);
+if ($detector{grid}) {
+	$detector = GridAdaptedFeatureDetector($detector, 500);
+}
+if ($detector{pyramid}) {
+	$detector = PyramidAdaptedFeatureDetector($detector);
+}
 
 my $extractor = $extractor{brief} && BriefDescriptorExtractor()
 	|| $extractor{freak} && FREAK();

@@ -25,6 +25,11 @@ static CvMat* matToCvmat(Mat& var)
 #endif
 }
 
+static const char* svt_names[] = {
+	"SVt_NULL", "SVt_BIND", "SVt_IV", "SVt_NV", "SVt_PV", "SVt_PVIV",
+	"SVt_PVNV", "SVt_PVMG", "SVt_REGEXP", "SVt_PVGV", "SVt_PVLV",
+	"SVt_PVAV", "SVt_PVHV", "SVt_PVCV", "SVt_PVFM", "SVt_PVIO",
+};
 
 static flann::IndexParams* xsIndexParams(HV* hv, const char *var)
 {
@@ -57,7 +62,7 @@ static flann::IndexParams* xsIndexParams(HV* hv, const char *var)
 							opt, var, key);
 			}
 		} else if (SvROK(sv)) {
-			Perl_croak(aTHX_ "can't use ref-sv to set %s[\"%s\"]", var, key);
+			Perl_croak(aTHX_ "can't use ref to set %s[\"%s\"]", var, key);
 		} else if (t == SVt_PV) {
 			p->setString(key, SvPV_nolen(sv));
 		} else if (t == SVt_IV) {
@@ -69,14 +74,8 @@ static flann::IndexParams* xsIndexParams(HV* hv, const char *var)
 		} else if (t == SVt_NV) {
 			p->setDouble(key, SvNV(sv));
 		} else {
-			const char* svt_names[] = {
-				"SVt_NULL", "SVt_BIND", "SVt_IV", "SVt_NV", "SVt_PV",
-				"SVt_PVIV", "SVt_PVNV", "SVt_PVMG", "SVt_REGEXP",
-				"SVt_PVGV", "SVt_PVLV", "SVt_PVAV", "SVt_PVHV",
-				"SVt_PVCV", "SVt_PVFM", "SVt_PVIO",
-			};
 			if (t < SVt_LAST)
-				Perl_croak(aTHX_ "can't %s to set %s[\"%s\"]",
+				Perl_croak(aTHX_ "can't use %s to set %s[\"%s\"]",
 					svt_names[t], var, key);
 			else
 				Perl_croak(aTHX_ "can't happen to set %s[\"%s\"]", var, key);
@@ -159,30 +158,6 @@ OUTPUT:
 	RETVAL
 
 
-#if _CV_VERSION() >= _VERSION(2,3,0)
-
-GridAdaptedFeatureDetector*
-GridAdaptedFeatureDetector(FeatureDetector* detector, int maxTotalKeypoints, int gridRows=4, int gridCols=4)
-INIT:
-    char* CLASS = (char*)sv_reftype(SvRV(ST(0)), TRUE);
-CODE:
-	unbless(ST(0));
-	RETVAL = new GridAdaptedFeatureDetector(detector, maxTotalKeypoints, gridRows, gridCols);
-OUTPUT:
-	RETVAL
-
-PyramidAdaptedFeatureDetector*
-PyramidAdaptedFeatureDetector(FeatureDetector* detector, int levels=2);
-INIT:
-    char* CLASS = (char*)sv_reftype(SvRV(ST(0)), TRUE);
-CODE:
-	unbless(ST(0));
-	RETVAL = new PyramidAdaptedFeatureDetector(detector, levels);
-OUTPUT:
-	RETVAL
-
-#endif
-
 # ============================================================
 #  Feature Detection and Description
 # ============================================================
@@ -264,6 +239,53 @@ CODE:
 	THIS->detect(cvarrToMat(image), RETVAL, mask? cvarrToMat(mask) : Mat());
 OUTPUT:
 	RETVAL
+
+
+# XXXXXX set
+
+void
+FeatureDetector::set(const char* name, SV* value)
+CODE:
+	if (SvROK(value)) {
+		Perl_croak(aTHX_ "can't use ref to set %s", name);
+	} else {
+		int t = SvTYPE(value);
+		if (t == SVt_PV) {
+			THIS->set(name, SvPV_nolen(value));
+		} else if (t == SVt_IV) {
+			THIS->set(name, (int)SvIV(value));
+		} else if (t == SVt_NV) {
+			THIS->set(name, SvNV(value));
+		} else {
+			Perl_croak(aTHX_ "can't use %s to set %s", svt_names[t], name);
+		}
+	}
+
+FeatureDetector*
+create(const char* CLASS, const char* detectorType)
+INIT:
+	string _detectorType = detectorType;
+CODE:
+	if (_detectorType.find("Grid") == 0) {
+		RETVAL = new GridAdaptedFeatureDetector(FeatureDetector::create(
+								_detectorType.substr(strlen("Grid"))));
+	} else if (_detectorType.find("Pyramid") == 0) {
+		RETVAL = new PyramidAdaptedFeatureDetector(FeatureDetector::create(
+								_detectorType.substr(strlen("Pyramid"))));
+	} else if (_detectorType.find("Dynamic") == 0) {
+		RETVAL = new DynamicAdaptedFeatureDetector(AdjusterAdapter::create(
+								_detectorType.substr(strlen("Dynamic"))));
+	} else if (_detectorType.compare( "HARRIS" ) == 0) {
+		RETVAL = FeatureDetector::create("GFTT");
+		RETVAL->set("useHarrisDetector", true);
+	} else {
+		RETVAL = Algorithm::create<FeatureDetector>("Feature2D." + _detectorType);
+	}
+OUTPUT:
+	RETVAL
+
+void
+FeatureDetector::DESTROY()
 
 MODULE = Cv::Features2d		PACKAGE = Cv::Features2d::FeatureDetector::FastFeatureDetector
 
