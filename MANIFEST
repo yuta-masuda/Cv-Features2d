@@ -8,12 +8,14 @@ ppport.h
 README
 sample/find_obj.pl
 sample/freak_demo.pl
-t/beaver.png
 t/detector.t
+t/detector2.t
 t/extractor.t
 t/features2d.t
+t/grid.t
 t/indexparams.t
 t/matcher.t
 t/pod-coverage.t
+t/pyramid.t
 t/surf.t
 typemap
