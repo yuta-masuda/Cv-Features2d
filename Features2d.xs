@@ -240,9 +240,6 @@ CODE:
 OUTPUT:
 	RETVAL
 
-
-# XXXXXX set
-
 void
 FeatureDetector::set(const char* name, SV* value)
 CODE:

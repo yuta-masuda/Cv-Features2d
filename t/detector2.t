@@ -42,9 +42,9 @@ for (
 	# FeatureDetector
 	FastFeatureDetector(10, 0),
 	StarFeatureDetector(),
-	GoodFeaturesToTrackDetector(),
-	MserFeatureDetector(5, 60, 14400, 0.25, 0.2, 200, 1.01, 0.003, 5),
-	DenseFeatureDetector(),
+	# GoodFeaturesToTrackDetector(),
+	# MserFeatureDetector(5, 60, 14400, 0.25, 0.2, 200, 1.01, 0.003, 5),
+	# DenseFeatureDetector(),
 	) {
 	my $name = "GridAdaptedFeatureDetector+" . (split('::', ref $_))[-1];
 	test_detect(GridAdaptedFeatureDetector($_, 500), $name);
@@ -59,9 +59,9 @@ for (
 	# FeatureDetector
 	FastFeatureDetector(10, 0),
 	StarFeatureDetector(),
-	GoodFeaturesToTrackDetector(),
-	MserFeatureDetector(5, 60, 14400, 0.25, 0.2, 200, 1.01, 0.003, 5),
-	DenseFeatureDetector(),
+	# GoodFeaturesToTrackDetector(),
+	# MserFeatureDetector(5, 60, 14400, 0.25, 0.2, 200, 1.01, 0.003, 5),
+	# DenseFeatureDetector(),
 	) {
 	my $name = "PyramidAdaptedFeatureDetector+" .(split('::', ref $_))[-1];
 	test_detect(PyramidAdaptedFeatureDetector($_), $name);
@@ -69,7 +69,7 @@ for (
 
 sub test_detect {
 	my $detector = shift;
-	(my $name = shift) =~ s/FeatureDetector//g;
+	(my $name = shift) =~ s/(Adapted|FeatureDetector)//g;
 	my $oimage = $image->cvtColor(CV_BGR2GRAY)->cvtColor(CV_GRAY2BGR);
 	my $t0 = gettimeofday();
 	my $keypoints = $detector->detect($image);
