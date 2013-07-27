@@ -355,6 +355,27 @@ int
 DescriptorExtractor::descriptorType()
 
 
+DescriptorExtractor*
+create(const char* CLASS, const char* descriptorExtractorType)
+INIT:
+	string _descriptorExtractorType = descriptorExtractorType;
+CODE:
+    if (_descriptorExtractorType.find("Opponent") == 0) {
+		size_t pos = String("Opponent").size();
+		String type = _descriptorExtractorType.substr(pos);
+		RETVAL = new OpponentColorDescriptorExtractor(
+			DescriptorExtractor::create(type));
+	} else {
+		RETVAL = Algorithm::create<DescriptorExtractor>(
+			"Feature2D." + _descriptorExtractorType);
+	}
+OUTPUT:
+	RETVAL
+
+void
+DescriptorExtractor::DESTROY()
+
+
 MODULE = Cv::Features2d		PACKAGE = Cv::Features2d::DescriptorExtractor::BriefDescriptorExtractor
 
 BriefDescriptorExtractor*
@@ -375,24 +396,6 @@ FREAK::new(bool orientationNormalized = true, bool scaleNormalized = true, float
 
 void
 FREAK::DESTROY()
-
-#endif
-
-#if _CV_VERSION() >= _VERSION(2,2,0)
-
-MODULE = Cv::Features2d		PACKAGE = Cv::Features2d::DescriptorExtractor::OpponentColorDescriptorExtractor
-
-DescriptorExtractor*
-create(const char* CLASS, const char* descriptorExtractorType)
-CODE:
-	RETVAL = new OpponentColorDescriptorExtractor(
-					DescriptorExtractor::create(descriptorExtractorType)
-				);
-OUTPUT:
-	RETVAL
-
-void
-DescriptorExtractor::DESTROY()
 
 #endif
 

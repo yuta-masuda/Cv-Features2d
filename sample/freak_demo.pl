@@ -10,7 +10,7 @@ use File::Basename;
 use Getopt::Long;
 # use Data::Dumper;
 
-my %detector = map { $_ => 0 } qw(surf sift orb brisk grid pyramid);
+my %detector = map { $_ => 0 } qw(surf sift orb brisk grid);
 my %extractor = map { $_ => 0 } qw(freak brief opponent);
 my $verbose = 0;
 
@@ -25,19 +25,19 @@ my $detector = $detector{sift} && SIFT()
 	|| $detector{orb} && ORB()
 	|| $detector{brisk} && BRISK()
 	|| SURF(2000, 4);
-if ($detector{grid}) {
-	$detector = GridAdaptedFeatureDetector($detector, 500);
-}
-if ($detector{pyramid}) {
-	$detector = PyramidAdaptedFeatureDetector($detector);
-}
 
 my $extractor = $extractor{brief} && BriefDescriptorExtractor()
-	|| $extractor{freak} && FREAK();
+	|| $extractor{freak} && FREAK()
+	|| $detector->can('compute') && $detector;
 if ($extractor{opponent}) {
 	$extractor = OpponentColorDescriptorExtractor($extractor || $detector);
 }
-$extractor ||= $detector;
+
+if ($detector{grid}) {
+	my $ref = ref $detector;
+	$detector = GridAdaptedFeatureDetector($detector, 500);
+	die "can't support GridAdaptedFeatureDetector for $ref\n" unless $detector;
+}
 
 use constant NORM_L1 => 2;
 use constant NORM_L2 => 4;
@@ -48,8 +48,7 @@ my $matcher = $detector =~ /SIFT|SURF/i && BFMatcher(NORM_L2)
 	|| BFMatcher(NORM_HAMMING);
 
 if ($verbose) {
-	warn "# $_: ", (split('::', ref eval "\$$_"))[-1], "\n"
-		for qw(detector extractor matcher);
+	warn "# $_: ", ref eval "\$$_", "\n" for qw(detector extractor matcher);
 }
 
 my $color_or_grayscale = $extractor =~ /opponent/i?

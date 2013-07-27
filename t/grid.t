@@ -8,6 +8,55 @@ use Test::Exception;
 BEGIN { use_ok('Cv') }
 BEGIN { use_ok('Cv::Features2d', qw(:all)) }
 
+my $verbose = Cv->hasGUI;
+
+use Time::HiRes qw(gettimeofday);
+my $image = chessboard();
+
+sub chessboard {
+	my $img = Cv->createMat(270, 270, CV_8UC3)
+		->fill(cvScalarAll(127));
+	for my $i (0 .. 7) {
+		for my $j (0 .. 7) {
+			my ($x, $y) = ($i * 30 + 15, $j * 30 + 15);
+			$img->rectangle(
+				[$x, $y], [$x + 30, $y + 30],
+				cvScalarAll(($i + $j + 1) % 2? 255 : 0), -1,
+				);
+		}
+	}
+	$img;
+}
+
+my $font = Cv->InitFont(CV_FONT_NORMAL, (0.4) x 2, 0, 1, CV_AA);
+if ($verbose) {
+	Cv->namedWindow('Cv', 0);
+}
+
+for (
+	SURF(500),
+	FastFeatureDetector(10, 0),
+	StarFeatureDetector(),
+	) {
+	my $detector = GridAdaptedFeatureDetector($_, 500);
+	(my $name = "Grid+" . (split('::', ref $_))[-1]) =~ s/FeatureDetector//g;
+	ok($detector, $name);
+	my $oimage = $image->cvtColor(CV_BGR2GRAY)->cvtColor(CV_GRAY2BGR);
+	my $t0 = gettimeofday();
+	my $keypoints = $detector->detect($image);
+	diag($name) unless @$keypoints;
+	my $ti = sprintf("$name: %.1f(ms)", (gettimeofday() - $t0) * 1000);
+	my ($x, $y) = (10, $image->height - 10);
+	$oimage->drawKeypoints($keypoints, cvScalarAll(-1), 4);
+	$oimage->putText($ti, [ $x-1, $y-1 ], $font, cvScalarAll(250));
+	$oimage->putText($ti, [ $x+1, $y+1 ], $font, cvScalarAll(50));
+	$oimage->putText($ti, [ $x+0, $y+0 ], $font, [100, 220, 220]);
+	if ($verbose) {
+		$oimage->show;
+		Cv->waitKey(1000);
+	}
+}
+
 # my $detector = FastFeatureDetector(10, 1);
 my $detector = SURF(500);
 isa_ok($detector, 'Cv::Features2d::Feature2D');
@@ -20,9 +69,20 @@ my $extractor = $detector;
 isa_ok($extractor, 'Cv::Features2d::DescriptorExtractor');
 can_ok($extractor, qw(compute));
 
-my $grid_detector = GridAdaptedFeatureDetector($detector, 500);
-isa_ok($grid_detector, 'Cv::Features2d::FeatureDetector');
-can_ok($grid_detector, qw(detect));
+my $detector2 = GridAdaptedFeatureDetector($detector, 500);
+isa_ok($detector2, 'Cv::Features2d::FeatureDetector');
+can_ok($detector2, qw(detect));
 
 isa_ok($extractor, 'Cv::Features2d::DescriptorExtractor');
 can_ok($extractor, qw(compute));
+
+for my $type (qw(FAST STAR SURF)) {
+	my $d = Cv::Features2d::FeatureDetector->create("Grid\U$type");
+	isa_ok($d, 'Cv::Features2d::FeatureDetector');
+	can_ok($d, qw(detect));
+	lives_ok { $d->set("maxTotalKeypoints", 100) };
+	lives_ok { $d->set("gridRows", 4) };
+	lives_ok { $d->set("gridCols", 4) };
+	throws_ok { $d->set("???", 1) }
+	qr/OpenCV Error: Bad argument \(No parameter '\?\?\?' is found\) in set at/;
+}

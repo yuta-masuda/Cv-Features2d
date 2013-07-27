@@ -1,5 +1,9 @@
 Revision history for Perl extension Cv::Features2d
 
+0.06 - 2013-07-28
+     * rewrote OpponentColorDescriptorExtractor
+     * added GridAdaptedFeatureDetector
+
 0.05 - 2013-06-25
      * fixed compute in Cv::Features2d::Feature2D
      * added OpponentColorDescriptorExtractor (experimental)

@@ -8,19 +8,24 @@ use Test::Exception;
 BEGIN { use_ok('Cv') }
 BEGIN { use_ok('Cv::Features2d', qw(:all)) }
 
-for my $extractor (
+for (
 	# DescriptorExtractor
-	FREAK(),
+	# FREAK(),
 	BriefDescriptorExtractor(),
 	# Feature2D
 	SIFT(),
 	SURF(500),
 	ORB(),
 	BRISK(),
-	# # OpponentColorDescriptorExtractor
-	# (map OpponentColorDescriptorExtractor($_), qw(SIFT SURF ORB BRISK BRIEF),
-	#  SIFT(), SURF(500), ORB(), BRISK(), BriefDescriptorExtractor())
 	) {
+	my $extractor = OpponentColorDescriptorExtractor($_);
+	isa_ok($extractor, 'Cv::Features2d::DescriptorExtractor');
+	can_ok($extractor, qw(compute));
+}
+
+for (qw(SIFT SURF ORB BRISK BRIEF)) {
+	my $extractor = OpponentColorDescriptorExtractor($_);
+	# diag("opponent + $_ = " . ref $extractor);
 	isa_ok($extractor, 'Cv::Features2d::DescriptorExtractor');
 	can_ok($extractor, qw(compute));
 }

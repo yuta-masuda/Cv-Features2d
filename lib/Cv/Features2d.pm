@@ -26,7 +26,7 @@ use strict;
 use warnings;
 use Cv ();
 
-our $VERSION = '0.05';
+our $VERSION = '0.06';
 
 require XSLoader;
 XSLoader::load('Cv::Features2d', $VERSION);
@@ -36,7 +36,8 @@ require Exporter;
 our @ISA = qw(Exporter);
 
 our @EXPORT_OK = (qw(drawKeypoints drawMatches),
-				  qw(GridAdaptedFeatureDetector PyramidAdaptedFeatureDetector),
+				  qw(GridAdaptedFeatureDetector),
+				  qw(OpponentColorDescriptorExtractor),
 	);
 our %EXPORT_TAGS = ( 'all' => \@EXPORT_OK );
 our @EXPORT = ( );
@@ -117,7 +118,7 @@ L<PyramidAdaptedFeatureDetector()|http://docs.opencv.org/search.html?q=PyramidAd
   my $detector = GoodFeaturesToTrackDetector();
   my $detector = DenseFeatureDetector();
  
-  my $detector = GridAdaptedFeatureDetector(FastFeatureDetector());
+  my $detector = GridAdaptedFeatureDetector(FastFeatureDetector(), 500);
   my $detector = PyramidAdaptedFeatureDetector(FastFeatureDetector());
 
 =over
@@ -134,34 +135,31 @@ L<detect()|http://docs.opencv.org/search.html?q=FeatureDetector::detect>
 
 {
 	package Cv::Features2d::FeatureDetector;
-	for (qw(FastFeatureDetector StarFeatureDetector MserFeatureDetector
-		GoodFeaturesToTrackDetector DenseFeatureDetector)) {
+	for ((map "${_}FeatureDetector", qw(Fast Star Mser Dense)),
+		 qw(GoodFeaturesToTrackDetector),
+		 (map "Grid$_", qw(FAST STAR SURF)),
+		) {
 		my $base = __PACKAGE__;
 		eval "package ${base}::$_; our \@ISA = qw(${base})";
 	}
 }
 
 sub GridAdaptedFeatureDetector {
-	my $detector = shift;
+	my $type = shift;			# detector
 	my $maxTotalKeypoints = shift;
-	my $type = $detector;
 	$type = (split('::', ref $type))[-1] if ref $type;
 	$type =~ s/(FeatureDetector$)//ig;
-	my $self = Cv::Features2d::FeatureDetector->create("Grid\U$type");
-	$self->set("maxTotalKeypoints", $maxTotalKeypoints);
-	$self->set("gridRows", shift || 4);
-	$self->set("gridCols", shift || 4);
-	$self;
-}
-
-sub PyramidAdaptedFeatureDetector {
-	my $detector = shift;
-	my $type = $detector;
-	$type = (split('::', ref $type))[-1] if ref $type;
-	$type =~ s/(FeatureDetector$)//ig;
-	my $self = Cv::Features2d::FeatureDetector->create("Pyramid\U$type");
-	# $self->set("maxLevel", shift || 2);
-	$self;
+	my $subclass = "Grid\U$type";
+	my $class = "Cv::Features2d::FeatureDetector::$subclass";
+	if ($class->can('create')) {
+		my $self = $class->create($subclass);
+		$self->set("maxTotalKeypoints", $maxTotalKeypoints);
+		$self->set("gridRows", shift || 4);
+		$self->set("gridCols", shift || 4);
+		$self;
+	} else {
+		undef;
+	}
 }
 
 =item
@@ -185,22 +183,30 @@ L<compute()|http://docs.opencv.org/search.html?q=DescriptorExtractor::compute>
 =cut
 
 {
-	package Cv::Features2d::DescriptorExtractor::OpponentColorDescriptorExtractor;
-	sub new {
-		my ($class, $type) = @_;
-		$type = (split('::', ref $type))[-1] if ref $type;
-		$type =~ s/(^opponent|descriptorextractor$)//ig;
-		$class->create(uc $type);
-	}
-}
-
-{
 	package Cv::Features2d::DescriptorExtractor;
-	for (qw(BriefDescriptorExtractor FREAK OpponentColorDescriptorExtractor)) {
+	for (qw(BriefDescriptorExtractor FREAK),
+		 (map "Opponent$_", qw(SIFT SURF ORB BRISK BRIEF)),
+		) {
 		my $base = __PACKAGE__;
 		eval "package ${base}::$_; our \@ISA = qw(${base})";
 	}
 }
+
+sub OpponentColorDescriptorExtractor {
+	my $type = shift;			# extractor
+	# warn "OpponentColorDescriptorExtractor($type)\n"; # XXXXX
+	$type = (split('::', ref $type))[-1] if ref $type;
+	$type =~ s/(DescriptorExtractor$)//ig;
+	my $subclass = "Opponent\U$type";
+	my $class = "Cv::Features2d::DescriptorExtractor::$subclass";
+	# warn "$class->create($subclass)\n"; # XXXXX
+	if ($class->can('create')) {
+		$class->create($subclass);
+	} else {
+		undef;
+	}
+}
+
 
 =item
 L<BFMatcher()|http://docs.opencv.org/search.html?q=BFMatcher>
