@@ -111,22 +111,6 @@ static void dumpIndexParams(flann::IndexParams* p, const char* varName)
 	}
 }
 
-
-static SV *unbless(SV * rv)
-{
-    SV* sv = SvRV(rv);
-    if (SvREADONLY(sv)) Perl_croak(aTHX_ "%s", PL_no_modify);
-    SvREFCNT_dec(SvSTASH(sv));
-    SvSTASH(sv) = NULL;
-    SvOBJECT_off(sv);
-    if (SvTYPE(sv) != SVt_PVIO) PL_sv_objcount--;
-    SvAMAGIC_off(rv);
-#ifdef SvUNMAGIC
-    SvUNMAGIC(sv);
-#endif
-    return rv;
-}
-
 MODULE = Cv::Features2d		PACKAGE = Cv::Features2d
 
 # ============================================================
