@@ -265,24 +265,6 @@ OUTPUT:
 
 #if _CV_VERSION() >= _VERSION(2,4,1)
 
-void
-FeatureDetector::set(const char* name, SV* value)
-CODE:
-	if (SvROK(value)) {
-		Perl_croak(aTHX_ "can't use ref to set %s", name);
-	} else {
-		int t = SvTYPE(value);
-		if (t == SVt_PV) {
-			THIS->set(name, SvPV_nolen(value));
-		} else if (t == SVt_IV) {
-			THIS->set(name, (int)SvIV(value));
-		} else if (t == SVt_NV) {
-			THIS->set(name, SvNV(value));
-		} else {
-			Perl_croak(aTHX_ "can't use %s to set %s", svt_names[t], name);
-		}
-	}
-
 SV*
 name(FeatureDetector* THIS)
 CODE:
