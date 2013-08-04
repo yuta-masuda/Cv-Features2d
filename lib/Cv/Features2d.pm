@@ -26,7 +26,7 @@ use strict;
 use warnings;
 use Cv ();
 
-our $VERSION = '0.06';
+our $VERSION = '0.07';
 
 require XSLoader;
 XSLoader::load('Cv::Features2d', $VERSION);
@@ -36,7 +36,7 @@ require Exporter;
 our @ISA = qw(Exporter);
 
 our @EXPORT_OK = (qw(drawKeypoints drawMatches),
-				  qw(GridAdaptedFeatureDetector),
+				  qw(GridAdaptedFeatureDetector PyramidAdaptedFeatureDetector),
 				  qw(OpponentColorDescriptorExtractor),
 	);
 our %EXPORT_TAGS = ( 'all' => \@EXPORT_OK );
@@ -111,7 +111,8 @@ L<StarFeatureDetector()|http://docs.opencv.org/search.html?q=StarFeatureDetector
 L<MserFeatureDetector()|http://docs.opencv.org/search.html?q=MserFeatureDetector>,
 L<GoodFeaturesToTrackDetector()|http://docs.opencv.org/search.html?q=GoodFeaturesToTrackDetector>,
 L<DenseFeatureDetector()|http://docs.opencv.org/search.html?q=DenseFeatureDetector>,
-L<GridAdaptedFeatureDetector()|http://docs.opencv.org/search.html?q=GridAdaptedFeatureDetector>
+L<GridAdaptedFeatureDetector()|http://docs.opencv.org/search.html?q=GridAdaptedFeatureDetector>,
+L<PyramidAdaptedFeatureDetector()|http://docs.opencv.org/search.html?q=PyramidAdaptedFeatureDetector>,
 
   my $detector = FastFeatureDetector();
   my $detector = StarFeatureDetector();
@@ -120,6 +121,7 @@ L<GridAdaptedFeatureDetector()|http://docs.opencv.org/search.html?q=GridAdaptedF
   my $detector = DenseFeatureDetector();
  
   my $detector = GridAdaptedFeatureDetector(FastFeatureDetector(), 500);
+  my $detector = PyramidAdaptedFeatureDetector(FastFeatureDetector());
 
 =over
 
@@ -136,8 +138,8 @@ L<detect()|http://docs.opencv.org/search.html?q=FeatureDetector::detect>
 {
 	package Cv::Features2d::FeatureDetector;
 	for ((map "${_}FeatureDetector", qw(Fast Star Mser Dense)),
-		 qw(GridAdaptedFeatureDetector),
 		 qw(GoodFeaturesToTrackDetector),
+		 qw(GridAdaptedFeatureDetector PyramidAdaptedFeatureDetector),
 		) {
 		my $base = __PACKAGE__;
 		eval "package ${base}::$_; our \@ISA = qw(${base})";
@@ -149,6 +151,14 @@ sub GridAdaptedFeatureDetector {
 	return undef unless ref $detector &&
 		$detector->name() =~ /Feature2D\.(SURF|FAST|STAR)/;
 	my $class = 'Cv::Features2d::FeatureDetector::GridAdaptedFeatureDetector';
+	$class->new($detector->new(), @_);
+}
+
+sub PyramidAdaptedFeatureDetector {
+	my $detector = shift;
+	return undef unless ref $detector &&
+		$detector->name() =~ /Feature2D\.(SURF|FAST|STAR|SIFT)/;
+	my $class = 'Cv::Features2d::FeatureDetector::PyramidAdaptedFeatureDetector';
 	$class->new($detector->new(), @_);
 }
 

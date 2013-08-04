@@ -16,5 +16,6 @@ t/indexparams.t
 t/matcher.t
 t/opponent.t
 t/pod-coverage.t
+t/pyramid.t
 t/surf.t
 typemap

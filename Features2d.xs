@@ -293,14 +293,6 @@ OUTPUT:
 
 #endif
 
-MODULE = Cv::Features2d		PACKAGE = Cv::Features2d::FeatureDetector::GridAdaptedFeatureDetector
-
-GridAdaptedFeatureDetector*
-GridAdaptedFeatureDetector::new(FeatureDetector *detector, int maxTotalKeypoints, int gridRows=4, int gridCols=4)
-
-void
-GridAdaptedFeatureDetector::DESTROY()
-
 MODULE = Cv::Features2d		PACKAGE = Cv::Features2d::FeatureDetector::FastFeatureDetector
 
 FastFeatureDetector*
@@ -363,6 +355,23 @@ void
 DenseFeatureDetector::DESTROY()
 
 #endif
+
+
+MODULE = Cv::Features2d		PACKAGE = Cv::Features2d::FeatureDetector::GridAdaptedFeatureDetector
+
+GridAdaptedFeatureDetector*
+GridAdaptedFeatureDetector::new(FeatureDetector *detector, int maxTotalKeypoints, int gridRows=4, int gridCols=4)
+
+void
+GridAdaptedFeatureDetector::DESTROY()
+
+MODULE = Cv::Features2d		PACKAGE = Cv::Features2d::FeatureDetector::PyramidAdaptedFeatureDetector
+
+PyramidAdaptedFeatureDetector*
+PyramidAdaptedFeatureDetector::new(FeatureDetector *detector, int levels=2)
+
+void
+PyramidAdaptedFeatureDetector::DESTROY()
 
 
 # ============================================================
