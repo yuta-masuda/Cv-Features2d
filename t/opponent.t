@@ -22,10 +22,3 @@ for (
 	isa_ok($extractor, 'Cv::Features2d::DescriptorExtractor');
 	can_ok($extractor, qw(compute));
 }
-
-for (qw(SIFT SURF ORB BRISK BRIEF)) {
-	my $extractor = OpponentColorDescriptorExtractor($_);
-	# diag("opponent + $_ = " . ref $extractor);
-	isa_ok($extractor, 'Cv::Features2d::DescriptorExtractor');
-	can_ok($extractor, qw(compute));
-}

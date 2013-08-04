@@ -26,17 +26,18 @@ my $detector = $detector{sift} && SIFT()
 	|| $detector{brisk} && BRISK()
 	|| SURF(2000, 4);
 
-my $extractor = $extractor{brief} && BriefDescriptorExtractor()
-	|| $extractor{freak} && FREAK()
-	|| $detector->can('compute') && $detector;
-if ($extractor{opponent}) {
-	$extractor = OpponentColorDescriptorExtractor($extractor || $detector);
+if ($detector{grid}) {
+	if (my $d = GridAdaptedFeatureDetector($detector, 500)) {
+		$detector = $d;
+	}
 }
 
-if ($detector{grid}) {
-	my $ref = ref $detector;
-	$detector = GridAdaptedFeatureDetector($detector, 500);
-	die "can't support GridAdaptedFeatureDetector for $ref\n" unless $detector;
+my $extractor = $extractor{brief} && BriefDescriptorExtractor()
+	|| $extractor{freak} && FREAK()
+	|| $detector->can('compute') && $detector
+	|| BriefDescriptorExtractor();
+if ($extractor{opponent}) {
+	$extractor = OpponentColorDescriptorExtractor($extractor || $detector);
 }
 
 use constant NORM_L1 => 2;

@@ -45,8 +45,10 @@ our @EXPORT = ( );
 for (classes(__PACKAGE__)) {
 	if ($_->can('new')) {
 		my $name = (split('::', $_))[-1];
-		eval "sub $name { ${_}->new(\@_) }";
-		push(@EXPORT_OK, $name);
+		unless (__PACKAGE__->can($name)) {
+			eval "sub $name { ${_}->new(\@_) }";
+			push(@EXPORT_OK, $name);
+		}
 	}
 }
 
@@ -109,8 +111,7 @@ L<StarFeatureDetector()|http://docs.opencv.org/search.html?q=StarFeatureDetector
 L<MserFeatureDetector()|http://docs.opencv.org/search.html?q=MserFeatureDetector>,
 L<GoodFeaturesToTrackDetector()|http://docs.opencv.org/search.html?q=GoodFeaturesToTrackDetector>,
 L<DenseFeatureDetector()|http://docs.opencv.org/search.html?q=DenseFeatureDetector>,
-L<GridAdaptedFeatureDetector()|http://docs.opencv.org/search.html?q=GridAdaptedFeatureDetector>,
-L<PyramidAdaptedFeatureDetector()|http://docs.opencv.org/search.html?q=PyramidAdaptedFeatureDetector>
+L<GridAdaptedFeatureDetector()|http://docs.opencv.org/search.html?q=GridAdaptedFeatureDetector>
 
   my $detector = FastFeatureDetector();
   my $detector = StarFeatureDetector();
@@ -119,7 +120,6 @@ L<PyramidAdaptedFeatureDetector()|http://docs.opencv.org/search.html?q=PyramidAd
   my $detector = DenseFeatureDetector();
  
   my $detector = GridAdaptedFeatureDetector(FastFeatureDetector(), 500);
-  my $detector = PyramidAdaptedFeatureDetector(FastFeatureDetector());
 
 =over
 
@@ -136,8 +136,8 @@ L<detect()|http://docs.opencv.org/search.html?q=FeatureDetector::detect>
 {
 	package Cv::Features2d::FeatureDetector;
 	for ((map "${_}FeatureDetector", qw(Fast Star Mser Dense)),
+		 qw(GridAdaptedFeatureDetector),
 		 qw(GoodFeaturesToTrackDetector),
-		 (map "Grid$_", qw(FAST STAR SURF)),
 		) {
 		my $base = __PACKAGE__;
 		eval "package ${base}::$_; our \@ISA = qw(${base})";
@@ -145,21 +145,11 @@ L<detect()|http://docs.opencv.org/search.html?q=FeatureDetector::detect>
 }
 
 sub GridAdaptedFeatureDetector {
-	my $type = shift;			# detector
-	my $maxTotalKeypoints = shift;
-	$type = (split('::', ref $type))[-1] if ref $type;
-	$type =~ s/(FeatureDetector$)//ig;
-	my $subclass = "Grid\U$type";
-	my $class = "Cv::Features2d::FeatureDetector::$subclass";
-	if ($class->can('create')) {
-		my $self = $class->create($subclass);
-		$self->set("maxTotalKeypoints", $maxTotalKeypoints);
-		$self->set("gridRows", shift || 4);
-		$self->set("gridCols", shift || 4);
-		$self;
-	} else {
-		undef;
-	}
+	my $detector = shift;
+	return undef unless ref $detector &&
+		$detector->name() =~ /Feature2D\.(SURF|FAST|STAR)/;
+	my $class = 'Cv::Features2d::FeatureDetector::GridAdaptedFeatureDetector';
+	$class->new($detector->new(), @_);
 }
 
 =item
@@ -185,26 +175,20 @@ L<compute()|http://docs.opencv.org/search.html?q=DescriptorExtractor::compute>
 {
 	package Cv::Features2d::DescriptorExtractor;
 	for (qw(BriefDescriptorExtractor FREAK),
-		 (map "Opponent$_", qw(SIFT SURF ORB BRISK BRIEF)),
+		 qw(OpponentColorDescriptorExtractor),
 		) {
 		my $base = __PACKAGE__;
 		eval "package ${base}::$_; our \@ISA = qw(${base})";
 	}
 }
 
+
 sub OpponentColorDescriptorExtractor {
-	my $type = shift;			# extractor
-	# warn "OpponentColorDescriptorExtractor($type)\n"; # XXXXX
-	$type = (split('::', ref $type))[-1] if ref $type;
-	$type =~ s/(DescriptorExtractor$)//ig;
-	my $subclass = "Opponent\U$type";
-	my $class = "Cv::Features2d::DescriptorExtractor::$subclass";
-	# warn "$class->create($subclass)\n"; # XXXXX
-	if ($class->can('create')) {
-		$class->create($subclass);
-	} else {
-		undef;
-	}
+	my $dextractor = shift;
+	return undef unless ref $dextractor &&
+		$dextractor->name() =~ /Feature2D\.(SIFT|SURF|ORB|BRISK|BRIEF)/;
+	my $class = 'Cv::Features2d::DescriptorExtractor::OpponentColorDescriptorExtractor';
+	$class->new($dextractor->new(), @_);
 }
 
 
@@ -252,7 +236,7 @@ To define SearchParams (one of IndexParams).
 IndexParams stores the key-value pairs. The type of the value stored
 in the IndexParams is more detailed than Perl SV.  There are double,
 float, int, bool, and string.  To clarify the type of them, you can
-put a letter with colon after the name.  The letter is as following.
+put a letter with a colon after the name.  The letter is as follows:
 
   letter  | type of IndexParams
  ------------------------------------

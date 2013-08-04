@@ -41,9 +41,10 @@ if (1) {
 		$params->[2],			# hessianThreshold
 		$params->[3],			# nOctaves
 		$params->[4],			# nOctaveLayers
-		$params->[1],			# upright
-		$params->[0],			# extended
+		$params->[1],			# extended
+		$params->[0],			# upright
 		);
+
 	my $keyPoint = $surf->detect($gray);
 	# print STDERR Data::Dumper->Dump([\%keyPoint], [qw(*keyPoint)]);
 

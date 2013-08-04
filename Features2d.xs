@@ -170,6 +170,15 @@ MODULE = Cv::Features2d		PACKAGE = Cv::Features2d::Feature2D::SIFT
 
 SIFT*
 SIFT::new(int nfeatures=0, int nOctaveLayers=3, double contrastThreshold=0.04, double edgeThreshold=10, double sigma=1.6)
+INIT:
+	if (sv_isobject(ST(0)) && (SvTYPE(SvRV(ST(0))) == SVt_PVMG)) {
+		SIFT* THIS = (SIFT*)SvIV((SV*)SvRV(ST(0)));
+		if (items < 2) nfeatures = THIS->get<int>("nFeatures");
+		if (items < 3) nOctaveLayers = THIS->get<int>("nOctaveLayers");
+		if (items < 4) contrastThreshold = THIS->get<double>("contrastThreshold");
+		if (items < 5) edgeThreshold = THIS->get<double>("edgeThreshold");
+		if (items < 6) sigma = THIS->get<double>("sigma");
+	}
 
 void
 SIFT::DESTROY()
@@ -180,7 +189,18 @@ SIFT::DESTROY()
 MODULE = Cv::Features2d		PACKAGE = Cv::Features2d::Feature2D::SURF
 
 SURF*
-SURF::new(double hessianThreshold, int nOctaves=4, int nOctaveLayers=2, bool extended=true, bool upright=false)
+SURF::new(double hessianThreshold=NO_INIT, int nOctaves=4, int nOctaveLayers=2, bool extended=true, bool upright=false)
+INIT:
+	if (sv_isobject(ST(0)) && (SvTYPE(SvRV(ST(0))) == SVt_PVMG)) {
+		SURF* THIS = (SURF*)SvIV((SV*)SvRV(ST(0)));
+		if (items < 2) hessianThreshold = THIS->get<double>("hessianThreshold");
+		if (items < 3) nOctaves = THIS->get<int>("nOctaves");
+		if (items < 4) nOctaveLayers = THIS->get<int>("nOctaveLayers");
+		if (items < 5) extended = THIS->get<bool>("extended");
+		if (items < 6) upright = THIS->get<bool>("upright");
+	} else if (items < 2) {
+		croak_xs_usage(cv,  "CLASS, hessianThreshold, nOctaves=4, nOctaveLayers=2, extended=true, upright=false");
+	}
 
 void
 SURF::DESTROY()
@@ -192,6 +212,18 @@ MODULE = Cv::Features2d		PACKAGE = Cv::Features2d::Feature2D::ORB
 
 ORB*
 ORB::new(int nfeatures=500, float scaleFactor=1.2f, int nlevels=8, int edgeThreshold=31, int firstLevel=0, int WTA_K=2, int scoreType=ORB::HARRIS_SCORE, int patchSize=31)
+INIT:
+	if (sv_isobject(ST(0)) && (SvTYPE(SvRV(ST(0))) == SVt_PVMG)) {
+		ORB* THIS = (ORB*)SvIV((SV*)SvRV(ST(0)));
+		if (items < 2) nfeatures = THIS->get<int>("nFeatures");
+		if (items < 3) scaleFactor = THIS->get<double>("scaleFactor");
+		if (items < 4) nlevels = THIS->get<int>("nLevels");
+		if (items < 5) edgeThreshold = THIS->get<int>("edgeThreshold");
+		if (items < 6) firstLevel = THIS->get<int>("firstLevel");
+		if (items < 7) WTA_K = THIS->get<int>("WTA_K");
+		if (items < 8) scoreType = THIS->get<int>("scoreType");
+		if (items < 9) patchSize = THIS->get<int>("patchSize");
+	}
 
 void
 ORB::DESTROY()
@@ -205,6 +237,13 @@ MODULE = Cv::Features2d		PACKAGE = Cv::Features2d::Feature2D::BRISK
 
 BRISK*
 BRISK::new(int thresh=30, int octaves=3, float patternScale=1.0f)
+INIT:
+	if (sv_isobject(ST(0)) && (SvTYPE(SvRV(ST(0))) == SVt_PVMG)) {
+		BRISK* THIS = (BRISK*)SvIV((SV*)SvRV(ST(0)));
+		if (items < 2) thresh = THIS->get<int>("thres");
+		if (items < 3) octaves = THIS->get<int>("octaves");
+		// if (items < 4) patternScale = THIS->get<double>("patternScale");
+	}
 
 void
 BRISK::DESTROY()
@@ -224,6 +263,8 @@ CODE:
 OUTPUT:
 	RETVAL
 
+#if _CV_VERSION() >= _VERSION(2,4,1)
+
 void
 FeatureDetector::set(const char* name, SV* value)
 CODE:
@@ -242,36 +283,34 @@ CODE:
 		}
 	}
 
-FeatureDetector*
-create(const char* CLASS, const char* detectorType)
-INIT:
-	string _detectorType = detectorType;
+SV*
+name(FeatureDetector* THIS)
 CODE:
-	if (_detectorType.find("Grid") == 0) {
-		RETVAL = new GridAdaptedFeatureDetector(FeatureDetector::create(
-								_detectorType.substr(strlen("Grid"))));
-	} else if (_detectorType.find("Pyramid") == 0) {
-		RETVAL = new PyramidAdaptedFeatureDetector(FeatureDetector::create(
-								_detectorType.substr(strlen("Pyramid"))));
-	} else if (_detectorType.find("Dynamic") == 0) {
-		RETVAL = new DynamicAdaptedFeatureDetector(AdjusterAdapter::create(
-								_detectorType.substr(strlen("Dynamic"))));
-	} else if (_detectorType.compare( "HARRIS" ) == 0) {
-		RETVAL = FeatureDetector::create("GFTT");
-		RETVAL->set("useHarrisDetector", true);
-	} else {
-		RETVAL = Algorithm::create<FeatureDetector>("Feature2D." + _detectorType);
-	}
+	string s = THIS->name();
+	RETVAL = newSVpvn(s.c_str(), s.size());
 OUTPUT:
 	RETVAL
 
+#endif
+
+MODULE = Cv::Features2d		PACKAGE = Cv::Features2d::FeatureDetector::GridAdaptedFeatureDetector
+
+GridAdaptedFeatureDetector*
+GridAdaptedFeatureDetector::new(FeatureDetector *detector, int maxTotalKeypoints, int gridRows=4, int gridCols=4)
+
 void
-FeatureDetector::DESTROY()
+GridAdaptedFeatureDetector::DESTROY()
 
 MODULE = Cv::Features2d		PACKAGE = Cv::Features2d::FeatureDetector::FastFeatureDetector
 
 FastFeatureDetector*
 FastFeatureDetector::new(int threshold=1, bool nonmaxSuppression=true)
+INIT:
+	if (sv_isobject(ST(0)) && (SvTYPE(SvRV(ST(0))) == SVt_PVMG)) {
+		FastFeatureDetector* THIS = (FastFeatureDetector*)SvIV((SV*)SvRV(ST(0)));
+		if (items < 2) threshold = THIS->get<int>("threshold");
+		if (items < 3) nonmaxSuppression = THIS->get<bool>("nonmaxSuppression");
+	}
 
 void
 FastFeatureDetector::DESTROY()
@@ -299,6 +338,15 @@ MODULE = Cv::Features2d		PACKAGE = Cv::Features2d::FeatureDetector::StarFeatureD
 
 StarFeatureDetector*
 StarFeatureDetector::new(int maxSize=16, int responseThreshold=30, int lineThresholdProjected = 10, int lineThresholdBinarized=8, int suppressNonmaxSize=5)
+INIT:
+	if (sv_isobject(ST(0)) && (SvTYPE(SvRV(ST(0))) == SVt_PVMG)) {
+		StarFeatureDetector* THIS = (StarFeatureDetector*)SvIV((SV*)SvRV(ST(0)));
+		if (items < 2) maxSize = THIS->get<int>("maxSize");
+		if (items < 3) responseThreshold = THIS->get<int>("responseThreshold");
+		if (items < 4) lineThresholdProjected = THIS->get<int>("lineThresholdProjected");
+		if (items < 5) lineThresholdBinarized = THIS->get<int>("lineThresholdBinarized");
+		if (items < 6) suppressNonmaxSize = THIS->get<int>("suppressNonmaxSize");
+	}
 
 void
 StarFeatureDetector::DESTROY()
@@ -338,32 +386,24 @@ DescriptorExtractor::descriptorSize()
 int
 DescriptorExtractor::descriptorType()
 
-
-DescriptorExtractor*
-create(const char* CLASS, const char* descriptorExtractorType)
-INIT:
-	string _descriptorExtractorType = descriptorExtractorType;
+SV*
+name(DescriptorExtractor* THIS)
 CODE:
-    if (_descriptorExtractorType.find("Opponent") == 0) {
-		size_t pos = String("Opponent").size();
-		String type = _descriptorExtractorType.substr(pos);
-		RETVAL = new OpponentColorDescriptorExtractor(
-			DescriptorExtractor::create(type));
-	} else {
-		RETVAL = Algorithm::create<DescriptorExtractor>(
-			"Feature2D." + _descriptorExtractorType);
-	}
+	string s = THIS->name();
+	RETVAL = newSVpvn(s.c_str(), s.size());
 OUTPUT:
 	RETVAL
-
-void
-DescriptorExtractor::DESTROY()
 
 
 MODULE = Cv::Features2d		PACKAGE = Cv::Features2d::DescriptorExtractor::BriefDescriptorExtractor
 
 BriefDescriptorExtractor*
 BriefDescriptorExtractor::new(int bytes = 32)
+INIT:
+	if (sv_isobject(ST(0)) && (SvTYPE(SvRV(ST(0))) == SVt_PVMG)) {
+		BriefDescriptorExtractor* THIS = (BriefDescriptorExtractor*)SvIV((SV*)SvRV(ST(0)));
+		if (items < 2) bytes = THIS->get<int>("bytes");
+	}
 
 void
 BriefDescriptorExtractor::DESTROY()
@@ -382,6 +422,16 @@ void
 FREAK::DESTROY()
 
 #endif
+
+
+MODULE = Cv::Features2d		PACKAGE = Cv::Features2d::DescriptorExtractor::OpponentColorDescriptorExtractor
+
+DescriptorExtractor*
+OpponentColorDescriptorExtractor::new(DescriptorExtractor* dextractor)
+
+void
+OpponentColorDescriptorExtractor::DESTROY()
+
 
 # ============================================================
 #  Common Interfaces of Descriptor Matchers

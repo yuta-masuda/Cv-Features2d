@@ -75,14 +75,3 @@ can_ok($detector2, qw(detect));
 
 isa_ok($extractor, 'Cv::Features2d::DescriptorExtractor');
 can_ok($extractor, qw(compute));
-
-for my $type (qw(FAST STAR SURF)) {
-	my $d = Cv::Features2d::FeatureDetector->create("Grid\U$type");
-	isa_ok($d, 'Cv::Features2d::FeatureDetector');
-	can_ok($d, qw(detect));
-	lives_ok { $d->set("maxTotalKeypoints", 100) };
-	lives_ok { $d->set("gridRows", 4) };
-	lives_ok { $d->set("gridCols", 4) };
-	throws_ok { $d->set("???", 1) }
-	qr/OpenCV Error: Bad argument \(No parameter '\?\?\?' is found\) in set at/;
-}
