@@ -1,5 +1,8 @@
 Revision history for Perl extension Cv::Features2d
 
+0.08 - 2013-08-25
+     * rewrite .pm using create() and // (defined-or)
+
 0.07 - 2013-08-04
      * fixed Grid, Pyramid, Opponent (experimental)
 

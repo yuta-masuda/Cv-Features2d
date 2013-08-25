@@ -21,14 +21,14 @@ Cv::Features2d - Cv extension for OpenCV Features Detector
 
 package Cv::Features2d;
 
-use 5.008008;
+use 5.010;
 use strict;
 use warnings;
 use Carp;
 use Data::Structure::Util qw(unbless);
 use Cv ();
 
-our $VERSION = '0.07';
+our $VERSION = '0.08';
 
 require XSLoader;
 XSLoader::load('Cv::Features2d', $VERSION);

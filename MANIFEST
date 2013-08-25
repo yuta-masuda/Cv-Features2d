@@ -8,6 +8,8 @@ ppport.h
 README
 sample/find_obj.pl
 sample/freak_demo.pl
+sample/harris_detector.pl
+t/create.t
 t/detector.t
 t/extractor.t
 t/features2d.t

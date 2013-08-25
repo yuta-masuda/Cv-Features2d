@@ -8,6 +8,7 @@ use strict;
 use warnings;
 use Cv;
 use Cv::Features2d qw(:all);
+use Cv::More 0.31 qw(nonzero);
 
 # Global variables
 my $thresh = 200;
@@ -48,32 +49,3 @@ sub cornerHarris_demo {
 	# Showing the result
 	$dst_norm_scaled->show($corners_window);
 }
-
-
-sub nonzero { @{nonzero_(@_)} }
-
-use Cv::Config;
-use Inline C => Config => %Cv::Config::C;
-use Inline C => << '----';
-
-AV*
-nonzero_(CvArr* src)
-{
-	CvSize size = cvGetSize(src);
-	AV* RETVAL = newAV();
-	int i, j;
-	for (j = 0; j < size.height; j++) {
-		uchar* line = cvPtr2D(src, j, 0);
-		for (i = 0; i < size.width; i++) {
-			if (line[i]) {
-				AV* pt = newAV();
-				av_push(pt, newSViv(i));
-				av_push(pt, newSViv(j));
-				av_push(RETVAL, newRV_inc(sv_2mortal((SV*)pt)));
-			}
-		}
-	}
-	return RETVAL;
-}
-
-----
