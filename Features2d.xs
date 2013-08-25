@@ -155,100 +155,6 @@ CODE:
 	(*THIS)(cvarrToMat(image), mask? cvarrToMat(mask) : noArray(), keypoints, _descriptors);
 	descriptors = matToCvmat(_descriptors);
 
-CvMat*
-Feature2D::compute(CvArr* image, KeyPointV keypoints)
-CODE:
-	Mat _descriptors;
-	(*THIS)(cvarrToMat(image), noArray(), keypoints, _descriptors, true);
-	RETVAL = matToCvmat(_descriptors);
-OUTPUT:
-	RETVAL
-
-#if _CV_VERSION() >= _VERSION(2,4,0)
-
-MODULE = Cv::Features2d		PACKAGE = Cv::Features2d::Feature2D::SIFT
-
-SIFT*
-SIFT::new(int nfeatures=0, int nOctaveLayers=3, double contrastThreshold=0.04, double edgeThreshold=10, double sigma=1.6)
-INIT:
-	if (sv_isobject(ST(0)) && (SvTYPE(SvRV(ST(0))) == SVt_PVMG)) {
-		SIFT* THIS = (SIFT*)SvIV((SV*)SvRV(ST(0)));
-		if (items < 2) nfeatures = THIS->get<int>("nFeatures");
-		if (items < 3) nOctaveLayers = THIS->get<int>("nOctaveLayers");
-		if (items < 4) contrastThreshold = THIS->get<double>("contrastThreshold");
-		if (items < 5) edgeThreshold = THIS->get<double>("edgeThreshold");
-		if (items < 6) sigma = THIS->get<double>("sigma");
-	}
-
-void
-SIFT::DESTROY()
-
-#endif
-
-
-MODULE = Cv::Features2d		PACKAGE = Cv::Features2d::Feature2D::SURF
-
-SURF*
-SURF::new(double hessianThreshold=NO_INIT, int nOctaves=4, int nOctaveLayers=2, bool extended=true, bool upright=false)
-INIT:
-	if (sv_isobject(ST(0)) && (SvTYPE(SvRV(ST(0))) == SVt_PVMG)) {
-		SURF* THIS = (SURF*)SvIV((SV*)SvRV(ST(0)));
-		if (items < 2) hessianThreshold = THIS->get<double>("hessianThreshold");
-		if (items < 3) nOctaves = THIS->get<int>("nOctaves");
-		if (items < 4) nOctaveLayers = THIS->get<int>("nOctaveLayers");
-		if (items < 5) extended = THIS->get<bool>("extended");
-		if (items < 6) upright = THIS->get<bool>("upright");
-	} else if (items < 2) {
-		croak_xs_usage(cv,  "CLASS, hessianThreshold, nOctaves=4, nOctaveLayers=2, extended=true, upright=false");
-	}
-
-void
-SURF::DESTROY()
-
-
-#if _CV_VERSION() >= _VERSION(2,4,0)
-
-MODULE = Cv::Features2d		PACKAGE = Cv::Features2d::Feature2D::ORB
-
-ORB*
-ORB::new(int nfeatures=500, float scaleFactor=1.2f, int nlevels=8, int edgeThreshold=31, int firstLevel=0, int WTA_K=2, int scoreType=ORB::HARRIS_SCORE, int patchSize=31)
-INIT:
-	if (sv_isobject(ST(0)) && (SvTYPE(SvRV(ST(0))) == SVt_PVMG)) {
-		ORB* THIS = (ORB*)SvIV((SV*)SvRV(ST(0)));
-		if (items < 2) nfeatures = THIS->get<int>("nFeatures");
-		if (items < 3) scaleFactor = THIS->get<double>("scaleFactor");
-		if (items < 4) nlevels = THIS->get<int>("nLevels");
-		if (items < 5) edgeThreshold = THIS->get<int>("edgeThreshold");
-		if (items < 6) firstLevel = THIS->get<int>("firstLevel");
-		if (items < 7) WTA_K = THIS->get<int>("WTA_K");
-		if (items < 8) scoreType = THIS->get<int>("scoreType");
-		if (items < 9) patchSize = THIS->get<int>("patchSize");
-	}
-
-void
-ORB::DESTROY()
-
-#endif
-
-
-#if _CV_VERSION() >= _VERSION(2,4,0)
-
-MODULE = Cv::Features2d		PACKAGE = Cv::Features2d::Feature2D::BRISK
-
-BRISK*
-BRISK::new(int thresh=30, int octaves=3, float patternScale=1.0f)
-INIT:
-	if (sv_isobject(ST(0)) && (SvTYPE(SvRV(ST(0))) == SVt_PVMG)) {
-		BRISK* THIS = (BRISK*)SvIV((SV*)SvRV(ST(0)));
-		if (items < 2) thresh = THIS->get<int>("thres");
-		if (items < 3) octaves = THIS->get<int>("octaves");
-		// if (items < 4) patternScale = THIS->get<double>("patternScale");
-	}
-
-void
-BRISK::DESTROY()
-
-#endif
 
 # ============================================================
 #  Common Interfaces of Feature Detectors
@@ -263,98 +169,29 @@ CODE:
 OUTPUT:
 	RETVAL
 
-#if _CV_VERSION() >= _VERSION(2,4,1)
-
-SV*
-name(FeatureDetector* THIS)
+FeatureDetector*
+create(const char* CLASS, const char* detectorType)
 CODE:
-	string s = THIS->name();
-	RETVAL = newSVpvn(s.c_str(), s.size());
+	Ptr<FeatureDetector> THIS = FeatureDetector::create(detectorType);
+	if (THIS.empty()) XSRETURN_UNDEF;
+	RETVAL = THIS; THIS.addref();
 OUTPUT:
 	RETVAL
 
-#endif
-
-MODULE = Cv::Features2d		PACKAGE = Cv::Features2d::FeatureDetector::FastFeatureDetector
-
-FastFeatureDetector*
-FastFeatureDetector::new(int threshold=1, bool nonmaxSuppression=true)
-INIT:
-	if (sv_isobject(ST(0)) && (SvTYPE(SvRV(ST(0))) == SVt_PVMG)) {
-		FastFeatureDetector* THIS = (FastFeatureDetector*)SvIV((SV*)SvRV(ST(0)));
-		if (items < 2) threshold = THIS->get<int>("threshold");
-		if (items < 3) nonmaxSuppression = THIS->get<bool>("nonmaxSuppression");
-	}
-
 void
-FastFeatureDetector::DESTROY()
+FeatureDetector::DESTROY()
+CODE:
+	((Ptr<FeatureDetector>)THIS).release();
 
-
-MODULE = Cv::Features2d		PACKAGE = Cv::Features2d::FeatureDetector::GoodFeaturesToTrackDetector
-
-GoodFeaturesToTrackDetector*
-GoodFeaturesToTrackDetector::new(int maxCorners=1000, double qualityLevel=0.01, double minDistance=1., int blockSize=3, bool useHarrisDetector=false, double k=0.04 )
-
-void
-GoodFeaturesToTrackDetector::DESTROY()
-
-
-MODULE = Cv::Features2d		PACKAGE = Cv::Features2d::FeatureDetector::MserFeatureDetector
-
-MserFeatureDetector*
-MserFeatureDetector::new(int delta, int minArea, int maxArea, double maxVariation, double minDiversity, int maxEvolution, double areaThreshold, double minMargin, int edgeBlurSize)
-
-void
-MserFeatureDetector::DESTROY()
-
-
-MODULE = Cv::Features2d		PACKAGE = Cv::Features2d::FeatureDetector::StarFeatureDetector
-
-StarFeatureDetector*
-StarFeatureDetector::new(int maxSize=16, int responseThreshold=30, int lineThresholdProjected = 10, int lineThresholdBinarized=8, int suppressNonmaxSize=5)
-INIT:
-	if (sv_isobject(ST(0)) && (SvTYPE(SvRV(ST(0))) == SVt_PVMG)) {
-		StarFeatureDetector* THIS = (StarFeatureDetector*)SvIV((SV*)SvRV(ST(0)));
-		if (items < 2) maxSize = THIS->get<int>("maxSize");
-		if (items < 3) responseThreshold = THIS->get<int>("responseThreshold");
-		if (items < 4) lineThresholdProjected = THIS->get<int>("lineThresholdProjected");
-		if (items < 5) lineThresholdBinarized = THIS->get<int>("lineThresholdBinarized");
-		if (items < 6) suppressNonmaxSize = THIS->get<int>("suppressNonmaxSize");
-	}
-
-void
-StarFeatureDetector::DESTROY()
-
-
-#if _CV_VERSION() >= _VERSION(2,4,0)
-
-MODULE = Cv::Features2d		PACKAGE = Cv::Features2d::FeatureDetector::DenseFeatureDetector
-
-DenseFeatureDetector*
-DenseFeatureDetector::new(float initFeatureScale=1.f, int featureScaleLevels=1, float featureScaleMul=0.1f, int initXyStep=6, int initImgBound=0, bool varyXyStepWithScale=true, bool varyImgBoundWithScale=false)
-
-void
-DenseFeatureDetector::DESTROY()
-
-#endif
-
-
-MODULE = Cv::Features2d		PACKAGE = Cv::Features2d::FeatureDetector::GridAdaptedFeatureDetector
-
-GridAdaptedFeatureDetector*
-GridAdaptedFeatureDetector::new(FeatureDetector *detector, int maxTotalKeypoints, int gridRows=4, int gridCols=4)
-
-void
-GridAdaptedFeatureDetector::DESTROY()
 
 MODULE = Cv::Features2d		PACKAGE = Cv::Features2d::FeatureDetector::PyramidAdaptedFeatureDetector
 
 PyramidAdaptedFeatureDetector*
-PyramidAdaptedFeatureDetector::new(FeatureDetector *detector, int levels=2)
+PyramidAdaptedFeatureDetector::new(VOID* detector, int levels=2)
+C_ARGS: (FeatureDetector*)detector, levels
 
 void
 PyramidAdaptedFeatureDetector::DESTROY()
-
 
 # ============================================================
 #  Common Interfaces of Descriptor Extractors
@@ -377,51 +214,19 @@ DescriptorExtractor::descriptorSize()
 int
 DescriptorExtractor::descriptorType()
 
-SV*
-name(DescriptorExtractor* THIS)
+DescriptorExtractor*
+create(const char* CLASS, const char* descriptorExtractorType)
 CODE:
-	string s = THIS->name();
-	RETVAL = newSVpvn(s.c_str(), s.size());
+	Ptr<DescriptorExtractor> THIS = DescriptorExtractor::create(descriptorExtractorType);
+	if (THIS.empty()) XSRETURN_UNDEF;
+	RETVAL = THIS; THIS.addref();
 OUTPUT:
 	RETVAL
 
-
-MODULE = Cv::Features2d		PACKAGE = Cv::Features2d::DescriptorExtractor::BriefDescriptorExtractor
-
-BriefDescriptorExtractor*
-BriefDescriptorExtractor::new(int bytes = 32)
-INIT:
-	if (sv_isobject(ST(0)) && (SvTYPE(SvRV(ST(0))) == SVt_PVMG)) {
-		BriefDescriptorExtractor* THIS = (BriefDescriptorExtractor*)SvIV((SV*)SvRV(ST(0)));
-		if (items < 2) bytes = THIS->get<int>("bytes");
-	}
-
 void
-BriefDescriptorExtractor::DESTROY()
-
-
-#if _CV_VERSION() >= _VERSION(2,4,2)
-
-MODULE = Cv::Features2d		PACKAGE = Cv::Features2d::DescriptorExtractor::FREAK
-
-# C++: FREAK::FREAK(bool orientationNormalized=true, bool scaleNormalized=true, float patternScale=22.0f, int nOctaves=4, const vector<int>& selectedPairs=vector<int>())
-
-FREAK*
-FREAK::new(bool orientationNormalized = true, bool scaleNormalized = true, float patternScale = 22.0f, int nOctaves = 4)
-
-void
-FREAK::DESTROY()
-
-#endif
-
-
-MODULE = Cv::Features2d		PACKAGE = Cv::Features2d::DescriptorExtractor::OpponentColorDescriptorExtractor
-
-DescriptorExtractor*
-OpponentColorDescriptorExtractor::new(DescriptorExtractor* dextractor)
-
-void
-OpponentColorDescriptorExtractor::DESTROY()
+DescriptorExtractor::DESTROY()
+CODE:
+	((Ptr<DescriptorExtractor>)THIS).release();
 
 
 # ============================================================
@@ -482,5 +287,56 @@ C_ARGS:	_indexParams, _searchParams
 
 void
 FlannBasedMatcher::DESTROY()
+
+MODULE = Cv::Features2d		PACKAGE = Cv::Features2d::Algorithm
+
+SV*
+Algorithm::name()
+CODE:
+	string s = THIS->name();
+	RETVAL = newSVpvn(s.c_str(), s.size());
+OUTPUT:
+	RETVAL
+
+void
+Algorithm::set_int(const char* name, int value)
+CODE:
+	THIS->set(name, value);
+
+int
+Algorithm::get_int(const char* name)
+CODE:
+	RETVAL = THIS->get<int>(name);
+OUTPUT:
+	RETVAL
+
+void
+Algorithm::set_double(const char* name, double value)
+CODE:
+	THIS->set(name, value);
+
+double
+Algorithm::get_double(const char* name)
+CODE:
+	RETVAL = THIS->get<double>(name);
+OUTPUT:
+	RETVAL
+
+void
+Algorithm::set_bool(const char* name, bool value)
+CODE:
+	THIS->set(name, value);
+
+bool
+Algorithm::get_bool(const char* name)
+CODE:
+	RETVAL = THIS->get<bool>(name);
+OUTPUT:
+	RETVAL
+
+void
+Algorithm::set_algorithm(const char* name, VOID* value)
+CODE:
+	THIS->set(name, (Ptr<Algorithm>)(Algorithm*)value);
 
 MODULE = Cv::Features2d		PACKAGE = Cv::Features2d

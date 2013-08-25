@@ -3,31 +3,15 @@
 ##################################################
 TYPEMAP
 
-FeatureDetector*					O_OBJECT
-FastFeatureDetector*				O_OBJECT
-GoodFeaturesToTrackDetector*		O_OBJECT
-MSER*								O_OBJECT
-MserFeatureDetector*				O_OBJECT
-StarFeatureDetector*				O_OBJECT
-DenseFeatureDetector*				O_OBJECT
-GridAdaptedFeatureDetector*			O_OBJECT
-PyramidAdaptedFeatureDetector*		O_OBJECT
-
+Algorithm*							O_OBJECT
 Feature2D*							O_OBJECT
-SIFT*								O_OBJECT
-SURF*								O_OBJECT
-ORB*								O_OBJECT
-BRISK*								O_OBJECT
-
+FeatureDetector*					O_OBJECT
 DescriptorExtractor*				O_OBJECT
-BriefDescriptorExtractor*			O_OBJECT
-FREAK*								O_OBJECT
-OpponentColorDescriptorExtractor*	O_OBJECT
-
 DescriptorMatcher*					O_OBJECT
+
+PyramidAdaptedFeatureDetector*		O_OBJECT
+FlannBasedMatcher*					O_OBJECT
 BFMatcher*							O_OBJECT
-FlannBasedMatcher*					O_OBJECT
-FlannBasedMatcher*					O_OBJECT
 
 MatV								T_MatV
 KeyPointV							T_KeyPointV
