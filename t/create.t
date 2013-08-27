@@ -18,7 +18,7 @@ if (1) {
 	is($q->sigma, $p->sigma);
 }
 
-if (1) {
+if (2) {
 	my $p = SURF(100);
 	my $q = $p->new();
 	is($q->hessianThreshold, $p->hessianThreshold);
@@ -28,7 +28,7 @@ if (1) {
 	is($q->upright, $p->upright);
 }
 
-if (1) {
+if (3) {
 	my $p = ORB();
 	my $q = $p->new();
 	is($q->nFeatures, $p->nFeatures);
@@ -41,14 +41,14 @@ if (1) {
 	is($q->scoreType, $p->scoreType);
 }
 
-if (1) {
+if (4) {
 	my $p = BRISK();
 	my $q = $p->new();
 	is($q->thres, $p->thres);
 	is($q->octaves, $p->octaves);
 }
 
-if (1) {
+if (5) {
 	my $p = FastFeatureDetector(10, 0);
 	my $q = $p->new();
 	is($q->threshold, $p->threshold);
@@ -56,7 +56,7 @@ if (1) {
 	# is($q->type, $p->type);
 }
 
-if (1) {
+if (6) {
 	my $p = StarFeatureDetector();
 	my $q = $p->new();
 	is($q->maxSize, $p->maxSize);
@@ -66,7 +66,7 @@ if (1) {
 	is($q->suppressNonmaxSize, $p->suppressNonmaxSize);
 }
 
-if (1) {
+if (7) {
 	my $p = GoodFeaturesToTrackDetector();
 	my $q = $p->new();
 	is($q->nfeatures, $p->nfeatures);
@@ -76,7 +76,7 @@ if (1) {
 	is($q->k, $p->k);
 }
 
-if (1) {
+if (8) {
 	my $p = MserFeatureDetector(5, 60, 14400, 0.25, 0.2, 200, 1.01, 0.003, 5);
 	my $q = $p->new();
 	is($q->delta, $p->delta);
@@ -90,7 +90,7 @@ if (1) {
 	is($q->edgeBlurSize, $p->edgeBlurSize);
 }
 
-if (1) {
+if (9) {
 	my $p = DenseFeatureDetector();
 	my $q = $p->new();
 	is($q->initFeatureScale, $p->initFeatureScale);
@@ -100,4 +100,24 @@ if (1) {
 	is($q->initImgBound, $p->initImgBound);
 	is($q->varyXyStepWithScale, $p->varyXyStepWithScale);
 	is($q->varyImgBoundWithScale, $p->varyImgBoundWithScale);
+}
+
+if (10) {
+	my $p = GridAdaptedFeatureDetector(SURF(500), 100);
+	my $detector = $p->detector;
+	my $q = $p->new();
+	is($q->maxTotalKeypoints, $p->maxTotalKeypoints);
+	is($q->gridRows, $p->gridRows);
+	is($q->gridCols, $p->gridCols);
+}
+
+if (99) {
+	for my $class (
+		qw(Cv::Features2d::FeatureDetector),
+		qw(Cv::Features2d::Feature2D),
+		qw(Cv::Features2d::Feature2D::SURF),
+		) {
+		my $surf = $class->create("SURF");
+		lives_ok { $surf->get_double("hessianThreshold") };
+	}
 }

@@ -291,9 +291,9 @@ FlannBasedMatcher::DESTROY()
 MODULE = Cv::Features2d		PACKAGE = Cv::Features2d::Algorithm
 
 SV*
-Algorithm::name()
+name(VOID* THIS)
 CODE:
-	string s = THIS->name();
+	string s = ((Algorithm *)THIS)->name();
 	RETVAL = newSVpvn(s.c_str(), s.size());
 OUTPUT:
 	RETVAL
@@ -338,5 +338,13 @@ void
 Algorithm::set_algorithm(const char* name, VOID* value)
 CODE:
 	THIS->set(name, (Ptr<Algorithm>)(Algorithm*)value);
+
+VOID*
+Algorithm::get_algorithm(const char* name)
+CODE:
+	RETVAL = (VOID*)THIS->get<Algorithm>(name);
+	((Ptr<Algorithm>)(Algorithm*)RETVAL).addref();
+OUTPUT:
+	RETVAL
 
 MODULE = Cv::Features2d		PACKAGE = Cv::Features2d
