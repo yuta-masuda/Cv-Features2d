@@ -14,10 +14,11 @@ typedef vector<vector<DMatch> > DMatchVV;
 
 static CvMat* matToCvmat(Mat& var)
 {
-#if 0
+#if 1
 	CvMat* cvmat = cvCreateMatHeader(var.rows, var.cols, var.type());
 	cvSetData(cvmat, var.data, CV_AUTOSTEP);
-	cvIncRefData(cvmat);	   // XXXXX
+	// cvIncRefData(cvmat);	   // XXXXX
+	var.addref();
 	return cvmat;
 #else
 	CvMat cvmat = var;
