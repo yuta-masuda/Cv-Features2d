@@ -150,11 +150,27 @@ OUTPUT:
 MODULE = Cv::Features2d		PACKAGE = Cv::Features2d::Feature2D
 
 void
-Feature2D::detectAndCompute(OUTLIST KeyPointV keypoints, OUTLIST CvMat*descriptors, CvArr* image, CvArr* mask = NULL)
+Feature2D::detectAndCompute(OUTLIST KeyPointV keypoints, OUTLIST CvMat* descriptors, CvArr* image, CvArr* mask = NULL)
 CODE:
 	Mat _descriptors;
 	(*THIS)(cvarrToMat(image), mask? cvarrToMat(mask) : noArray(), keypoints, _descriptors);
 	descriptors = matToCvmat(_descriptors);
+
+KeyPointV
+Feature2D::detect(CvArr* image, CvArr* mask = NULL)
+CODE:
+	THIS->detect(cvarrToMat(image), RETVAL, mask? cvarrToMat(mask) : Mat());
+OUTPUT:
+	RETVAL
+
+CvMat*
+Feature2D::compute(CvArr* image, KeyPointV keypoints)
+CODE:
+	Mat _descriptors;
+	(*THIS)(cvarrToMat(image), noArray(), keypoints, _descriptors, true);
+	RETVAL = matToCvmat(_descriptors);
+OUTPUT:
+	RETVAL
 
 
 # ============================================================

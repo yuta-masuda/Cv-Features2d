@@ -70,13 +70,9 @@ sub classes {
 
 =head1 DESCRIPTION
 
-=head2 METHOD
-
 =cut
 
-# ============================================================
 #  core. Basic Structures: Algorithm
-# ============================================================
 
 {
 	package Cv::Features2d::Algorithm;
@@ -123,9 +119,7 @@ sub classes {
 }
 
 
-# ============================================================
-#  features2d. Feature Detection and Description
-# ============================================================
+# @ISAs of the Cv::Features2d
 
 {
 	package Cv::Features2d::FeatureDetector;
@@ -134,7 +128,14 @@ sub classes {
 	our @ISA = qw(Cv::Features2d::Algorithm);
 	package Cv::Features2d::Feature2D;
 	our @ISA = qw(Cv::Features2d::FeatureDetector Cv::Features2d::DescriptorExtractor);
+	package Cv::Features2d::DescriptorMatcher;
 }
+
+
+=head2 Feature2D
+
+There are constructors for extracting keypoints and computing
+descriptors.
 
 =over
 
@@ -147,7 +148,6 @@ L<ORB()|http://docs.opencv.org/search.html?q=ORB>
 	package Cv::Features2d::Feature2D::ORB;
 	use constant { kBytes => 32, HARRIS_SCORE => 0, FAST_SCORE => 1 };
 	our @ISA = qw(Cv::Features2d::Feature2D);
-	Cv::Features2d::Algorithm->import(qw(Int Double));
 	$Cv::Features2d::CLASS{ 'Feature2D.ORB' } = __PACKAGE__;
 	sub new {
 		my ($class, $nFeatures, $scaleFactor, $nLevels,
@@ -174,14 +174,6 @@ L<ORB()|http://docs.opencv.org/search.html?q=ORB>
 		$self->patchSize($patchSize // 31);
 		$self;
 	}
-	sub nFeatures { &Int }
-	sub scaleFactor { &Double }
-	sub nLevels { &Int }
-	sub edgeThreshold { &Int }
-	sub firstLevel { &Int }
-	sub WTA_K { &Int }
-	sub scoreType { &Int }
-	sub patchSize { &Int }
 }
 
 
@@ -193,7 +185,6 @@ L<BRISK()|http://docs.opencv.org/search.html?q=BRISK>
 {
 	package Cv::Features2d::Feature2D::BRISK;
 	our @ISA = qw(Cv::Features2d::Feature2D);
-	Cv::Features2d::Algorithm->import(qw(Int Double));
 	$Cv::Features2d::CLASS{ 'Feature2D.BRISK' } = __PACKAGE__;
 	sub new {
 		my ($class, $thres, $octaves) = @_;
@@ -206,8 +197,6 @@ L<BRISK()|http://docs.opencv.org/search.html?q=BRISK>
 		$self->octaves($octaves // 3);
 		$self;
 	}
-	sub thres { &Int }
-	sub octaves { &Int }
 }
 
 
@@ -219,7 +208,6 @@ L<SIFT()|http://docs.opencv.org/search.html?q=SIFT>
 {
 	package Cv::Features2d::Feature2D::SIFT;
 	our @ISA = qw(Cv::Features2d::Feature2D);
-	Cv::Features2d::Algorithm->import(qw(Int Double));
 	sub new {
 		my ($class, $nFeatures, $nOctaveLayers, $contrastThreshold,
 			$edgeThreshold, $sigma) = @_;
@@ -238,11 +226,6 @@ L<SIFT()|http://docs.opencv.org/search.html?q=SIFT>
 		$self->sigma($sigma // 1.6);
 		$self;
 	}
-	sub nFeatures { &Int }
-	sub nOctaveLayers { &Int }
-	sub contrastThreshold { &Double }
-	sub edgeThreshold { &Double }
-	sub sigma { &Double }
 }
 
 
@@ -254,7 +237,6 @@ L<SURF()|http://docs.opencv.org/search.html?q=SURF>
 {
 	package Cv::Features2d::Feature2D::SURF;
 	our @ISA = qw(Cv::Features2d::Feature2D);
-	Cv::Features2d::Algorithm->import(qw(Int Double Bool));
 	$Cv::Features2d::CLASS{ 'Feature2D.SURF' } = __PACKAGE__;
 	sub new {
 		my ($class, $hessianThreshold, $nOctaves, $nOctaveLayers,
@@ -283,6 +265,95 @@ L<SURF()|http://docs.opencv.org/search.html?q=SURF>
 		$copy->upright($self->upright);
 		$copy;
 	}
+}
+
+=back
+
+  my $orb = ORB();
+  my $brisk = BRISK();
+  my $sift = SIFT();
+  my $surf = SURF(200);
+
+The object has methods detect(), compute(), and detectAndCompute().
+
+=over
+
+=item
+L<detectAndCompute()|http://docs.opencv.org/search.html?q=detectAndCompute>
+
+=back
+
+  my ($kp, $desc) = $surf->detectAndCompute($img, $mask);
+  my ($kp, $desc) = $surf->detectAndCompute($img);
+
+Parameters of the constructor can also be set/get as properties of the
+object.
+
+  my $hessianThreshold = $surf->hessianThreshold;
+  $surf->hessianThreshold(200);
+
+=over
+
+=item *
+
+ORB() - nFeatures, scaleFactor, nLevels, edgeThreshold,
+firstLevel, WTA_K, scoreType, patchSize
+
+=cut
+
+{
+	package Cv::Features2d::Feature2D::ORB;
+	Cv::Features2d::Algorithm->import(qw(Int Double));
+	sub nFeatures { &Int }
+	sub scaleFactor { &Double }
+	sub nLevels { &Int }
+	sub edgeThreshold { &Int }
+	sub firstLevel { &Int }
+	sub WTA_K { &Int }
+	sub scoreType { &Int }
+	sub patchSize { &Int }
+}
+
+=item *
+
+BRISK() - thres, octaves
+
+=cut
+
+{
+	package Cv::Features2d::Feature2D::BRISK;
+	Cv::Features2d::Algorithm->import(qw(Int Double));
+	sub thres { &Int }
+	sub octaves { &Int }
+}
+
+=item *
+
+SIFT() - nFeatures, nOctaveLayers, contrastThreshold,
+edgeThreshold, sigma
+
+=cut
+
+{
+	package Cv::Features2d::Feature2D::SIFT;
+	Cv::Features2d::Algorithm->import(qw(Int Double));
+	sub nFeatures { &Int }
+	sub nOctaveLayers { &Int }
+	sub contrastThreshold { &Double }
+	sub edgeThreshold { &Double }
+	sub sigma { &Double }
+}
+
+=item *
+
+SURF() - hessianThreshold, nOctaves, nOctaveLayers,
+extended, upright
+
+=cut
+
+{
+	package Cv::Features2d::Feature2D::SURF;
+	Cv::Features2d::Algorithm->import(qw(Int Double Bool));
 	sub hessianThreshold { &Double }
 	sub nOctaves { &Int }
 	sub nOctaveLayers { &Int }
@@ -290,22 +361,10 @@ L<SURF()|http://docs.opencv.org/search.html?q=SURF>
 	sub upright { &Bool }
 }
 
+
+=head2 FeatureDetector
+
 =over
-
-=item
-L<detectAndCompute()|http://docs.opencv.org/search.html?q=detectAndCompute>
-
-  my ($kp, $desc) = $f2d->detectAndCompute($img, $mask);
-  my ($kp, $desc) = $f2d->detectAndCompute($img);
-
-=back
-
-=cut
-
-
-# ============================================================
-#  features2d. Feature Detection and Description
-# ============================================================
 
 =item
 L<FastFeatureDetector()|http://docs.opencv.org/search.html?q=FastFeatureDetector>
@@ -315,7 +374,6 @@ L<FastFeatureDetector()|http://docs.opencv.org/search.html?q=FastFeatureDetector
 {
 	package Cv::Features2d::FeatureDetector::FastFeatureDetector;
 	our @ISA = qw(Cv::Features2d::FeatureDetector);
-	Cv::Features2d::Algorithm->import(qw(Int Bool));
 	$Cv::Features2d::CLASS{ 'Feature2D.FAST' } = __PACKAGE__;
 	sub new {
 		my ($class, $threshold, $nonmaxSuppression, $type) = @_;
@@ -334,10 +392,7 @@ L<FastFeatureDetector()|http://docs.opencv.org/search.html?q=FastFeatureDetector
 		$copy->nonmaxSuppression($self->nonmaxSuppression);
 		$copy;
 	}
-	sub threshold { &Int }
-	sub nonmaxSuppression { &Bool }
 }
-
 
 =item
 L<StarFeatureDetector()|http://docs.opencv.org/search.html?q=StarFeatureDetector>
@@ -347,7 +402,6 @@ L<StarFeatureDetector()|http://docs.opencv.org/search.html?q=StarFeatureDetector
 {
 	package Cv::Features2d::FeatureDetector::StarFeatureDetector;
 	our @ISA = qw(Cv::Features2d::FeatureDetector);
-	Cv::Features2d::Algorithm->import(qw(Int));
 	$Cv::Features2d::CLASS{ 'Feature2D.STAR' } = __PACKAGE__;
 	sub new {
 		my ($class, $maxSize, $responseThreshold,
@@ -377,11 +431,6 @@ L<StarFeatureDetector()|http://docs.opencv.org/search.html?q=StarFeatureDetector
 		$copy->suppressNonmaxSize($self->suppressNonmaxSize);
 		$copy;
 	}
-	sub maxSize { &Int }
-	sub responseThreshold { &Int }
-	sub lineThresholdProjected { &Int }
-	sub lineThresholdBinarized { &Int }
-	sub suppressNonmaxSize { &Int }
 }
 
 
@@ -394,7 +443,6 @@ L<MserFeatureDetector()|http://docs.opencv.org/search.html?q=MserFeatureDetector
 {
 	package Cv::Features2d::FeatureDetector::MserFeatureDetector;
 	our @ISA = qw(Cv::Features2d::FeatureDetector);
-	Cv::Features2d::Algorithm->import(qw(Int Double));
 	$Cv::Features2d::CLASS{ 'Feature2D.MSER' } = __PACKAGE__;
 	sub new {
 		my ($class, $delta, $minArea, $maxArea, $maxVariation,
@@ -423,27 +471,17 @@ L<MserFeatureDetector()|http://docs.opencv.org/search.html?q=MserFeatureDetector
 		$self->edgeBlurSize($edgeBlurSize);
 		$self;
 	}
-	sub delta { &Int }
-	sub minArea { &Int }
-	sub maxArea { &Int }
-	sub maxVariation { &Double }
-	sub minDiversity { &Double }
-	sub maxEvolution { &Int }
-	sub areaThreshold { &Double }
-	sub minMargin { &Double }
-	sub edgeBlurSize { &Int }
 }
 
 
 =item
-L<GoodFeaturesToTrackDetector()|http://docs.opencv.org/search.html?q=GoodFeaturesToTrackDetector>,
+L<GoodFeaturesToTrackDetector()|http://docs.opencv.org/search.html?q=GoodFeaturesToTrackDetector>
 
 =cut
 
 {
 	package Cv::Features2d::FeatureDetector::GoodFeaturesToTrackDetector;
 	our @ISA = qw(Cv::Features2d::FeatureDetector);
-	Cv::Features2d::Algorithm->import(qw(Int Bool Double));
 	our $detectorType = "GFTT";	# GFTT or HARRIS
 	$Cv::Features2d::CLASS{ "Feature2D.$detectorType" } = __PACKAGE__;
 	sub new {
@@ -464,13 +502,7 @@ L<GoodFeaturesToTrackDetector()|http://docs.opencv.org/search.html?q=GoodFeature
 		$self->k($k // 0.04);
 		$self;
 	}
-	sub nfeatures { &Int }
-	sub qualityLevel { &Double }
-	sub minDistance { &Double }
-	sub useHarrisDetector { &Bool }
-	sub k { &Double }
 }
-
 
 =item
 L<DenseFeatureDetector()|http://docs.opencv.org/search.html?q=DenseFeatureDetector>
@@ -480,7 +512,6 @@ L<DenseFeatureDetector()|http://docs.opencv.org/search.html?q=DenseFeatureDetect
 {
 	package Cv::Features2d::FeatureDetector::DenseFeatureDetector;
 	our @ISA = qw(Cv::Features2d::FeatureDetector);
-	Cv::Features2d::Algorithm->import(qw(Int Bool Double));
 	$Cv::Features2d::CLASS{ 'Feature2D.Dense' } = __PACKAGE__;
 	sub new {
 		my ($class, $initFeatureScale, $featureScaleLevels,
@@ -505,25 +536,17 @@ L<DenseFeatureDetector()|http://docs.opencv.org/search.html?q=DenseFeatureDetect
 		$self->varyImgBoundWithScale($varyImgBoundWithScale // 0);
 		$self;
 	}
-	sub initFeatureScale { &Double }
-	sub featureScaleLevels { &Int }
-	sub featureScaleMul { &Double }
-	sub initXyStep { &Int }
-	sub initImgBound { &Int }
-	sub varyXyStepWithScale { &Bool }
-	sub varyImgBoundWithScale { &Bool }
 }
 
-
 =item
-L<SimpleBlobDetector()|http://docs.opencv.org/search.html?q=SimpleBlobDetector>
+L<SimpleBlobDetector|http://docs.opencv.org/search.html?q=SimpleBlobDetector>
+()
 
 =cut
 
 {
 	package Cv::Features2d::FeatureDetector::SimpleBlobDetector;
 	our @ISA = qw(Cv::Features2d::FeatureDetector);
-	Cv::Features2d::Algorithm->import(qw(Int Bool Double));
 	$Cv::Features2d::CLASS{ 'Feature2D.SimpleBlob' } = __PACKAGE__;
 	sub new {
 		my ($class, $thresholdStep, $minThreshold, $maxThreshold,
@@ -572,27 +595,7 @@ L<SimpleBlobDetector()|http://docs.opencv.org/search.html?q=SimpleBlobDetector>
 		$self->maxConvexity($maxConvexity);
 		$self;
 	}
-	sub thresholdStep { &Double }
-	sub minThreshold { &Double }
-	sub maxThreshold { &Double }
-	sub minRepeatability { &Int }
-	sub minDistBetweenBlobs { &Double }
-	sub filterByColor { &Bool }
-	sub blobColor { &Int }
-	sub filterByArea { &Bool }
-	sub minArea { &Double }
-	sub maxArea { &Double }
-	sub filterByCircularity { &Bool }
-	sub minCircularity { &Double }
-	sub maxCircularity { &Double }
-	sub filterByInertia { &Bool }
-	sub minInertiaRatio { &Double }
-	sub maxInertiaRatio { &Double }
-	sub filterByConvexity { &Bool }
-	sub minConvexity { &Double }
-	sub maxConvexity { &Double }
 }
-
 
 =item
 L<GridAdaptedFeatureDetector()|http://docs.opencv.org/search.html?q=GridAdaptedFeatureDetector>
@@ -604,7 +607,6 @@ L<GridAdaptedFeatureDetector()|http://docs.opencv.org/search.html?q=GridAdaptedF
 	use Data::Structure::Util qw(unbless);
 	use Scalar::Util qw(blessed);
 	our @ISA = qw(Cv::Features2d::FeatureDetector);
-	Cv::Features2d::Algorithm->import(qw(Int Algorithm));
 	$Cv::Features2d::CLASS{ 'Feature2D.Grid' } = __PACKAGE__;
 	sub new {
 		my ($class, $detector, $maxTotalKeypoints, $gridRows,
@@ -633,15 +635,11 @@ L<GridAdaptedFeatureDetector()|http://docs.opencv.org/search.html?q=GridAdaptedF
 		}
 		$self;
 	}
-	sub detector { &Algorithm }
-	sub maxTotalKeypoints { &Int }
-	sub gridRows { &Int }
-	sub gridCols { &Int }
 }
 
 
 =item
-L<PyramidAdaptedFeatureDetector()|http://docs.opencv.org/search.html?q=PyramidAdaptedFeatureDetector>,
+L<PyramidAdaptedFeatureDetector()|http://docs.opencv.org/search.html?q=PyramidAdaptedFeatureDetector>
 
 =cut
 
@@ -659,14 +657,13 @@ sub PyramidAdaptedFeatureDetector {
 		->new($ptr, @_);
 }
 
-=pod
+=back
 
   my $detector = FastFeatureDetector();
   my $detector = StarFeatureDetector();
   my $detector = MserFeatureDetector();
   my $detector = GoodFeaturesToTrackDetector();
   my $detector = DenseFeatureDetector();
- 
   my $detector = GridAdaptedFeatureDetector(FastFeatureDetector(), 500);
   my $detector = PyramidAdaptedFeatureDetector(FastFeatureDetector());
 
@@ -680,12 +677,155 @@ L<detect()|http://docs.opencv.org/search.html?q=FeatureDetector::detect>
   my $kp = $detector->detect($img, $mask);
   my $kp = $detector->detect($img);
 
+properties are:
+
+=over
+
+=item *
+
+FastFeatureDetector() - threshold, nonmaxSuppression
+
 =cut
 
+{
+	package Cv::Features2d::FeatureDetector::FastFeatureDetector;
+	Cv::Features2d::Algorithm->import(qw(Int Bool));
+	sub threshold { &Int }
+	sub nonmaxSuppression { &Bool }
+}
 
-# ============================================================
-#  features2d. Common Interfaces of Descriptor Extractors
-# ============================================================
+
+=item *
+
+StarFeatureDetector() - maxSize, responseThreshold, lineThresholdProjected,
+lineThresholdBinarized, suppressNonmaxSize
+
+=cut
+
+{
+	package Cv::Features2d::FeatureDetector::StarFeatureDetector;
+	Cv::Features2d::Algorithm->import(qw(Int));
+	sub maxSize { &Int }
+	sub responseThreshold { &Int }
+	sub lineThresholdProjected { &Int }
+	sub lineThresholdBinarized { &Int }
+	sub suppressNonmaxSize { &Int }
+}
+
+
+=item *
+
+MserFeatureDetector() - delta, minArea, maxArea, maxVariation,
+minDiversity, maxEvolution, minMargin, edgeBlurSize
+
+=cut
+
+{
+	package Cv::Features2d::FeatureDetector::MserFeatureDetector;
+	Cv::Features2d::Algorithm->import(qw(Int Double));
+	sub delta { &Int }
+	sub minArea { &Int }
+	sub maxArea { &Int }
+	sub maxVariation { &Double }
+	sub minDiversity { &Double }
+	sub maxEvolution { &Int }
+	sub areaThreshold { &Double }
+	sub minMargin { &Double }
+	sub edgeBlurSize { &Int }
+}
+
+=item *
+
+GoodFeaturesToTrackDetector() - nfeatures, qualityLevel, minDistance,
+useHarrisDetector, k
+
+=cut
+
+{
+	package Cv::Features2d::FeatureDetector::GoodFeaturesToTrackDetector;
+	Cv::Features2d::Algorithm->import(qw(Int Bool Double));
+	sub nfeatures { &Int }
+	sub qualityLevel { &Double }
+	sub minDistance { &Double }
+	sub useHarrisDetector { &Bool }
+	sub k { &Double }
+}
+
+=item *
+
+DenseFeatureDetector() - initFeatureScale, featureScaleLevels,
+featureScaleMul, initXyStep, varyXyStepWithScale, varyImgBoundWithScale
+
+=cut
+
+{
+	package Cv::Features2d::FeatureDetector::DenseFeatureDetector;
+	Cv::Features2d::Algorithm->import(qw(Int Bool Double));
+	sub initFeatureScale { &Double }
+	sub featureScaleLevels { &Int }
+	sub featureScaleMul { &Double }
+	sub initXyStep { &Int }
+	sub initImgBound { &Int }
+	sub varyXyStepWithScale { &Bool }
+	sub varyImgBoundWithScale { &Bool }
+}
+
+
+=item *
+
+=cut
+
+{
+	package Cv::Features2d::FeatureDetector::SimpleBlobDetector;
+	Cv::Features2d::Algorithm->import(qw(Int Bool Double));
+	sub thresholdStep { &Double }
+	sub minThreshold { &Double }
+	sub maxThreshold { &Double }
+	sub minRepeatability { &Int }
+	sub minDistBetweenBlobs { &Double }
+	sub filterByColor { &Bool }
+	sub blobColor { &Int }
+	sub filterByArea { &Bool }
+	sub minArea { &Double }
+	sub maxArea { &Double }
+	sub filterByCircularity { &Bool }
+	sub minCircularity { &Double }
+	sub maxCircularity { &Double }
+	sub filterByInertia { &Bool }
+	sub minInertiaRatio { &Double }
+	sub maxInertiaRatio { &Double }
+	sub filterByConvexity { &Bool }
+	sub minConvexity { &Double }
+	sub maxConvexity { &Double }
+}
+
+
+=item *
+
+GridAdaptedFeatureDetector() - detector, maxTotalKeypoints,
+gridRows, gridCols
+
+=cut
+
+{
+	package Cv::Features2d::FeatureDetector::GridAdaptedFeatureDetector;
+	Cv::Features2d::Algorithm->import(qw(Int Algorithm));
+	sub detector { &Algorithm }
+	sub maxTotalKeypoints { &Int }
+	sub gridRows { &Int }
+	sub gridCols { &Int }
+}
+
+
+=item *
+
+PyramidAdaptedFeatureDetector() - not supported
+
+=back
+
+=head2 DescriptorExtractor
+
+=over
 
 =item
 L<FREAK()|http://docs.opencv.org/search.html?q=FREAK>
@@ -695,7 +835,6 @@ L<FREAK()|http://docs.opencv.org/search.html?q=FREAK>
 {
 	package Cv::Features2d::DescriptorExtractor::FREAK;
 	our @ISA = qw(Cv::Features2d::DescriptorExtractor);
-	Cv::Features2d::Algorithm->import(qw(Int Double Bool));
 	$Cv::Features2d::CLASS{ 'Feature2D.FREAK' } = __PACKAGE__;
 	sub new {
 		my ($class, $orientationNormalized,
@@ -713,10 +852,6 @@ L<FREAK()|http://docs.opencv.org/search.html?q=FREAK>
 		$self->nbOctave($nbOctave // 4);
 		$self;
 	}
-	sub orientationNormalized { &Bool }
-	sub scaleNormalized { &Bool }
-	sub patternScale { &Double }
-	sub nbOctave { &Int }
 }
 
 =item
@@ -738,7 +873,6 @@ L<BriefDescriptorExtractor()|http://docs.opencv.org/search.html?q=BriefDescripto
 		$self->bytes($bytes // 32);
 		$self;
 	}
-	sub bytes { &Int }
 }
 
 
@@ -759,8 +893,7 @@ L<OpponentColorDescriptorExtractor()|http://docs.opencv.org/search.html?q=Oppone
 	}
 }
 
-
-=pod
+=back
 
   my $extractor = FREAK();
   my $extractor = BriefDescriptorExtractor();
@@ -775,50 +908,68 @@ L<compute()|http://docs.opencv.org/search.html?q=DescriptorExtractor::compute>
 
   my $desc = $extractor->compute($img, $kp);
 
+properties are:
+
+=over
+
+=item *
+
+FREAK() - orientationNormalized, scaleNormalized, patternScale, nbOctave
+
 =cut
 
+{
+	package Cv::Features2d::DescriptorExtractor::FREAK;
+	Cv::Features2d::Algorithm->import(qw(Int Double Bool));
+	sub orientationNormalized { &Bool }
+	sub scaleNormalized { &Bool }
+	sub patternScale { &Double }
+	sub nbOctave { &Int }
+}
 
-# ============================================================
-#  features2d. Common Interfaces of Descriptor Matchers
-# ============================================================
+
+=item *
+
+BriefDescriptorExtractor() - bytes
+
+=cut
+
+{
+	package Cv::Features2d::DescriptorExtractor::BriefDescriptorExtractor;
+	Cv::Features2d::Algorithm->import(qw(Int));
+	sub bytes { &Int }
+}
+
+=item *
+
+OpponentColorDescriptorExtractor() - not supported
+
+=back
+
+=head2 DescriptorMatcher
+
+=over
 
 =item
 L<BFMatcher()|http://docs.opencv.org/search.html?q=BFMatcher>
 
-  my $matcher = BFMatcher();
-
-=over
-
 =cut
-
 
 {
 	package Cv::Features2d::DescriptorMatcher::BFMatcher;
 	our @ISA = qw(Cv::Features2d::DescriptorMatcher);
-	Cv::Features2d::Algorithm->import(qw(Int));
 	$Cv::Features2d::CLASS{ 'DescriptorMatcher.BFMatcher' } = __PACKAGE__;
-	sub normType { &Int }
-	sub crossCheck { &Bool }
 }
-
-
-=item
-L<match()|http://docs.opencv.org/search.html?q=DescriptorMatcher::match>,
-L<knnMatch()|http://docs.opencv.org/search.html?q=DescriptorMatcher::knnMatch>,
-L<radiusMatch()|http://docs.opencv.org/search.html?q=DescriptorMatcher::radiusMatch>
-
-=back
-
-  my $matches = $matcher->match($desc, $desc2, $mask);
-  my $matches = $matcher->knnMatch($desc, $desc2, $k, $mask, $compact);
-  my $matches = $matcher->radiusMatch($desc, $desc2, $maxDist, $mask, $compact);
 
 =item
 L<FlannBasedMatcher()|http://docs.opencv.org/search.html?q=FlannBasedMatcher>
 
+=back
+
+  my $matcher = BFMatcher();
   my $matcher = FlannBasedMatcher($indexParams, $searchParams);
 
-The parameters are hashrefs as follows:
+The parameters of FlannBasedMatcher() are hashrefs as follows:
 
   my $matcher = FlannBasedMatcher(
     my $indexParams = {
@@ -860,26 +1011,68 @@ sv-type.
 
 Please see the samples in t/indexparam.t and sample/find_obj.pl.
 
+
+=over
+
+=item
+L<match()|http://docs.opencv.org/search.html?q=DescriptorMatcher::match>
+
+=item
+L<knnMatch()|http://docs.opencv.org/search.html?q=DescriptorMatcher::knnMatch>
+
+=item
+L<radiusMatch()|http://docs.opencv.org/search.html?q=DescriptorMatcher::radiusMatch>
+
+=back
+
+  my $matches = $matcher->match($desc, $desc2, $mask);
+  my $matches = $matcher->knnMatch($desc, $desc2, $k, $mask, $compact);
+  my $matches = $matcher->radiusMatch($desc, $desc2, $maxDist, $mask, $compact);
+
+properties are:
+
+=over
+
+=item *
+
+BFMatcher() -  normType, crossCheck
+
 =cut
 
 {
+	package Cv::Features2d::DescriptorMatcher::BFMatcher;
+	our @ISA = qw(Cv::Features2d::DescriptorMatcher);
+	Cv::Features2d::Algorithm->import(qw(Int));
+	sub normType { &Int }
+	sub crossCheck { &Bool }
+}
+
+=item *
+
+FlannBasedMatcher() - not supported
+
+=cut
+
+{
+	package Cv::Features2d::DescriptorMatcher::FlannBasedMatcher;
+	our @ISA = qw(Cv::Features2d::DescriptorMatcher);
 	package Cv::IndexParams;
 	our $VERBOSE = 0;
-	package Cv::Features2d::DescriptorMatcher;
-	for (qw(BFMatcher FlannBasedMatcher)) {
-		my $base = __PACKAGE__;
-		eval "package ${base}::$_; our \@ISA = qw(${base})";
-	}
-} 
+}
 
+=back
 
-# ============================================================
-#  features2d. Drawing Function of Keypoints and Matches
-# ============================================================
+=head2 Drawing Function
+
+=over
 
 =item
-L<drawKeypoints()|http://docs.opencv.org/search.html?q=drawKeypoints>,
+L<drawKeypoints()|http://docs.opencv.org/search.html?q=drawKeypoints>
+
+=item
 L<drawMatches()|http://docs.opencv.org/search.html?q=drawMatches>
+
+=back
 
   drawKeypoints($image, $keypoints, $color, $flags);
   my $image = drawMatches($img1, $keypoints1, $img2, $keypoints2);
