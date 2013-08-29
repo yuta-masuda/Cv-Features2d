@@ -1067,7 +1067,7 @@ None by default.
 
 =head1 SEE ALSO
 
-L<http://github.com/yuta-masuda/Cv-Features2d>
+L<http://github.com/yuta-masuda/Cv>
 
 
 =head1 AUTHOR
