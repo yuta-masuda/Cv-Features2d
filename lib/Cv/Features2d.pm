@@ -176,7 +176,6 @@ L<ORB()|http://docs.opencv.org/search.html?q=ORB>
 	}
 }
 
-
 =item
 L<BRISK()|http://docs.opencv.org/search.html?q=BRISK>
 
@@ -198,7 +197,6 @@ L<BRISK()|http://docs.opencv.org/search.html?q=BRISK>
 		$self;
 	}
 }
-
 
 =item
 L<SIFT()|http://docs.opencv.org/search.html?q=SIFT>
@@ -227,7 +225,6 @@ L<SIFT()|http://docs.opencv.org/search.html?q=SIFT>
 		$self;
 	}
 }
-
 
 =item
 L<SURF()|http://docs.opencv.org/search.html?q=SURF>
@@ -295,8 +292,7 @@ object.
 =over
 
 =item *
-
-ORB() - nFeatures, scaleFactor, nLevels, edgeThreshold,
+L</ORB()> - nFeatures, scaleFactor, nLevels, edgeThreshold,
 firstLevel, WTA_K, scoreType, patchSize
 
 =cut
@@ -315,8 +311,7 @@ firstLevel, WTA_K, scoreType, patchSize
 }
 
 =item *
-
-BRISK() - thres, octaves
+L</BRISK()> - thres, octaves
 
 =cut
 
@@ -328,8 +323,7 @@ BRISK() - thres, octaves
 }
 
 =item *
-
-SIFT() - nFeatures, nOctaveLayers, contrastThreshold,
+L</SIFT()> - nFeatures, nOctaveLayers, contrastThreshold,
 edgeThreshold, sigma
 
 =cut
@@ -345,8 +339,7 @@ edgeThreshold, sigma
 }
 
 =item *
-
-SURF() - hessianThreshold, nOctaves, nOctaveLayers,
+L</SURF()> - hessianThreshold, nOctaves, nOctaveLayers,
 extended, upright
 
 =cut
@@ -361,6 +354,7 @@ extended, upright
 	sub upright { &Bool }
 }
 
+=back
 
 =head2 FeatureDetector
 
@@ -473,7 +467,6 @@ L<MserFeatureDetector()|http://docs.opencv.org/search.html?q=MserFeatureDetector
 	}
 }
 
-
 =item
 L<GoodFeaturesToTrackDetector()|http://docs.opencv.org/search.html?q=GoodFeaturesToTrackDetector>
 
@@ -539,8 +532,7 @@ L<DenseFeatureDetector()|http://docs.opencv.org/search.html?q=DenseFeatureDetect
 }
 
 =item
-L<SimpleBlobDetector|http://docs.opencv.org/search.html?q=SimpleBlobDetector>
-()
+L<SimpleBlobDetector()|http://docs.opencv.org/search.html?q=SimpleBlobDetector>
 
 =cut
 
@@ -637,7 +629,6 @@ L<GridAdaptedFeatureDetector()|http://docs.opencv.org/search.html?q=GridAdaptedF
 	}
 }
 
-
 =item
 L<PyramidAdaptedFeatureDetector()|http://docs.opencv.org/search.html?q=PyramidAdaptedFeatureDetector>
 
@@ -682,8 +673,7 @@ properties are:
 =over
 
 =item *
-
-FastFeatureDetector() - threshold, nonmaxSuppression
+L</FastFeatureDetector()> - threshold, nonmaxSuppression
 
 =cut
 
@@ -694,10 +684,8 @@ FastFeatureDetector() - threshold, nonmaxSuppression
 	sub nonmaxSuppression { &Bool }
 }
 
-
 =item *
-
-StarFeatureDetector() - maxSize, responseThreshold, lineThresholdProjected,
+L</StarFeatureDetector()> - maxSize, responseThreshold, lineThresholdProjected,
 lineThresholdBinarized, suppressNonmaxSize
 
 =cut
@@ -712,10 +700,8 @@ lineThresholdBinarized, suppressNonmaxSize
 	sub suppressNonmaxSize { &Int }
 }
 
-
 =item *
-
-MserFeatureDetector() - delta, minArea, maxArea, maxVariation,
+L</MserFeatureDetector()> - delta, minArea, maxArea, maxVariation,
 minDiversity, maxEvolution, minMargin, edgeBlurSize
 
 =cut
@@ -735,8 +721,7 @@ minDiversity, maxEvolution, minMargin, edgeBlurSize
 }
 
 =item *
-
-GoodFeaturesToTrackDetector() - nfeatures, qualityLevel, minDistance,
+L</GoodFeaturesToTrackDetector()> - nfeatures, qualityLevel, minDistance,
 useHarrisDetector, k
 
 =cut
@@ -752,8 +737,7 @@ useHarrisDetector, k
 }
 
 =item *
-
-DenseFeatureDetector() - initFeatureScale, featureScaleLevels,
+L</DenseFeatureDetector()> - initFeatureScale, featureScaleLevels,
 featureScaleMul, initXyStep, varyXyStepWithScale, varyImgBoundWithScale
 
 =cut
@@ -771,9 +755,7 @@ featureScaleMul, initXyStep, varyXyStepWithScale, varyImgBoundWithScale
 }
 
 
-=item *
-
-=cut
+# TODO - test SimpleBlobDetector
 
 {
 	package Cv::Features2d::FeatureDetector::SimpleBlobDetector;
@@ -799,10 +781,8 @@ featureScaleMul, initXyStep, varyXyStepWithScale, varyImgBoundWithScale
 	sub maxConvexity { &Double }
 }
 
-
 =item *
-
-GridAdaptedFeatureDetector() - detector, maxTotalKeypoints,
+L</GridAdaptedFeatureDetector()> - detector, maxTotalKeypoints,
 gridRows, gridCols
 
 =cut
@@ -816,10 +796,8 @@ gridRows, gridCols
 	sub gridCols { &Int }
 }
 
-
 =item *
-
-PyramidAdaptedFeatureDetector() - not supported
+L</PyramidAdaptedFeatureDetector()> - not supported
 
 =back
 
@@ -875,7 +853,6 @@ L<BriefDescriptorExtractor()|http://docs.opencv.org/search.html?q=BriefDescripto
 	}
 }
 
-
 =item
 L<OpponentColorDescriptorExtractor()|http://docs.opencv.org/search.html?q=OpponentColorDescriptorExtractor>
 
@@ -913,8 +890,7 @@ properties are:
 =over
 
 =item *
-
-FREAK() - orientationNormalized, scaleNormalized, patternScale, nbOctave
+L</FREAK()> - orientationNormalized, scaleNormalized, patternScale, nbOctave
 
 =cut
 
@@ -927,10 +903,8 @@ FREAK() - orientationNormalized, scaleNormalized, patternScale, nbOctave
 	sub nbOctave { &Int }
 }
 
-
 =item *
-
-BriefDescriptorExtractor() - bytes
+L</BriefDescriptorExtractor()> - bytes
 
 =cut
 
@@ -941,8 +915,7 @@ BriefDescriptorExtractor() - bytes
 }
 
 =item *
-
-OpponentColorDescriptorExtractor() - not supported
+L</OpponentColorDescriptorExtractor()> - not supported
 
 =back
 
@@ -1034,8 +1007,7 @@ properties are:
 =over
 
 =item *
-
-BFMatcher() -  normType, crossCheck
+L</BFMatcher()> -  normType, crossCheck
 
 =cut
 
@@ -1048,8 +1020,7 @@ BFMatcher() -  normType, crossCheck
 }
 
 =item *
-
-FlannBasedMatcher() - not supported
+L</FlannBasedMatcher()> - not supported
 
 =cut
 
@@ -1088,8 +1059,6 @@ while (my ($name, $package) = each %CLASS) {
 
 1;
 __END__
-
-=back
 
 =head2 EXPORT
 
