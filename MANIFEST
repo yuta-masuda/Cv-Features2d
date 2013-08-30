@@ -13,6 +13,7 @@ t/create.t
 t/detector.t
 t/extractor.t
 t/features2d.t
+t/ghost.t
 t/grid.t
 t/indexparams.t
 t/matcher.t

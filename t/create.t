@@ -10,6 +10,8 @@ BEGIN { use_ok('Cv::Features2d', qw(:all)) }
 
 if (1) {
 	my $p = SIFT();
+	lives_ok { $p->name };
+	is($Cv::Features2d::CLASS{$p->name}, ref $p);
 	my $q = $p->new();
 	is($q->nFeatures, $p->nFeatures);
 	is($q->nOctaveLayers, $p->nOctaveLayers);
@@ -20,6 +22,8 @@ if (1) {
 
 if (2) {
 	my $p = SURF(100);
+	lives_ok { $p->name };
+	is($Cv::Features2d::CLASS{$p->name}, ref $p);
 	my $q = $p->new();
 	is($q->hessianThreshold, $p->hessianThreshold);
 	is($q->nOctaves, $p->nOctaves);
@@ -30,6 +34,8 @@ if (2) {
 
 if (3) {
 	my $p = ORB();
+	lives_ok { $p->name };
+	is($Cv::Features2d::CLASS{$p->name}, ref $p);
 	my $q = $p->new();
 	is($q->nFeatures, $p->nFeatures);
 	is($q->scaleFactor, $p->scaleFactor);
@@ -43,6 +49,8 @@ if (3) {
 
 if (4) {
 	my $p = BRISK();
+	lives_ok { $p->name };
+	is($Cv::Features2d::CLASS{$p->name}, ref $p);
 	my $q = $p->new();
 	is($q->thres, $p->thres);
 	is($q->octaves, $p->octaves);
@@ -50,6 +58,8 @@ if (4) {
 
 if (5) {
 	my $p = FastFeatureDetector(10, 0);
+	lives_ok { $p->name };
+	is($Cv::Features2d::CLASS{$p->name}, ref $p);
 	my $q = $p->new();
 	is($q->threshold, $p->threshold);
 	is($q->nonmaxSuppression, $p->nonmaxSuppression);
@@ -58,6 +68,8 @@ if (5) {
 
 if (6) {
 	my $p = StarFeatureDetector();
+	lives_ok { $p->name };
+	is($Cv::Features2d::CLASS{$p->name}, ref $p);
 	my $q = $p->new();
 	is($q->maxSize, $p->maxSize);
 	is($q->responseThreshold, $p->responseThreshold);
@@ -68,6 +80,8 @@ if (6) {
 
 if (7) {
 	my $p = GoodFeaturesToTrackDetector();
+	lives_ok { $p->name };
+	is($Cv::Features2d::CLASS{$p->name}, ref $p);
 	my $q = $p->new();
 	is($q->nfeatures, $p->nfeatures);
 	is($q->qualityLevel, $p->qualityLevel);
@@ -78,6 +92,8 @@ if (7) {
 
 if (8) {
 	my $p = MserFeatureDetector(5, 60, 14400, 0.25, 0.2, 200, 1.01, 0.003, 5);
+	lives_ok { $p->name };
+	is($Cv::Features2d::CLASS{$p->name}, ref $p);
 	my $q = $p->new();
 	is($q->delta, $p->delta);
 	is($q->minArea, $p->minArea);
@@ -92,6 +108,8 @@ if (8) {
 
 if (9) {
 	my $p = DenseFeatureDetector();
+	lives_ok { $p->name };
+	is($Cv::Features2d::CLASS{$p->name}, ref $p);
 	my $q = $p->new();
 	is($q->initFeatureScale, $p->initFeatureScale);
 	is($q->featureScaleLevels, $p->featureScaleLevels);
@@ -104,11 +122,62 @@ if (9) {
 
 if (10) {
 	my $p = GridAdaptedFeatureDetector(SURF(500), 100);
+	lives_ok { $p->name };
+	is($Cv::Features2d::CLASS{$p->name}, ref $p);
 	my $detector = $p->detector;
 	my $q = $p->new();
 	is($q->maxTotalKeypoints, $p->maxTotalKeypoints);
 	is($q->gridRows, $p->gridRows);
 	is($q->gridCols, $p->gridCols);
+}
+
+if (11) {
+	my $p = SimpleBlobDetector();
+	lives_ok { $p->name };
+	is($Cv::Features2d::CLASS{$p->name}, ref $p);
+	my $q = $p->new();
+	is($q->thresholdStep, $p->thresholdStep);
+	is($q->minThreshold, $p->minThreshold);
+	is($q->maxThreshold, $p->maxThreshold);
+	is($q->minRepeatability, $p->minRepeatability);
+	is($q->minDistBetweenBlobs, $p->minDistBetweenBlobs);
+	is($q->filterByColor, $p->filterByColor);
+	is($q->blobColor, $p->blobColor);
+	is($q->filterByArea, $p->filterByArea);
+	is($q->maxArea, $p->maxArea);
+	is($q->filterByCircularity, $p->filterByCircularity);
+	is($q->maxCircularity, $p->maxCircularity);
+	is($q->filterByInertia, $p->filterByInertia);
+	is($q->maxInertiaRatio, $p->maxInertiaRatio);
+	is($q->filterByConvexity, $p->filterByConvexity);
+	is($q->maxConvexity, $p->maxConvexity);
+}
+
+if (12) {
+	my $p = BriefDescriptorExtractor();
+	lives_ok { $p->name };
+	is($Cv::Features2d::CLASS{$p->name}, ref $p);
+	my $q = $p->new();
+	is($q->bytes, $p->bytes);
+}
+
+if (13) {
+	my $p = FREAK();
+	lives_ok { $p->name };
+	is($Cv::Features2d::CLASS{$p->name}, ref $p);
+	my $q = $p->new();
+	is($q->orientationNormalized, $p->orientationNormalized);
+	is($q->scaleNormalized, $p->scaleNormalized);
+	is($q->patternScale, $p->patternScale);
+	is($q->nbOctave, $p->nbOctave);
+}
+
+if (14) {
+	my $p = BFMatcher();
+	lives_ok { $p->name };
+	is($Cv::Features2d::CLASS{$p->name}, ref $p);
+	lives_ok { $p->normType };
+	lives_ok { $p->crossCheck };
 }
 
 if (99) {

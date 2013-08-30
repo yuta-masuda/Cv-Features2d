@@ -28,7 +28,7 @@ use Carp;
 use Data::Structure::Util qw(unbless);
 use Cv ();
 
-our $VERSION = '0.08';
+our $VERSION = '0.09';
 
 require XSLoader;
 XSLoader::load('Cv::Features2d', $VERSION);
@@ -129,6 +129,7 @@ sub classes {
 	package Cv::Features2d::Feature2D;
 	our @ISA = qw(Cv::Features2d::FeatureDetector Cv::Features2d::DescriptorExtractor);
 	package Cv::Features2d::DescriptorMatcher;
+	our @ISA = qw(Cv::Features2d::Algorithm);
 }
 
 
@@ -206,6 +207,7 @@ L<SIFT()|http://docs.opencv.org/search.html?q=SIFT>
 {
 	package Cv::Features2d::Feature2D::SIFT;
 	our @ISA = qw(Cv::Features2d::Feature2D);
+	$Cv::Features2d::CLASS{ 'Feature2D.SIFT' } = __PACKAGE__;
 	sub new {
 		my ($class, $nFeatures, $nOctaveLayers, $contrastThreshold,
 			$edgeThreshold, $sigma) = @_;
@@ -541,13 +543,12 @@ L<SimpleBlobDetector()|http://docs.opencv.org/search.html?q=SimpleBlobDetector>
 	our @ISA = qw(Cv::Features2d::FeatureDetector);
 	$Cv::Features2d::CLASS{ 'Feature2D.SimpleBlob' } = __PACKAGE__;
 	sub new {
-		my ($class, $thresholdStep, $minThreshold, $maxThreshold,
-			$minRepeatability, $minDistBetweenBlobs,
-			$filterByColor, $blobColor,
-			$filterByArea, $minArea, $maxArea,
-			$filterByCircularity, $minCircularity, $maxCircularity,
-			$filterByInertia, $minInertiaRatio, $maxInertiaRatio,
-			$filterByConvexity, $minConvexity, $maxConvexity) = @_;
+		my $class = shift;
+		my ($thresholdStep, $minThreshold, $maxThreshold,
+			$minRepeatability, $minDistBetweenBlobs, $filterByColor,
+			$blobColor, $filterByArea, $maxArea, $filterByCircularity,
+			$maxCircularity, $filterByInertia, $maxInertiaRatio,
+			$filterByConvexity, $maxConvexity);
 		if (ref $class) {
 			$thresholdStep //= $class->thresholdStep;
 			$minThreshold //= $class->minThreshold;
@@ -557,34 +558,30 @@ L<SimpleBlobDetector()|http://docs.opencv.org/search.html?q=SimpleBlobDetector>
 			$filterByColor //= $class->filterByColor;
 			$blobColor //= $class->blobColor;
 			$filterByArea //= $class->filterByArea;
-			$minArea //= $class->minArea;
 			$maxArea //= $class->maxArea;
 			$filterByCircularity //= $class->filterByCircularity;
-			$minCircularity //= $class->minCircularity;
 			$maxCircularity //= $class->maxCircularity;
 			$filterByInertia //= $class->filterByInertia;
-			$minInertiaRatio //= $class->minInertiaRatio;
 			$maxInertiaRatio //= $class->maxInertiaRatio;
 			$filterByConvexity //= $class->filterByConvexity;
-			$minConvexity //= $class->minConvexity;
 			$maxConvexity //= $class->maxConvexity;
 		}
 		my $self = bless $class->create("SimpleBlob");
-		$self->thresholdStep($thresholdStep);
-		$self->minThreshold($minThreshold);
-		$self->maxThreshold($maxThreshold);
-		$self->minRepeatability($minRepeatability);
-		$self->minDistBetweenBlobs($minDistBetweenBlobs);
-		$self->filterByColor($filterByColor);
-		$self->blobColor($blobColor);
-		$self->filterByArea($filterByArea);
-		$self->maxArea($maxArea);
-		$self->filterByCircularity($filterByCircularity);
-		$self->maxCircularity($maxCircularity);
-		$self->filterByInertia($filterByInertia);
-		$self->maxInertiaRatio($maxInertiaRatio);
-		$self->filterByConvexity($filterByConvexity);
-		$self->maxConvexity($maxConvexity);
+		$self->thresholdStep($thresholdStep) if defined $thresholdStep;
+		$self->minThreshold($minThreshold) if defined $minThreshold;
+		$self->maxThreshold($maxThreshold) if defined $maxThreshold;
+		$self->minRepeatability($minRepeatability) if defined $minRepeatability;
+		$self->minDistBetweenBlobs($minDistBetweenBlobs) if defined $minDistBetweenBlobs;
+		$self->filterByColor($filterByColor) if defined $filterByColor;
+		# $self->blobColor($blobColor) if defined $blobColor;
+		$self->filterByArea($filterByArea) if defined $filterByArea;
+		$self->maxArea($maxArea) if defined $maxArea;
+		$self->filterByCircularity($filterByCircularity) if defined $filterByCircularity;
+		$self->maxCircularity($maxCircularity) if defined $maxCircularity;
+		$self->filterByInertia($filterByInertia) if defined $filterByInertia;
+		$self->maxInertiaRatio($maxInertiaRatio) if defined $maxInertiaRatio;
+		$self->filterByConvexity($filterByConvexity) if defined $filterByConvexity;
+		$self->maxConvexity($maxConvexity) if defined $maxConvexity;
 		$self;
 	}
 }
@@ -768,16 +765,12 @@ featureScaleMul, initXyStep, varyXyStepWithScale, varyImgBoundWithScale
 	sub filterByColor { &Bool }
 	sub blobColor { &Int }
 	sub filterByArea { &Bool }
-	sub minArea { &Double }
 	sub maxArea { &Double }
 	sub filterByCircularity { &Bool }
-	sub minCircularity { &Double }
 	sub maxCircularity { &Double }
 	sub filterByInertia { &Bool }
-	sub minInertiaRatio { &Double }
 	sub maxInertiaRatio { &Double }
 	sub filterByConvexity { &Bool }
-	sub minConvexity { &Double }
 	sub maxConvexity { &Double }
 }
 
@@ -821,7 +814,7 @@ L<FREAK()|http://docs.opencv.org/search.html?q=FREAK>
 			$orientationNormalized //= $class->orientationNormalized;
 			$scaleNormalized //= $class->scaleNormalized;
 			$patternScale //= $class->patternScale;
-			$nbOctave //= $class->nOctaves;
+			$nbOctave //= $class->nbOctave;
 		}
 		my $self = bless $class->create("FREAK");
 		$self->orientationNormalized($orientationNormalized // 1);
@@ -1014,7 +1007,7 @@ L</BFMatcher()> -  normType, crossCheck
 {
 	package Cv::Features2d::DescriptorMatcher::BFMatcher;
 	our @ISA = qw(Cv::Features2d::DescriptorMatcher);
-	Cv::Features2d::Algorithm->import(qw(Int));
+	Cv::Features2d::Algorithm->import(qw(Int Bool));
 	sub normType { &Int }
 	sub crossCheck { &Bool }
 }
@@ -1027,6 +1020,7 @@ L</FlannBasedMatcher()> - not supported
 {
 	package Cv::Features2d::DescriptorMatcher::FlannBasedMatcher;
 	our @ISA = qw(Cv::Features2d::DescriptorMatcher);
+	$Cv::Features2d::CLASS{ 'DescriptorMatcher.FlannBasedMatcher' } = __PACKAGE__;
 	package Cv::IndexParams;
 	our $VERBOSE = 0;
 }

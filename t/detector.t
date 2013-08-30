@@ -46,6 +46,7 @@ for my $detector (
 	GoodFeaturesToTrackDetector(),
 	MserFeatureDetector(5, 60, 14400, 0.25, 0.2, 200, 1.01, 0.003, 5),
 	DenseFeatureDetector(),
+	SimpleBlobDetector(),
 	) {
 	isa_ok($detector, 'Cv::Features2d::FeatureDetector');
 	if ($detector->isa('Cv::Features2d::Feature2D')) {
