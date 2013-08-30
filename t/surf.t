@@ -5,7 +5,7 @@ use warnings;
 use Test::More qw(no_plan);
 # use Test::More tests => 13;
 use Test::Exception;
-BEGIN { use_ok('Cv') }
+BEGIN { use_ok('Cv', -nonfree) }
 BEGIN { use_ok('Cv::Features2d', ':all') }
 
 my $verbose = Cv->hasGUI;
