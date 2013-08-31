@@ -32,6 +32,14 @@ if (1) {
 	is($q->contrastThreshold, $p->contrastThreshold);
 	is($q->edgeThreshold, $p->edgeThreshold);
 	is($q->sigma, $p->sigma);
+	my $r = $p->new(
+		$nfeatures,
+		$nOctaveLayers,
+		$contrastThreshold,
+		$edgeThreshold,
+		$sigma,
+		);
+	ok($r);
 }
 
 if (2) {
@@ -56,16 +64,24 @@ if (2) {
 	is($q->nOctaveLayers, $p->nOctaveLayers);
 	is($q->extended, $p->extended);
 	is($q->upright, $p->upright);
+	my $r = $p->new(
+		$hessianThreshold,
+		$nOctaves,
+		$nOctaveLayers,
+		$extended,
+		$upright,
+		);
+	ok($p);
 }
 
 if (3) {
 	my $p = ORB(
-		my $nfeatures = 500,
-		my $scaleFactor = 1.2,
-		my $nlevels = 8,
-		my $edgeThreshold = 31,
-		my $firstLevel = 0,
-		my $WTA_K = 2,
+		my $nfeatures = 500 + 1,
+		my $scaleFactor = 1.2 + 0.1,
+		my $nlevels = 8 + 1,
+		my $edgeThreshold = 31 + 2,
+		my $firstLevel = 0 + 1,
+		my $WTA_K = 2 + 1,
 		my $scoreType = 0,
 		my $patchSize = 31,
 		);
@@ -89,6 +105,17 @@ if (3) {
 	is($q->WTA_K, $p->WTA_K);
 	is($q->scoreType, $p->scoreType);
 	is($q->patchSize, $p->patchSize);
+	my $r = $p->new(
+		$nfeatures,
+		$scaleFactor,
+		$nlevels,
+		$edgeThreshold,
+		$firstLevel,
+		$WTA_K,
+		$scoreType,
+		$patchSize,
+		);
+	ok($r);
 }
 
 if (4) {
@@ -113,18 +140,20 @@ if (5) {
 	my $p = FastFeatureDetector(
 		my $threshold = 1,
 		my $nonmaxSuppression = true,
-		my $type = 2,
 		);
 	ok($p);
 	is($p->threshold, $threshold, 'threshold');
 	is($p->nonmaxSuppression, $nonmaxSuppression, 'nonmaxSuppression');
-	# is($p->type, $type, 'type');
 	lives_ok { $p->name };
 	is($Cv::Features2d::CLASS{$p->name}, ref $p);
 	my $q = $p->new();
 	is($q->threshold, $p->threshold);
 	is($q->nonmaxSuppression, $p->nonmaxSuppression);
-	# is($q->type, $p->type);
+	my $r = $p->new(
+		$threshold,
+		$nonmaxSuppression,
+		);
+	ok($r);
 }
 
 if (6) {
@@ -149,6 +178,14 @@ if (6) {
 	is($q->lineThresholdProjected, $p->lineThresholdProjected);
 	is($q->lineThresholdBinarized, $p->lineThresholdBinarized);
 	is($q->suppressNonmaxSize, $p->suppressNonmaxSize);
+	my $r = $p->new(
+		$maxSize,
+		$responseThreshold,
+		$lineThresholdProjected,
+		$lineThresholdBinarized,
+		$suppressNonmaxSize,
+		);
+	ok($r);
 }
 
 if (7) {
@@ -211,6 +248,18 @@ if (8) {
 	is($q->areaThreshold, $p->areaThreshold);
 	is($q->minMargin, $p->minMargin);
 	is($q->edgeBlurSize, $p->edgeBlurSize);
+	my $r = $p->new(
+		$delta,
+		$minArea,
+		$maxArea,
+		$maxVariation,
+		$minDiversity,
+		$maxEvolution,
+		$areaThreshold,
+		$minMargin,
+		$edgeBlurSize,
+		);
+	ok($r);
 }
 
 if (9) {
@@ -241,17 +290,39 @@ if (9) {
 	is($q->initImgBound, $p->initImgBound);
 	is($q->varyXyStepWithScale, $p->varyXyStepWithScale);
 	is($q->varyImgBoundWithScale, $p->varyImgBoundWithScale);
+	my $r = $p->new(
+		$initFeatureScale,
+		$featureScaleLevels,
+		$featureScaleMul,
+		$initXyStep,
+		$initImgBound,
+		$varyXyStepWithScale,
+		$varyImgBoundWithScale,
+		);
+	ok($r);
 }
 
 if (10) {
-	my $p = GridAdaptedFeatureDetector(SURF(500), 100);
+	my $p = GridAdaptedFeatureDetector(
+		my $detector = SURF(500),
+		my $maxTotalKeypoints = 100,
+		my $gridRows = 4,
+		my $gridCols = 4,
+		);
 	lives_ok { $p->name };
 	is($Cv::Features2d::CLASS{$p->name}, ref $p);
-	my $detector = $p->detector;
+	# my $detector2 = $p->detector;
 	my $q = $p->new();
 	is($q->maxTotalKeypoints, $p->maxTotalKeypoints);
 	is($q->gridRows, $p->gridRows);
 	is($q->gridCols, $p->gridCols);
+	my $r = $p->new(
+		$detector,
+		$maxTotalKeypoints,
+		$gridRows,
+		$gridCols,
+		);
+	ok($r);
 }
 
 if (11) {
@@ -286,10 +357,24 @@ if (12) {
 	is($Cv::Features2d::CLASS{$p->name}, ref $p);
 	my $q = $p->new();
 	is($q->bytes, $p->bytes);
+	my $r = $p->new(
+		$bytes,
+		);
+	ok($r);
 }
 
 if (13) {
-	my $p = FREAK();
+	my $p = FREAK(
+		my $orientationNormalized = true,
+		my $scaleNormalized = true,
+		my $patternScale = 22.0,
+		my $nbOctave = 4,
+		);
+	ok($p);
+	is($p->orientationNormalized, $orientationNormalized, 'orientationNormalized');
+	is($p->scaleNormalized, $scaleNormalized, 'scaleNormalized');
+	is($p->patternScale, $patternScale, 'patternScale');
+	is($p->nbOctave, $nbOctave, 'nbOctave');
 	lives_ok { $p->name };
 	is($Cv::Features2d::CLASS{$p->name}, ref $p);
 	my $q = $p->new();
@@ -297,6 +382,13 @@ if (13) {
 	is($q->scaleNormalized, $p->scaleNormalized);
 	is($q->patternScale, $p->patternScale);
 	is($q->nbOctave, $p->nbOctave);
+	my $r = $p->new(
+		$orientationNormalized,
+		$scaleNormalized,
+		$patternScale,
+		$nbOctave,
+		);
+	ok($r);
 }
 
 if (14) {

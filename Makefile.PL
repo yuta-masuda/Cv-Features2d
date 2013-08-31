@@ -1,6 +1,6 @@
 # -*- mode: perl; coding: utf-8; tab-width: 4; -*-
 
-use 5.010;
+use 5.008008;
 use ExtUtils::MakeMaker;
 
 our %CONFIGURE_REQUIRES = (

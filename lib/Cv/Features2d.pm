@@ -21,7 +21,7 @@ Cv::Features2d - Cv extension for OpenCV Features Detector
 
 package Cv::Features2d;
 
-use 5.010;
+use 5.008009;
 use strict;
 use warnings;
 use Carp;
@@ -157,24 +157,32 @@ L<ORB()|http://docs.opencv.org/search.html?q=ORB>
 			$edgeThreshold, $firstLevel, $WTA_K, $scoreType,
 			$patchSize) = @_;
 		if (ref $class) {
-			$nFeatures //= $class->nFeatures;
-			$scaleFactor //= $class->scaleFactor;
-			$nLevels //= $class->nLevels;
-			$edgeThreshold //= $class->edgeThreshold;
-			$firstLevel //= $class->firstLevel;
-			$WTA_K //= $class->WTA_K;
-			$scoreType //= $class->scoreType;
-			$patchSize //= $class->patchSize;
+			$nFeatures = $class->nFeatures
+				unless defined $nFeatures;
+			$scaleFactor = $class->scaleFactor
+				unless defined $scaleFactor;
+			$nLevels = $class->nLevels
+				unless defined $nLevels;
+			$edgeThreshold = $class->edgeThreshold
+				unless defined $edgeThreshold;
+			$firstLevel = $class->firstLevel
+				unless defined $firstLevel;
+			$WTA_K = $class->WTA_K
+				unless defined $WTA_K;
+			$scoreType = $class->scoreType
+				unless defined $scoreType;
+			$patchSize = $class->patchSize
+				unless defined $patchSize;
 		}
 		my $self = bless $class->create("ORB");
-		$self->nFeatures($nFeatures // 500);
-		$self->scaleFactor($scaleFactor // 1.2);
-		$self->nLevels($nLevels // 8);
-		$self->edgeThreshold($edgeThreshold // 31);
-		$self->firstLevel($firstLevel // 0);
-		$self->WTA_K($WTA_K // 2);
-		$self->scoreType($scoreType // HARRIS_SCORE);
-		$self->patchSize($patchSize // 31);
+		$self->nFeatures($nFeatures || 500);
+		$self->scaleFactor($scaleFactor || 1.2);
+		$self->nLevels($nLevels || 8);
+		$self->edgeThreshold($edgeThreshold || 31);
+		$self->firstLevel($firstLevel || 0);
+		$self->WTA_K($WTA_K || 2);
+		$self->scoreType($scoreType || HARRIS_SCORE);
+		$self->patchSize($patchSize || 31);
 		$self;
 	}
 }
@@ -203,18 +211,23 @@ L<SIFT()|http://docs.opencv.org/search.html?q=SIFT>
 		my ($class, $nFeatures, $nOctaveLayers, $contrastThreshold,
 			$edgeThreshold, $sigma) = @_;
 		if (ref $class) {
-			$nFeatures //= $class->nFeatures;
-			$nOctaveLayers //= $class->nOctaveLayers;
-			$contrastThreshold //= $class->contrastThreshold;
-			$edgeThreshold //= $class->edgeThreshold;
-			$sigma //= $class->sigma;
+			$nFeatures = $class->nFeatures
+				unless defined $nFeatures;
+			$nOctaveLayers = $class->nOctaveLayers
+				unless defined $nOctaveLayers;
+			$contrastThreshold = $class->contrastThreshold
+				unless defined $contrastThreshold;
+			$edgeThreshold = $class->edgeThreshold
+				unless defined $edgeThreshold;
+			$sigma = $class->sigma
+				unless defined $sigma;
 		}
 		my $self = bless $class->create("SIFT");
-		$self->nFeatures($nFeatures // 0);
-		$self->nOctaveLayers($nOctaveLayers // 3);
-		$self->contrastThreshold($contrastThreshold // 0.04);
-		$self->edgeThreshold($edgeThreshold // 10);
-		$self->sigma($sigma // 1.6);
+		$self->nFeatures($nFeatures || 0);
+		$self->nOctaveLayers($nOctaveLayers || 3);
+		$self->contrastThreshold($contrastThreshold || 0.04);
+		$self->edgeThreshold($edgeThreshold || 10);
+		$self->sigma($sigma || 1.6);
 		$self;
 	}
 }
@@ -232,18 +245,23 @@ L<SURF()|http://docs.opencv.org/search.html?q=SURF>
 		my ($class, $hessianThreshold, $nOctaves, $nOctaveLayers,
 			$extended, $upright) = @_;
 		if (ref $class) {
-			$hessianThreshold //= $class->hessianThreshold;
-			$nOctaves //= $class->nOctaves;
-			$nOctaveLayers //= $class->nOctaveLayers;
-			$extended //= $class->extended;
-			$upright //= $class->upright;
+			$hessianThreshold = $class->hessianThreshold
+				unless defined $hessianThreshold;
+			$nOctaves = $class->nOctaves
+				unless defined $nOctaves;
+			$nOctaveLayers = $class->nOctaveLayers
+				unless defined $nOctaveLayers;
+			$extended = $class->extended
+				unless defined $extended;
+			$upright = $class->upright
+				unless defined $upright;
 		}
 		my $self = bless $class->create("SURF");
 		$self->hessianThreshold($hessianThreshold);
-		$self->nOctaves($nOctaves // 4);
-		$self->nOctaveLayers($nOctaveLayers // 2);
-		$self->extended($extended // 1);
-		$self->upright($upright // 0);
+		$self->nOctaves($nOctaves || 4);
+		$self->nOctaveLayers($nOctaveLayers || 2);
+		$self->extended($extended || 1);
+		$self->upright($upright || 0);
 		$self;
 	}
 	sub copy {
@@ -363,14 +381,16 @@ L<FastFeatureDetector()|http://docs.opencv.org/search.html?q=FastFeatureDetector
 	our @ISA = qw(Cv::Features2d::FeatureDetector);
 	$Cv::Features2d::CLASS{ 'Feature2D.FAST' } = __PACKAGE__;
 	sub new {
-		my ($class, $threshold, $nonmaxSuppression, $type) = @_;
+		my ($class, $threshold, $nonmaxSuppression) = @_;
 		if (ref $class) {
-			$threshold //= $class->threshold;
-			$nonmaxSuppression //= $class->nonmaxSuppression;
+			$threshold = $class->threshold
+				unless defined $threshold;
+			$nonmaxSuppression = $class->nonmaxSuppression
+				unless defined $nonmaxSuppression;
 		}
 		my $self = bless $class->create("FAST");
-		$self->threshold($threshold // 1);
-		$self->nonmaxSuppression($nonmaxSuppression // 1);
+		$self->threshold($threshold || 1);
+		$self->nonmaxSuppression($nonmaxSuppression || 1);
 		$self;
 	}
 	sub copy {
@@ -395,18 +415,23 @@ L<StarFeatureDetector()|http://docs.opencv.org/search.html?q=StarFeatureDetector
 			$lineThresholdProjected, $lineThresholdBinarized,
 			$suppressNonmaxSize) = @_;
 		if (ref $class) {
-			$maxSize //= $class->maxSize;
-			$responseThreshold //= $class->responseThreshold;
-			$lineThresholdProjected //= $class->lineThresholdProjected;
-			$lineThresholdBinarized //= $class->lineThresholdBinarized;
-			$suppressNonmaxSize //= $class->suppressNonmaxSize;
+			$maxSize = $class->maxSize
+				unless defined $maxSize;
+			$responseThreshold = $class->responseThreshold
+				unless defined $responseThreshold;
+			$lineThresholdProjected = $class->lineThresholdProjected
+				unless defined $lineThresholdProjected;
+			$lineThresholdBinarized = $class->lineThresholdBinarized
+				unless defined $lineThresholdBinarized;
+			$suppressNonmaxSize = $class->suppressNonmaxSize
+				unless defined $suppressNonmaxSize;
 		}
 		my $self = bless $class->create("STAR");
-		$self->maxSize($maxSize // 16);
-		$self->responseThreshold($responseThreshold // 30);
-		$self->lineThresholdProjected($lineThresholdProjected // 10);
-		$self->lineThresholdBinarized($lineThresholdBinarized // 8);
-		$self->suppressNonmaxSize($suppressNonmaxSize // 5);
+		$self->maxSize($maxSize || 16);
+		$self->responseThreshold($responseThreshold || 30);
+		$self->lineThresholdProjected($lineThresholdProjected || 10);
+		$self->lineThresholdBinarized($lineThresholdBinarized || 8);
+		$self->suppressNonmaxSize($suppressNonmaxSize || 5);
 		$self;
 	}
 	sub copy {
@@ -436,15 +461,24 @@ L<MserFeatureDetector()|http://docs.opencv.org/search.html?q=MserFeatureDetector
 			$minDiversity, $maxEvolution, $areaThreshold, $minMargin,
 			$edgeBlurSize) = @_;
 		if (ref $class) {
-			$delta //= $class->delta;
-			$minArea //= $class->minArea;
-			$maxArea //= $class->maxArea;
-			$maxVariation //= $class->maxVariation;
-			$minDiversity //= $class->minDiversity;
-			$maxEvolution //= $class->maxEvolution;
-			$areaThreshold //= $class->areaThreshold;
-			$minMargin //= $class->minMargin;
-			$edgeBlurSize //= $class->edgeBlurSize;
+			$delta = $class->delta
+				unless defined $delta;
+			$minArea = $class->minArea
+				unless defined $minArea;
+			$maxArea = $class->maxArea
+				unless defined $maxArea;
+			$maxVariation = $class->maxVariation
+				unless defined $maxVariation;
+			$minDiversity = $class->minDiversity
+				unless defined $minDiversity;
+			$maxEvolution = $class->maxEvolution
+				unless defined $maxEvolution;
+			$areaThreshold = $class->areaThreshold
+				unless defined $areaThreshold;
+			$minMargin = $class->minMargin
+				unless defined $minMargin;
+			$edgeBlurSize = $class->edgeBlurSize
+				unless defined $edgeBlurSize;
 		}
 		my $self = bless $class->create("MSER");
 		$self->delta($delta);
@@ -485,22 +519,29 @@ L<DenseFeatureDetector()|http://docs.opencv.org/search.html?q=DenseFeatureDetect
 			$featureScaleMul, $initXyStep, $initImgBound,
 			$varyXyStepWithScale, $varyImgBoundWithScale) = @_;
 		if (ref $class) {
-			$initFeatureScale //= $class->initFeatureScale;
-			$featureScaleLevels //= $class->featureScaleLevels;
-			$featureScaleMul //= $class->featureScaleMul;
-			$initXyStep //= $class->initXyStep;
-			$initImgBound //= $class->initImgBound;
-			$varyXyStepWithScale //= $class->varyXyStepWithScale;
-			$varyImgBoundWithScale //= $class->varyImgBoundWithScale;
+			$initFeatureScale = $class->initFeatureScale
+				unless defined $initFeatureScale;
+			$featureScaleLevels = $class->featureScaleLevels
+				unless defined $featureScaleLevels;
+			$featureScaleMul = $class->featureScaleMul
+				unless defined $featureScaleMul;
+			$initXyStep = $class->initXyStep
+				unless defined $initXyStep;
+			$initImgBound = $class->initImgBound
+				unless defined $initImgBound;
+			$varyXyStepWithScale = $class->varyXyStepWithScale
+				unless defined $varyXyStepWithScale;
+			$varyImgBoundWithScale = $class->varyImgBoundWithScale
+				unless defined $varyImgBoundWithScale;
 		}
 		my $self = bless $class->create("Dense");
-		$self->initFeatureScale($initFeatureScale // 1);
-		$self->featureScaleLevels($featureScaleLevels // 1);
-		$self->featureScaleMul($featureScaleMul // 0.1);
-		$self->initXyStep($initXyStep // 6);
-		$self->initImgBound($initImgBound // 0);
-		$self->varyXyStepWithScale($varyXyStepWithScale // 1);
-		$self->varyImgBoundWithScale($varyImgBoundWithScale // 0);
+		$self->initFeatureScale($initFeatureScale || 1);
+		$self->featureScaleLevels($featureScaleLevels || 1);
+		$self->featureScaleMul($featureScaleMul || 0.1);
+		$self->initXyStep($initXyStep || 6);
+		$self->initImgBound($initImgBound || 0);
+		$self->varyXyStepWithScale($varyXyStepWithScale || 1);
+		$self->varyImgBoundWithScale($varyImgBoundWithScale || 0);
 		$self;
 	}
 }
@@ -516,44 +557,24 @@ L<SimpleBlobDetector()|http://docs.opencv.org/search.html?q=SimpleBlobDetector>
 	$Cv::Features2d::CLASS{ 'Feature2D.SimpleBlob' } = __PACKAGE__;
 	sub new {
 		my $class = shift;
-		my ($thresholdStep, $minThreshold, $maxThreshold,
-			$minRepeatability, $minDistBetweenBlobs, $filterByColor,
-			$blobColor, $filterByArea, $maxArea, $filterByCircularity,
-			$maxCircularity, $filterByInertia, $maxInertiaRatio,
-			$filterByConvexity, $maxConvexity);
-		if (ref $class) {
-			$thresholdStep //= $class->thresholdStep;
-			$minThreshold //= $class->minThreshold;
-			$maxThreshold //= $class->maxThreshold;
-			$minRepeatability //= $class->minRepeatability;
-			$minDistBetweenBlobs //= $class->minDistBetweenBlobs;
-			$filterByColor //= $class->filterByColor;
-			$blobColor //= $class->blobColor;
-			$filterByArea //= $class->filterByArea;
-			$maxArea //= $class->maxArea;
-			$filterByCircularity //= $class->filterByCircularity;
-			$maxCircularity //= $class->maxCircularity;
-			$filterByInertia //= $class->filterByInertia;
-			$maxInertiaRatio //= $class->maxInertiaRatio;
-			$filterByConvexity //= $class->filterByConvexity;
-			$maxConvexity //= $class->maxConvexity;
-		}
 		my $self = bless $class->create("SimpleBlob");
-		$self->thresholdStep($thresholdStep) if defined $thresholdStep;
-		$self->minThreshold($minThreshold) if defined $minThreshold;
-		$self->maxThreshold($maxThreshold) if defined $maxThreshold;
-		$self->minRepeatability($minRepeatability) if defined $minRepeatability;
-		$self->minDistBetweenBlobs($minDistBetweenBlobs) if defined $minDistBetweenBlobs;
-		$self->filterByColor($filterByColor) if defined $filterByColor;
-		# $self->blobColor($blobColor) if defined $blobColor;
-		$self->filterByArea($filterByArea) if defined $filterByArea;
-		$self->maxArea($maxArea) if defined $maxArea;
-		$self->filterByCircularity($filterByCircularity) if defined $filterByCircularity;
-		$self->maxCircularity($maxCircularity) if defined $maxCircularity;
-		$self->filterByInertia($filterByInertia) if defined $filterByInertia;
-		$self->maxInertiaRatio($maxInertiaRatio) if defined $maxInertiaRatio;
-		$self->filterByConvexity($filterByConvexity) if defined $filterByConvexity;
-		$self->maxConvexity($maxConvexity) if defined $maxConvexity;
+		if (ref $class) {
+			$self->thresholdStep($class->thresholdStep);
+			$self->minThreshold($class->minThreshold);
+			$self->maxThreshold($class->maxThreshold);
+			$self->minRepeatability($class->minRepeatability);
+			$self->minDistBetweenBlobs($class->minDistBetweenBlobs);
+			$self->filterByColor($class->filterByColor);
+			# $self->blobColor($class->blobColor);
+			$self->filterByArea($class->filterByArea);
+			$self->maxArea($class->maxArea);
+			$self->filterByCircularity($class->filterByCircularity);
+			$self->maxCircularity($class->maxCircularity);
+			$self->filterByInertia($class->filterByInertia);
+			$self->maxInertiaRatio($class->maxInertiaRatio);
+			$self->filterByConvexity($class->filterByConvexity);
+			$self->maxConvexity($class->maxConvexity);
+		}
 		$self;
 	}
 }
@@ -573,10 +594,14 @@ L<GridAdaptedFeatureDetector()|http://docs.opencv.org/search.html?q=GridAdaptedF
 		my ($class, $detector, $maxTotalKeypoints, $gridRows,
 			$gridCols) = @_;
 		if (ref $class) {
-			$detector //= $class->detector;
-			$maxTotalKeypoints //= $class->maxTotalKeypoints;
-			$gridRows //= $class->gridRows;
-			$gridCols //= $class->gridCols;
+			$detector = $class->detector
+				unless defined $detector;
+			$maxTotalKeypoints = $class->maxTotalKeypoints
+				unless defined $maxTotalKeypoints;
+			$gridRows = $class->gridRows
+				unless defined $gridRows;
+			$gridCols = $class->gridCols
+				unless defined $gridCols;
 		}
 		my $detectorType = ref $detector?
 			(split(/\./, $detector->name))[-1] : $detector;
@@ -586,8 +611,8 @@ L<GridAdaptedFeatureDetector()|http://docs.opencv.org/search.html?q=GridAdaptedF
 				$detector->copy($self->detector());
 			}
 			$self->maxTotalKeypoints($maxTotalKeypoints);
-			$self->gridRows($gridRows // 4);
-			$self->gridCols($gridCols // 4);
+			$self->gridRows($gridRows || 4);
+			$self->gridCols($gridCols || 4);
 		}
 		$self;
 	}
@@ -835,16 +860,20 @@ L<FREAK()|http://docs.opencv.org/search.html?q=FREAK>
 		my ($class, $orientationNormalized,
 			$scaleNormalized, $patternScale, $nbOctave) = @_;
 		if (ref $class) {
-			$orientationNormalized //= $class->orientationNormalized;
-			$scaleNormalized //= $class->scaleNormalized;
-			$patternScale //= $class->patternScale;
-			$nbOctave //= $class->nbOctave;
+			$orientationNormalized = $class->orientationNormalized
+				unless defined $orientationNormalized;
+			$scaleNormalized = $class->scaleNormalized
+				unless defined $scaleNormalized;
+			$patternScale = $class->patternScale
+				unless defined $patternScale;
+			$nbOctave = $class->nbOctave
+				unless defined $nbOctave;
 		}
 		my $self = bless $class->create("FREAK");
-		$self->orientationNormalized($orientationNormalized // 1);
-		$self->scaleNormalized($scaleNormalized // 1);
-		$self->patternScale($patternScale // 22);
-		$self->nbOctave($nbOctave // 4);
+		$self->orientationNormalized($orientationNormalized || 1);
+		$self->scaleNormalized($scaleNormalized || 1);
+		$self->patternScale($patternScale || 22);
+		$self->nbOctave($nbOctave || 4);
 		$self;
 	}
 }
@@ -862,10 +891,11 @@ L<BriefDescriptorExtractor()|http://docs.opencv.org/search.html?q=BriefDescripto
 	sub new {
 		my ($class, $bytes) = @_;
 		if (ref $class) {
-			$bytes //= $class->bytes;
+			$bytes = $class->bytes
+				unless defined $bytes;
 		}
 		my $self = bless $class->create("BRIEF");
-		$self->bytes($bytes // 32);
+		$self->bytes($bytes || 32);
 		$self;
 	}
 }
