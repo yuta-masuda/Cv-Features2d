@@ -798,6 +798,8 @@ L</PyramidAdaptedFeatureDetector()> - not supported
 
 =head2 AdjusterAdapter
 
+=over
+
 =item
 L<DynamicAdaptedFeatureDetector()|http://docs.opencv.org/search.html?q=DynamicAdaptedFeatureDetector>
 
@@ -828,8 +830,6 @@ L<FastAdjuster()|http://docs.opencv.org/search.html?q=FastAdjuster>
 	our @ISA = qw(Cv::Features2d::FeatureDetector);
 }
 
-
-
 =item
 L<StarAdjuster()|http://docs.opencv.org/search.html?q=StarAdjuster>
 
@@ -839,8 +839,6 @@ L<StarAdjuster()|http://docs.opencv.org/search.html?q=StarAdjuster>
 	package Cv::Features2d::AdjusterAdapter::StarAdjuster;
 	our @ISA = qw(Cv::Features2d::FeatureDetector);
 }
-
-
 
 =item
 L<SurfAdjuster()|http://docs.opencv.org/search.html?q=SurfAdjuster>
@@ -852,6 +850,7 @@ L<SurfAdjuster()|http://docs.opencv.org/search.html?q=SurfAdjuster>
 	our @ISA = qw(Cv::Features2d::FeatureDetector);
 }
 
+=back
 
 =head2 DescriptorExtractor
 
