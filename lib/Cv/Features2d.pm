@@ -39,6 +39,7 @@ our @ISA = qw(Exporter);
 
 our @EXPORT_OK = (qw(drawKeypoints drawMatches),
 				  qw(PyramidAdaptedFeatureDetector),
+				  qw(OpponentColorDescriptorExtractor),
 	);
 our %EXPORT_TAGS = ( 'all' => \@EXPORT_OK );
 our @EXPORT = ( );
@@ -187,17 +188,6 @@ L<BRISK()|http://docs.opencv.org/search.html?q=BRISK>
 	package Cv::Features2d::Feature2D::BRISK;
 	our @ISA = qw(Cv::Features2d::Feature2D);
 	$Cv::Features2d::CLASS{ 'Feature2D.BRISK' } = __PACKAGE__;
-	sub new {
-		my ($class, $thres, $octaves) = @_;
-		if (ref $class) {
-			$thres //= $class->thres;
-			$octaves //= $class->octaves;
-		}
-		my $self = bless $class->create("BRISK");
-		$self->thres($thres // 30);
-		$self->octaves($octaves // 3);
-		$self;
-	}
 }
 
 =item
@@ -478,26 +468,7 @@ L<GoodFeaturesToTrackDetector()|http://docs.opencv.org/search.html?q=GoodFeature
 {
 	package Cv::Features2d::FeatureDetector::GoodFeaturesToTrackDetector;
 	our @ISA = qw(Cv::Features2d::FeatureDetector);
-	our $detectorType = "GFTT";	# GFTT or HARRIS
-	$Cv::Features2d::CLASS{ "Feature2D.$detectorType" } = __PACKAGE__;
-	sub new {
-		my ($class, $nfeatures, $qualityLevel, $minDistance,
-			$useHarrisDetector, $k) = @_;
-		if (ref $class) {
-			$nfeatures //= $class->nfeatures;
-			$qualityLevel //= $class->qualityLevel;
-			$minDistance //= $class->minDistance;
-			$useHarrisDetector //= $class->useHarrisDetector;
-			$k //= $class->k;
-		}
-		my $self = bless $class->create($detectorType);
-		$self->nfeatures($nfeatures // 1000);
-		$self->qualityLevel($qualityLevel // 0.01);
-		$self->minDistance($minDistance // 1.0);
-		$self->useHarrisDetector($useHarrisDetector // 0);
-		$self->k($k // 0.04);
-		$self;
-	}
+	$Cv::Features2d::CLASS{ "Feature2D.GFTT" } = __PACKAGE__;
 }
 
 =item
@@ -601,24 +572,19 @@ L<GridAdaptedFeatureDetector()|http://docs.opencv.org/search.html?q=GridAdaptedF
 	sub new {
 		my ($class, $detector, $maxTotalKeypoints, $gridRows,
 			$gridCols) = @_;
-		my $release_detector = 0;
 		if (ref $class) {
 			$detector //= $class->detector;
 			$maxTotalKeypoints //= $class->maxTotalKeypoints;
 			$gridRows //= $class->gridRows;
 			$gridCols //= $class->gridCols;
 		}
-		return undef unless ref $detector;
-		my $detectorType = (split(/\./, $detector->name))[-1];
-		# return undef unless $detectorType =~ /^(SURF|FAST|STAR)$/;
+		my $detectorType = ref $detector?
+			(split(/\./, $detector->name))[-1] : $detector;
 		my $self = bless $class->create("Grid$detectorType");
 		if ($self) {
-			my $self_detector = $self->detector();
-			bless $self_detector, ref $detector;
-			if ($self_detector->can('copy')) {
-				$detector->copy($self_detector);
+			if (ref $detector && $detector->can('copy')) {
+				$detector->copy($self->detector());
 			}
-			unbless $self_detector;
 			$self->maxTotalKeypoints($maxTotalKeypoints);
 			$self->gridRows($gridRows // 4);
 			$self->gridCols($gridCols // 4);
@@ -912,20 +878,22 @@ L<OpponentColorDescriptorExtractor()|http://docs.opencv.org/search.html?q=Oppone
 {
 	package Cv::Features2d::DescriptorExtractor::OpponentColorDescriptorExtractor;
 	our @ISA = qw(Cv::Features2d::DescriptorExtractor);
-	sub new {
-		my ($class, $dextractor) = @_;
-		my $descriptorExtractorType = ref $dextractor?
-			(split(/\./, $dextractor->name))[-1] : $dextractor;
-		return undef unless $descriptorExtractorType =~ /^(SIFT|SURF|ORB|BRISK|BRIEF)$/;
-		bless $class->create("Opponent$descriptorExtractorType");
-	}
+}
+
+sub OpponentColorDescriptorExtractor {
+	my $detector = shift;
+	return undef unless ref $detector &&
+		$detector->name =~ /Feature2D\.(SIFT|SURF|ORB|BRISK|BRIEF)/;
+	my $ptr = unbless $detector->new();
+	Cv::Features2d::DescriptorExtractor::OpponentColorDescriptorExtractor
+		->new($ptr, @_);
 }
 
 =back
 
   my $extractor = FREAK();
   my $extractor = BriefDescriptorExtractor();
-  my $extractor = OpponentColorDescriptorExtractor("ORB"); # SIFT, SURF, ORB, BRISK, BRIEF
+  my $extractor = OpponentColorDescriptorExtractor(SIFT()); # SIFT, SURF, ORB, BRISK, BRIEF
 
 =over
 

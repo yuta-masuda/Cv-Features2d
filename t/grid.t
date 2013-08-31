@@ -34,13 +34,17 @@ if ($verbose) {
 }
 
 for (
-	SURF(500),
-	FastFeatureDetector(10, 0),
-	StarFeatureDetector(),
+	SURF(500), qw(SURF),
+	FastFeatureDetector(10, 0), qw(FAST),
+	StarFeatureDetector(), qw(STAR),
 	) {
 	my $detector = GridAdaptedFeatureDetector($_, 500);
-	(my $name = "Grid+" . (split('::', ref $_))[-1]) =~ s/FeatureDetector//g;
-	ok($detector, $name);
+	ok($detector, ref $_);
+	(my $dname = $detector->detector()->name()) =~ s/Feature2D.//;
+	my $name = ref $_ ? "Grid+$dname" : "Grid-$dname";
+	if ($_ eq 'SURF') { SURF(500)->copy($detector->detector) }
+	if ($_ eq 'FAST') { FastFeatureDetector(10, 0)->copy($detector->detector) }
+	if ($_ eq 'STAR') { StarFeatureDetector()->copy($detector->detector) }
 	my $oimage = $image->cvtColor(CV_BGR2GRAY)->cvtColor(CV_GRAY2BGR);
 	my $t0 = gettimeofday();
 	my $keypoints = $detector->detect($image);

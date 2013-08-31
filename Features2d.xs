@@ -172,6 +172,24 @@ CODE:
 OUTPUT:
 	RETVAL
 
+MODULE = Cv::Features2d		PACKAGE = Cv::Features2d::Feature2D::BRISK
+
+BRISK*
+BRISK::new(int thresh=30, int octaves=3, float patternScale=1.0)
+INIT:
+	if (SvROK(ST(0))) {
+		char *p = strchr(CLASS, '=');
+		if (p) *p = '\0';
+	}
+	if (sv_isobject(ST(0)) && (SvTYPE(SvRV(ST(0))) == SVt_PVMG)) {
+		BRISK* THIS = (BRISK*)SvIV((SV*)SvRV(ST(0)));
+		if (items < 2) thresh = THIS->get<int>("thres");
+		if (items < 3) octaves = THIS->get<int>("octaves");
+		// if (items < 4) patternScale = THIS->get<int>("patternScale");
+	}
+
+void
+BRISK::DESTROY()
 
 # ============================================================
 #  Common Interfaces of Feature Detectors
@@ -200,6 +218,28 @@ FeatureDetector::DESTROY()
 CODE:
 	((Ptr<FeatureDetector>)THIS).release();
 
+
+MODULE = Cv::Features2d		PACKAGE = Cv::Features2d::FeatureDetector::GoodFeaturesToTrackDetector
+
+GoodFeaturesToTrackDetector*
+GoodFeaturesToTrackDetector::new(int maxCorners=1000, double qualityLevel=0.01, double minDistance=1, int blockSize=3, bool useHarrisDetector=false, double k=0.04)
+INIT:
+	if (SvROK(ST(0))) {
+		char *p = strchr(CLASS, '=');
+		if (p) *p = '\0';
+	}
+	if (sv_isobject(ST(0)) && (SvTYPE(SvRV(ST(0))) == SVt_PVMG)) {
+		GoodFeaturesToTrackDetector* THIS = (GoodFeaturesToTrackDetector*)SvIV((SV*)SvRV(ST(0)));
+		if (items < 2) maxCorners = THIS->get<int>("nfeatures");
+		if (items < 3) qualityLevel = THIS->get<double>("qualityLevel");
+		if (items < 4) minDistance = THIS->get<double>("minDistance");
+		// if (items < 5) blockSize = THIS->get<int>("blockSize");
+		if (items < 5) useHarrisDetector = THIS->get<bool>("useHarrisDetector");
+		if (items < 6) k = THIS->get<double>("k");
+	}
+
+void
+GoodFeaturesToTrackDetector::DESTROY()
 
 MODULE = Cv::Features2d		PACKAGE = Cv::Features2d::FeatureDetector::PyramidAdaptedFeatureDetector
 
@@ -311,6 +351,14 @@ DescriptorExtractor::DESTROY()
 CODE:
 	((Ptr<DescriptorExtractor>)THIS).release();
 
+MODULE = Cv::Features2d		PACKAGE = Cv::Features2d::DescriptorExtractor::OpponentColorDescriptorExtractor
+
+OpponentColorDescriptorExtractor*
+OpponentColorDescriptorExtractor::new(VOID* dextractor)
+C_ARGS: (DescriptorExtractor*)dextractor
+
+void
+OpponentColorDescriptorExtractor::DESTROY()
 
 # ============================================================
 #  Common Interfaces of Descriptor Matchers
