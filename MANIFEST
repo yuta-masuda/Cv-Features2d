@@ -11,6 +11,7 @@ sample/freak_demo.pl
 sample/harris_detector.pl
 t/create.t
 t/detector.t
+t/dynamic.t
 t/extractor.t
 t/features2d.t
 t/ghost.t

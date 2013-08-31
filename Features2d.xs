@@ -210,6 +210,72 @@ C_ARGS: (FeatureDetector*)detector, levels
 void
 PyramidAdaptedFeatureDetector::DESTROY()
 
+MODULE = Cv::Features2d		PACKAGE = Cv::Features2d::FeatureDetector::DynamicAdaptedFeatureDetector
+
+DynamicAdaptedFeatureDetector*
+DynamicAdaptedFeatureDetector::new(VOID* adjuster, int min_features=400, int max_features=500, int max_iters=5)
+INIT:
+	Ptr<AdjusterAdapter> _adjuster = ((AdjusterAdapter*)adjuster)->clone();
+C_ARGS: _adjuster, min_features, max_features, max_iters
+
+
+void
+DynamicAdaptedFeatureDetector::DESTROY()
+
+
+MODULE = Cv::Features2d		PACKAGE = Cv::Features2d::AdjusterAdapter
+
+AdjusterAdapter*
+create(const char* CLASS, const char* detectorType)
+CODE:
+	Ptr<AdjusterAdapter> THIS = FeatureDetector::create(detectorType);
+	if (THIS.empty()) XSRETURN_UNDEF;
+	RETVAL = THIS; THIS.addref();
+OUTPUT:
+	RETVAL
+
+AdjusterAdapter*
+AdjusterAdapter::clone()
+INIT:
+	const char* CLASS = (const char*)sv_reftype(SvRV(ST(0)), TRUE);
+CODE:
+	Ptr<AdjusterAdapter> CLONE = THIS->clone();
+	if (CLONE.empty()) XSRETURN_UNDEF;
+	RETVAL = CLONE; CLONE.addref();
+OUTPUT:
+	RETVAL
+
+void
+AdjusterAdapter::DESTROY()
+
+
+MODULE = Cv::Features2d		PACKAGE = Cv::Features2d::AdjusterAdapter::FastAdjuster
+
+FastAdjuster*
+FastAdjuster::new(int init_thresh = 20, bool nonmax = true)
+
+void
+FastAdjuster::DESTROY()
+
+
+MODULE = Cv::Features2d		PACKAGE = Cv::Features2d::AdjusterAdapter::StarAdjuster
+
+StarAdjuster*
+StarAdjuster::new(int init_thresh = 20, bool nonmax = true)
+
+void
+StarAdjuster::DESTROY()
+
+
+MODULE = Cv::Features2d		PACKAGE = Cv::Features2d::AdjusterAdapter::SurfAdjuster
+
+SurfAdjuster*
+SurfAdjuster::new(double initial_thresh=400.f, double min_thresh=2, double max_thresh=1000)
+
+void
+SurfAdjuster::DESTROY()
+
+
 # ============================================================
 #  Common Interfaces of Descriptor Extractors
 # ============================================================

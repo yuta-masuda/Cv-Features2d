@@ -49,6 +49,7 @@ for (classes(__PACKAGE__)) {
 	if ($_->can('new')) {
 		my $name = (split('::', $_))[-1];
 		unless (__PACKAGE__->can($name)) {
+			# warn "sub $name { ${_}->new(\@_) }", "\n";
 			eval "sub $name { ${_}->new(\@_) }";
 			push(@EXPORT_OK, $name);
 		}
@@ -793,6 +794,64 @@ gridRows, gridCols
 L</PyramidAdaptedFeatureDetector()> - not supported
 
 =back
+
+
+=head2 AdjusterAdapter
+
+=item
+L<DynamicAdaptedFeatureDetector()|http://docs.opencv.org/search.html?q=DynamicAdaptedFeatureDetector>
+
+=cut
+
+{
+	package Cv::Features2d::FeatureDetector::DynamicAdaptedFeatureDetector;
+	our @ISA = qw(Cv::Features2d::FeatureDetector);
+}
+
+=item
+L<AdjusterAdapter()|http://docs.opencv.org/search.html?q=AdjusterAdapter>
+
+=cut
+
+{
+	package Cv::Features2d::AdjusterAdapter;
+	our @ISA = qw(Cv::Features2d::FeatureDetector);
+}
+
+=item
+L<FastAdjuster()|http://docs.opencv.org/search.html?q=FastAdjuster>
+
+=cut
+
+{
+	package Cv::Features2d::AdjusterAdapter::FastAdjuster;
+	our @ISA = qw(Cv::Features2d::FeatureDetector);
+}
+
+
+
+=item
+L<StarAdjuster()|http://docs.opencv.org/search.html?q=StarAdjuster>
+
+=cut
+
+{
+	package Cv::Features2d::AdjusterAdapter::StarAdjuster;
+	our @ISA = qw(Cv::Features2d::FeatureDetector);
+}
+
+
+
+=item
+L<SurfAdjuster()|http://docs.opencv.org/search.html?q=SurfAdjuster>
+
+=cut
+
+{
+	package Cv::Features2d::AdjusterAdapter::SurfAdjuster;
+	our @ISA = qw(Cv::Features2d::FeatureDetector);
+}
+
 
 =head2 DescriptorExtractor
 
