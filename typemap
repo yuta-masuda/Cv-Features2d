@@ -14,9 +14,9 @@ GoodFeaturesToTrackDetector*		O_OBJECT
 PyramidAdaptedFeatureDetector*		O_OBJECT
 DynamicAdaptedFeatureDetector*		O_OBJECT
 AdjusterAdapter*					O_OBJECT
-FastAdjuster*						O_OBJECT
-StarAdjuster*						O_OBJECT
-SurfAdjuster*						O_OBJECT
+xsFastAdjuster*						O_OBJECT
+xsStarAdjuster*						O_OBJECT
+xsSurfAdjuster*						O_OBJECT
 OpponentColorDescriptorExtractor*	O_OBJECT
 FlannBasedMatcher*					O_OBJECT
 BFMatcher*							O_OBJECT

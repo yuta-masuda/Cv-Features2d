@@ -637,6 +637,16 @@ sub PyramidAdaptedFeatureDetector {
 		->new($ptr, @_);
 }
 
+=item
+L<DynamicAdaptedFeatureDetector()|http://docs.opencv.org/search.html?q=DynamicAdaptedFeatureDetector>
+
+=cut
+
+{
+	package Cv::Features2d::FeatureDetector::DynamicAdaptedFeatureDetector;
+	our @ISA = qw(Cv::Features2d::FeatureDetector);
+}
+
 =back
 
   my $detector = FastFeatureDetector();
@@ -792,16 +802,6 @@ L</PyramidAdaptedFeatureDetector()> - not supported
 =over
 
 =item
-L<DynamicAdaptedFeatureDetector()|http://docs.opencv.org/search.html?q=DynamicAdaptedFeatureDetector>
-
-=cut
-
-{
-	package Cv::Features2d::FeatureDetector::DynamicAdaptedFeatureDetector;
-	our @ISA = qw(Cv::Features2d::FeatureDetector);
-}
-
-=item
 L<AdjusterAdapter()|http://docs.opencv.org/search.html?q=AdjusterAdapter>
 
 =cut
@@ -819,6 +819,10 @@ L<FastAdjuster()|http://docs.opencv.org/search.html?q=FastAdjuster>
 {
 	package Cv::Features2d::AdjusterAdapter::FastAdjuster;
 	our @ISA = qw(Cv::Features2d::FeatureDetector);
+	our ($thresh, $nonmax, $init_thresh, $min_thresh, $max_thresh);
+	our $tooFew = sub { $thresh--; };
+	our $tooMany = sub { $thresh++; };
+	our $good = sub { $thresh > $min_thresh && $thresh < $max_thresh; };
 }
 
 =item
@@ -829,6 +833,10 @@ L<StarAdjuster()|http://docs.opencv.org/search.html?q=StarAdjuster>
 {
 	package Cv::Features2d::AdjusterAdapter::StarAdjuster;
 	our @ISA = qw(Cv::Features2d::FeatureDetector);
+	our ($thresh, $init_thresh, $min_thresh, $max_thresh);
+	our $tooFew = sub { $thresh *= 0.9; $thresh = 1.1 if $thresh < 1.1; };
+	our $tooMany = sub { $thresh *= 1.1; };
+	our $good = sub { $thresh > $min_thresh && $thresh < $max_thresh; };
 }
 
 =item
@@ -839,6 +847,10 @@ L<SurfAdjuster()|http://docs.opencv.org/search.html?q=SurfAdjuster>
 {
 	package Cv::Features2d::AdjusterAdapter::SurfAdjuster;
 	our @ISA = qw(Cv::Features2d::FeatureDetector);
+	our ($thresh, $init_thresh, $min_thresh, $max_thresh);
+	our $tooFew = sub { $thresh *= 0.9; $thresh = 1.1 if $thresh < 1.1; };
+	our $tooMany = sub { $thresh *= 1.1; };
+	our $good = sub { $thresh > $min_thresh && $thresh < $max_thresh; };
 }
 
 =back
