@@ -426,7 +426,7 @@ CODE:
 OUTPUT:
 	RETVAL
 
-MODULE = Cv::Features2d		PACKAGE = Cv::Features2d::Feature2D::BRISK
+MODULE = Cv::Features2d		PACKAGE = Cv::Features2d::BRISK
 
 BRISK*
 BRISK::new(int thresh=30, int octaves=3, float patternScale=1.0)
@@ -471,7 +471,7 @@ INIT:
 	CHECK_DESTROY(ST(0));
 
 
-MODULE = Cv::Features2d		PACKAGE = Cv::Features2d::FeatureDetector::GoodFeaturesToTrackDetector
+MODULE = Cv::Features2d		PACKAGE = Cv::Features2d::GoodFeaturesToTrackDetector
 
 GoodFeaturesToTrackDetector*
 GoodFeaturesToTrackDetector::new(int maxCorners=1000, double qualityLevel=0.01, double minDistance=1, int blockSize=3, bool useHarrisDetector=false, double k=0.04)
@@ -493,7 +493,7 @@ INIT:
 	CHECK_DESTROY(ST(0));
 
 
-MODULE = Cv::Features2d		PACKAGE = Cv::Features2d::FeatureDetector::PyramidAdaptedFeatureDetector
+MODULE = Cv::Features2d		PACKAGE = Cv::Features2d::PyramidAdaptedFeatureDetector
 
 PyramidAdaptedFeatureDetector*
 PyramidAdaptedFeatureDetector::new(VOID* detector, int levels=2)
@@ -507,7 +507,7 @@ INIT:
 	CHECK_DESTROY(ST(0));
 
 
-MODULE = Cv::Features2d		PACKAGE = Cv::Features2d::FeatureDetector::DynamicAdaptedFeatureDetector
+MODULE = Cv::Features2d		PACKAGE = Cv::Features2d::DynamicAdaptedFeatureDetector
 
 DynamicAdaptedFeatureDetector*
 DynamicAdaptedFeatureDetector::new(VOID* adjuster, int min_features=400, int max_features=500, int max_iters=5)
@@ -521,35 +521,7 @@ INIT:
 	CHECK_DESTROY(ST(0));
 
 
-MODULE = Cv::Features2d		PACKAGE = Cv::Features2d::AdjusterAdapter
-
-AdjusterAdapter*
-create(const char* CLASS, const char* detectorType)
-CODE:
-	Ptr<AdjusterAdapter> THIS = FeatureDetector::create(detectorType);
-	if (THIS.empty()) XSRETURN_UNDEF;
-	RETVAL = THIS; THIS.addref();
-OUTPUT:
-	RETVAL
-
-AdjusterAdapter*
-AdjusterAdapter::clone()
-INIT:
-	const char* CLASS = (const char*)sv_reftype(SvRV(ST(0)), TRUE);
-CODE:
-	Ptr<AdjusterAdapter> CLONE = THIS->clone();
-	if (CLONE.empty()) XSRETURN_UNDEF;
-	RETVAL = CLONE; CLONE.addref();
-OUTPUT:
-	RETVAL
-
-void
-AdjusterAdapter::DESTROY()
-INIT:
-	CHECK_DESTROY(ST(0));
-
-
-MODULE = Cv::Features2d		PACKAGE = Cv::Features2d::AdjusterAdapter::FastAdjuster
+MODULE = Cv::Features2d		PACKAGE = Cv::Features2d::FastAdjuster
 
 XsFastAdjuster*
 XsFastAdjuster::new(int init_thresh = 20, bool nonmax = true, int min_thresh=1, int max_thresh=200)
@@ -561,7 +533,7 @@ INIT:
 	CHECK_DESTROY(ST(0));
 
 
-MODULE = Cv::Features2d		PACKAGE = Cv::Features2d::AdjusterAdapter::StarAdjuster
+MODULE = Cv::Features2d		PACKAGE = Cv::Features2d::StarAdjuster
 
 XsStarAdjuster*
 XsStarAdjuster::new(int init_thresh = 20, bool nonmax = true)
@@ -573,7 +545,7 @@ INIT:
 	CHECK_DESTROY(ST(0));
 
 
-MODULE = Cv::Features2d		PACKAGE = Cv::Features2d::AdjusterAdapter::SurfAdjuster
+MODULE = Cv::Features2d		PACKAGE = Cv::Features2d::SurfAdjuster
 
 XsSurfAdjuster*
 XsSurfAdjuster::new(double initial_thresh=400.f, double min_thresh=2, double max_thresh=1000)
@@ -621,7 +593,7 @@ INIT:
 	CHECK_DESTROY(ST(0));
 
 
-MODULE = Cv::Features2d		PACKAGE = Cv::Features2d::DescriptorExtractor::OpponentColorDescriptorExtractor
+MODULE = Cv::Features2d		PACKAGE = Cv::Features2d::OpponentColorDescriptorExtractor
 
 OpponentColorDescriptorExtractor*
 OpponentColorDescriptorExtractor::new(VOID* dextractor)

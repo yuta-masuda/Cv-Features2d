@@ -35,7 +35,7 @@ if ($verbose) {
 
 {
 	package Your::FastAdjuster;
-    our @ISA = qw(Cv::Features2d::AdjusterAdapter::FastAdjuster);
+    our @ISA = qw(Cv::Features2d::FastAdjuster);
     our ($THRESH, $INIT_THRESH, $MIN_THRESH, $MAX_THRESH);
     sub tooFew { $THRESH--; }
     sub tooMany { $THRESH++; }
@@ -45,7 +45,7 @@ if ($verbose) {
 
 {
 	package Your::StarAdjuster;
-	our @ISA = qw(Cv::Features2d::AdjusterAdapter::StarAdjuster);
+	our @ISA = qw(Cv::Features2d::StarAdjuster);
 	our ($THRESH, $INIT_THRESH, $MIN_THRESH, $MAX_THRESH);
 	sub tooFew { $THRESH *= 0.9; $THRESH = 1.1 if $THRESH < 1.1; }
 	sub tooMany { $THRESH *= 1.1; }
@@ -55,7 +55,7 @@ if ($verbose) {
 
 {
 	package Your::SurfAdjuster;
-	our @ISA = qw(Cv::Features2d::AdjusterAdapter::SurfAdjuster);
+	our @ISA = qw(Cv::Features2d::SurfAdjuster);
 	our ($THRESH, $INIT_THRESH, $MIN_THRESH, $MAX_THRESH);
 	sub tooFew { $THRESH *= 0.9; $THRESH = 1.1 if $THRESH < 1.1; }
 	sub tooMany { $THRESH *= 1.1; }

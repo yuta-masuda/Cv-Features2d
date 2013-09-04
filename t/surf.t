@@ -37,7 +37,7 @@ if (1) {
 		};
 	}
 
-	my $surf = Cv::Features2d::Feature2D::SURF->new(
+	my $surf = Cv::Features2d::SURF->new(
 		$params->[2],			# hessianThreshold
 		$params->[3],			# nOctaves
 		$params->[4],			# nOctaveLayers
@@ -70,12 +70,12 @@ if (1) {
 
 
 if (1) {
-	lives_ok { Cv::Features2d::Feature2D::SURF->new(500) };
+	lives_ok { Cv::Features2d::SURF->new(500) };
 	lives_ok { SURF(500) };
 }
 
 if (2) {
 	my $surf = Cv::Features2d::FeatureDetector->create("SURF");
-	bless $surf, 'Cv::Features2d::Feature2D::SURF';
+	bless $surf, 'Cv::Features2d::SURF';
 	lives_ok { $surf->hessianThreshold };
 }

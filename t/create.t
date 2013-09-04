@@ -403,7 +403,7 @@ if (99) {
 	for my $class (
 		qw(Cv::Features2d::FeatureDetector),
 		qw(Cv::Features2d::Feature2D),
-		qw(Cv::Features2d::Feature2D::SURF),
+		qw(Cv::Features2d::SURF),
 		) {
 		my $surf = $class->create("SURF");
 		lives_ok { $surf->get_double("hessianThreshold") };
