@@ -14,6 +14,7 @@ our %CONFIGURE_REQUIRES = (
 our %TEST_REQUIRES = (
 	'Test::Number::Delta' => '1.030',
 	'Test::Exception'     => '0.310',
+	'Test::LeakTrace'     => '0.140',
 	);
 
 our %PREREQ_PM = ( %CONFIGURE_REQUIRES );
