@@ -1,6 +1,6 @@
 Revision history for Perl extension Cv::Features2d
 
-0.09 - 2013-08-31
+0.09 - 2013-09-04
      * fixed properties
      * add Dynamic
      * rewrite in perl 5.008

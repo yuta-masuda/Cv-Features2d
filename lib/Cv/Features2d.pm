@@ -4,7 +4,7 @@
 
 =head1 NAME
 
-Cv::Features2d - Cv extension for OpenCV Features Detector
+Cv::Features2d - Cv extension for OpenCV Feature Detector
 
 =head1 SYNOPSIS
 
@@ -40,6 +40,7 @@ our @ISA = qw(Exporter);
 our @EXPORT_OK = (qw(drawKeypoints drawMatches),
 				  qw(PyramidAdaptedFeatureDetector),
 				  qw(OpponentColorDescriptorExtractor),
+				  qw(DynamicAdaptedFeatureDetector),
 	);
 our %EXPORT_TAGS = ( 'all' => \@EXPORT_OK );
 our @EXPORT = ( );
@@ -115,7 +116,8 @@ sub classes {
 				bless $RETVAL, "${class}::Ghost";
 			}
 		}
-		$self->set_algorithm($name, $_[0]) if defined $_[0];
+		# can't call set_algorithm; - makes memory leak
+		# $self->set_algorithm($name, $_[0]) if defined $_[0];
 		$RETVAL;
 	}
 }
@@ -586,8 +588,6 @@ L<GridAdaptedFeatureDetector()|http://docs.opencv.org/search.html?q=GridAdaptedF
 
 {
 	package Cv::Features2d::FeatureDetector::GridAdaptedFeatureDetector;
-	use Data::Structure::Util qw(unbless);
-	use Scalar::Util qw(blessed);
 	our @ISA = qw(Cv::Features2d::FeatureDetector);
 	$Cv::Features2d::CLASS{ 'Feature2D.Grid' } = __PACKAGE__;
 	sub new {
@@ -645,6 +645,13 @@ L<DynamicAdaptedFeatureDetector()|http://docs.opencv.org/search.html?q=DynamicAd
 {
 	package Cv::Features2d::FeatureDetector::DynamicAdaptedFeatureDetector;
 	our @ISA = qw(Cv::Features2d::FeatureDetector);
+}
+
+sub DynamicAdaptedFeatureDetector {
+	my $adapter = shift;
+	my $ptr = unbless $adapter->new();
+	Cv::Features2d::FeatureDetector::DynamicAdaptedFeatureDetector
+		->new($ptr, @_);
 }
 
 =back
@@ -801,9 +808,6 @@ L</PyramidAdaptedFeatureDetector()> - not supported
 
 =over
 
-=item
-L<AdjusterAdapter()|http://docs.opencv.org/search.html?q=AdjusterAdapter>
-
 =cut
 
 {
@@ -819,10 +823,10 @@ L<FastAdjuster()|http://docs.opencv.org/search.html?q=FastAdjuster>
 {
 	package Cv::Features2d::AdjusterAdapter::FastAdjuster;
 	our @ISA = qw(Cv::Features2d::FeatureDetector);
-	our ($thresh, $nonmax, $init_thresh, $min_thresh, $max_thresh);
-	our $tooFew = sub { $thresh--; };
-	our $tooMany = sub { $thresh++; };
-	our $good = sub { $thresh > $min_thresh && $thresh < $max_thresh; };
+	our ($THRESH, $INIT_THRESH, $MIN_THRESH, $MAX_THRESH);
+	sub tooFew { $THRESH--; }
+	sub tooMany { $THRESH++; }
+	sub good { $THRESH > $MIN_THRESH && $THRESH < $MAX_THRESH; }
 }
 
 =item
@@ -833,10 +837,10 @@ L<StarAdjuster()|http://docs.opencv.org/search.html?q=StarAdjuster>
 {
 	package Cv::Features2d::AdjusterAdapter::StarAdjuster;
 	our @ISA = qw(Cv::Features2d::FeatureDetector);
-	our ($thresh, $init_thresh, $min_thresh, $max_thresh);
-	our $tooFew = sub { $thresh *= 0.9; $thresh = 1.1 if $thresh < 1.1; };
-	our $tooMany = sub { $thresh *= 1.1; };
-	our $good = sub { $thresh > $min_thresh && $thresh < $max_thresh; };
+	our ($THRESH, $INIT_THRESH, $MIN_THRESH, $MAX_THRESH);
+	sub tooFew { $THRESH *= 0.9; $THRESH = 1.1 if $THRESH < 1.1; }
+	sub tooMany { $THRESH *= 1.1; }
+	sub good { $THRESH > $MIN_THRESH && $THRESH < $MAX_THRESH; }
 }
 
 =item
@@ -847,13 +851,30 @@ L<SurfAdjuster()|http://docs.opencv.org/search.html?q=SurfAdjuster>
 {
 	package Cv::Features2d::AdjusterAdapter::SurfAdjuster;
 	our @ISA = qw(Cv::Features2d::FeatureDetector);
-	our ($thresh, $init_thresh, $min_thresh, $max_thresh);
-	our $tooFew = sub { $thresh *= 0.9; $thresh = 1.1 if $thresh < 1.1; };
-	our $tooMany = sub { $thresh *= 1.1; };
-	our $good = sub { $thresh > $min_thresh && $thresh < $max_thresh; };
+	our ($THRESH, $INIT_THRESH, $MIN_THRESH, $MAX_THRESH);
+	sub tooFew { $THRESH *= 0.9; $THRESH = 1.1 if $THRESH < 1.1; }
+	sub tooMany { $THRESH *= 1.1; }
+	sub good { $THRESH > $MIN_THRESH && $THRESH < $MAX_THRESH; }
 }
 
 =back
+
+Use DynamicAdaptedFeatureDetector() with the adjusters.
+
+  my $detector = DynamicAdaptedFeatureDetector(FastAdjuster());
+
+If you adjust the detector parameters, you can define your adjuster as
+follows:
+
+  { package Your::FastAdjuster;
+    our @ISA = qw(Cv::Features2d::AdjusterAdapter::FastAdjuster);
+    our ($THRESH, $INIT_THRESH, $MIN_THRESH, $MAX_THRESH);
+    sub tooFew { $THRESH--; }
+    sub tooMany { $THRESH++; }
+    sub good { $THRESH > $MIN_THRESH && $THRESH < $MAX_THRESH; }
+  }
+  my $detector = DynamicAdaptedFeatureDetector(Your::FastAdjuster->new());
+
 
 =head2 DescriptorExtractor
 

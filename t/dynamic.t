@@ -33,6 +33,33 @@ if ($verbose) {
 	Cv->namedWindow('Cv', 0);
 }
 
+if (1) {
+	my $fast = FastAdjuster();
+	my $star = StarAdjuster();
+	my $surf = SurfAdjuster();
+}
+
+if (2) {
+	my $fast = FastAdjuster();
+	my $star = StarAdjuster();
+	my $surf = SurfAdjuster();
+	lives_ok { $fast->DESTROY; };
+	lives_ok { $star->DESTROY; };
+	lives_ok { $surf->DESTROY; };
+}
+
+if (3) {
+	for (
+		FastAdjuster(),
+		StarAdjuster(),
+		SurfAdjuster(),
+		) {
+		my $detector;
+		lives_ok { $detector = DynamicAdaptedFeatureDetector($_); };
+		lives_ok { $detector->DESTROY; };
+	}
+}
+
 for (
 	FastAdjuster(),
 	StarAdjuster(),

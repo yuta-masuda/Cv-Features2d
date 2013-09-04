@@ -17,9 +17,11 @@ t/features2d.t
 t/ghost.t
 t/grid.t
 t/indexparams.t
+t/leak.t
 t/matcher.t
 t/opponent.t
 t/pod-coverage.t
 t/pyramid.t
 t/surf.t
+t/youradjuster.t
 typemap

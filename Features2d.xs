@@ -14,16 +14,10 @@ typedef vector<vector<DMatch> > DMatchVV;
 
 static CvMat* matToCvmat(Mat& var)
 {
-#if 1
 	CvMat* cvmat = cvCreateMatHeader(var.rows, var.cols, var.type());
 	cvSetData(cvmat, var.data, CV_AUTOSTEP);
-	// cvIncRefData(cvmat);	   // XXXXX
 	var.addref();
 	return cvmat;
-#else
-	CvMat cvmat = var;
-	return cvCloneMat(&cvmat);
-#endif
 }
 
 static const char* svt_names[] = {
@@ -112,373 +106,318 @@ static void dumpIndexParams(flann::IndexParams* p, const char* varName)
 	}
 }
 
+
 // ============================================================
 
-class xsFastAdjuster: public FastAdjuster {
+class XsFastAdjuster: public FastAdjuster {
 public:
-	xsFastAdjuster(int init_thresh=20, bool nonmax=true, int min_thresh=1, int max_thresh=200);
-	void tooFew(int minv, int n_detected);
-	void tooMany(int maxv, int n_detected);
-	bool good() const;
-	Ptr<AdjusterAdapter> clone() const;
+	XsFastAdjuster(String CLASS, int init_thresh=20, bool nonmax=true, int min_thresh=1, int max_thresh=200);
 
-	void linkup(char* CLASS);
+	virtual void tooFew(int minv, int n_detected);
+	virtual void tooMany(int maxv, int n_detected);
+	virtual bool good() const;
+
+	virtual Ptr<AdjusterAdapter> clone() const;
 
 protected:
-	void detectImpl(const Mat& image, vector<KeyPoint>& keypoints, const Mat& mask=Mat()) const;
+	virtual void detectImpl(const Mat& image, vector<KeyPoint>& keypoints, const Mat& mask=Mat()) const;
 	int thresh_;
 	bool nonmax_;
 	int init_thresh_, min_thresh_, max_thresh_;
 
+	String CLASS_;
 	SV* sv_thresh;
-	SV* sv_nonmax;
 	SV* sv_init_thresh;
 	SV* sv_min_thresh;
 	SV* sv_max_thresh;
-	SV* sv_tooFew;
-	SV* sv_tooMany;
-	SV* sv_good;
 };
 
-void xsFastAdjuster::linkup(char* CLASS)
-{
-	String xs = CLASS;
-
-	sv_thresh      = get_sv((xs + "::thresh"     ).c_str(), 0);
-	sv_nonmax      = get_sv((xs + "::nonmax"     ).c_str(), 0);
-	sv_init_thresh = get_sv((xs + "::init_thresh").c_str(), 0);
-	sv_min_thresh  = get_sv((xs + "::min_thresh" ).c_str(), 0);
-	sv_max_thresh  = get_sv((xs + "::max_thresh" ).c_str(), 0);
-
-	sv_setsv(sv_thresh,      newSViv(init_thresh_));
-	sv_setsv(sv_nonmax,      newSViv(nonmax_     ));
-	sv_setsv(sv_init_thresh, newSViv(init_thresh_));
-	sv_setsv(sv_min_thresh,  newSViv(min_thresh_ ));
-	sv_setsv(sv_max_thresh,  newSViv(max_thresh_ ));
-
-	sv_tooFew  = get_sv((xs + "::tooFew" ).c_str(), 0);
-	sv_tooMany = get_sv((xs + "::tooMany").c_str(), 0);
-	sv_good    = get_sv((xs + "::good"   ).c_str(), 0);
-}
-
-xsFastAdjuster::xsFastAdjuster(int init_thresh, bool nonmax, int min_thresh, int max_thresh):
+XsFastAdjuster::XsFastAdjuster(String CLASS, int init_thresh, bool nonmax, int min_thresh, int max_thresh):
+	CLASS_(CLASS),
 	thresh_(init_thresh), nonmax_(nonmax), init_thresh_(init_thresh),
 	min_thresh_(min_thresh), max_thresh_(max_thresh)
-{ }
+{
+	int n = CLASS_.find("=");
+	if (n >= 0) CLASS_ = CLASS_.substr(0, n);
 
-void xsFastAdjuster::detectImpl(const Mat& image, vector<KeyPoint>& keypoints, const Mat& mask) const
+	sv_thresh      = get_sv((CLASS_ + "::THRESH"     ).c_str(), GV_ADD);
+	sv_init_thresh = get_sv((CLASS_ + "::INIT_THRESH").c_str(), GV_ADD);
+	sv_min_thresh  = get_sv((CLASS_ + "::MIN_THRESH" ).c_str(), GV_ADD);
+	sv_max_thresh  = get_sv((CLASS_ + "::MAX_THRESH" ).c_str(), GV_ADD);
+
+	sv_setsv(sv_thresh,      sv_2mortal(newSViv(init_thresh_)));
+	sv_setsv(sv_init_thresh, sv_2mortal(newSViv(init_thresh_)));
+	sv_setsv(sv_min_thresh,  sv_2mortal(newSViv(min_thresh_ )));
+	sv_setsv(sv_max_thresh,  sv_2mortal(newSViv(max_thresh_ )));
+}
+
+void XsFastAdjuster::detectImpl(const Mat& image, vector<KeyPoint>& keypoints, const Mat& mask) const
 {
 	FastFeatureDetector(thresh_, nonmax_).detect(image, keypoints, mask);
 }
 
-void xsFastAdjuster::tooFew(int min, int n_detected)
+void XsFastAdjuster::tooFew(int min, int n_detected)
 {
-	if (SvROK(sv_tooFew) && SvTYPE(SvRV(sv_tooFew)) == SVt_PVCV) {
-		dSP;
-		ENTER;
-		SAVETMPS;
-		PUSHMARK(SP);
-		XPUSHs(sv_2mortal(newSViv(min)));
-		XPUSHs(sv_2mortal(newSViv(n_detected)));
-		PUTBACK;
-		call_sv(sv_tooFew, 0);
-		FREETMPS;
-		LEAVE;
-		thresh_ = SvIV(sv_thresh);
-	} else {
-		thresh_--;
-	}
+	dSP;
+	ENTER;
+	SAVETMPS;
+	PUSHMARK(SP);
+	XPUSHs(sv_2mortal(newSViv(min)));
+	XPUSHs(sv_2mortal(newSViv(n_detected)));
+	PUTBACK;
+	call_pv((CLASS_ + "::tooFew").c_str(), 0);
+	FREETMPS;
+	LEAVE;
+	thresh_ = SvIV(sv_thresh);
 }
 
-void xsFastAdjuster::tooMany(int max, int n_detected)
+void XsFastAdjuster::tooMany(int max, int n_detected)
 {
-	if (SvROK(sv_tooFew) && SvTYPE(SvRV(sv_tooFew)) == SVt_PVCV) {
-		dSP;
-		ENTER;
-		SAVETMPS;
-		PUSHMARK(SP);
-		XPUSHs(sv_2mortal(newSViv(max)));
-		XPUSHs(sv_2mortal(newSViv(n_detected)));
-		PUTBACK;
-		call_sv(sv_tooMany, 0);
-		FREETMPS;
-		LEAVE;
-		thresh_ = SvIV(sv_thresh);
-	} else {
-		thresh_++;
-	}
+	dSP;
+	ENTER;
+	SAVETMPS;
+	PUSHMARK(SP);
+	XPUSHs(sv_2mortal(newSViv(max)));
+	XPUSHs(sv_2mortal(newSViv(n_detected)));
+	PUTBACK;
+	call_pv((CLASS_ + "::tooMany").c_str(), 0);
+	FREETMPS;
+	LEAVE;
+	thresh_ = SvIV(sv_thresh);
 }
 
-bool xsFastAdjuster::good() const
+bool XsFastAdjuster::good() const
 {
-	if (SvROK(sv_good) && SvTYPE(SvRV(sv_good)) == SVt_PVCV) {
-		dSP;
-		ENTER;
-		SAVETMPS;
-		PUSHMARK(SP);
-		// PUTBACK;
-		int result = call_sv(sv_good, 0);
-		FREETMPS;
-		LEAVE;
-		return result;
-	} else {
-	    return (thresh_ > min_thresh_) && (thresh_ < max_thresh_);
-	}
+	dSP;
+	ENTER;
+	SAVETMPS;
+	PUSHMARK(SP);
+	// PUTBACK;
+	int result = call_pv((CLASS_ + "::good").c_str(), 0);
+	FREETMPS;
+	LEAVE;
+	return result;
 }
 
-Ptr<AdjusterAdapter> xsFastAdjuster::clone() const
+Ptr<AdjusterAdapter> XsFastAdjuster::clone() const
 {
-    Ptr<AdjusterAdapter> cloned_obj = new xsFastAdjuster(init_thresh_, nonmax_, min_thresh_, max_thresh_);
+    Ptr<AdjusterAdapter> cloned_obj = new XsFastAdjuster(
+		CLASS_, init_thresh_, nonmax_, min_thresh_, max_thresh_);
     return cloned_obj;
 }
 
-
 // ============================================================
 
-class xsStarAdjuster: public StarAdjuster
+class XsStarAdjuster: public StarAdjuster
 {
 public:
-    xsStarAdjuster(double initial_thresh=30.0, double min_thresh=2., double max_thresh=200.);
+    XsStarAdjuster(String CLASS, double initial_thresh=30.0, double min_thresh=2., double max_thresh=200.);
 
-    void tooFew(int minv, int n_detected);
-    void tooMany(int maxv, int n_detected);
-    bool good() const;
+    virtual void tooFew(int minv, int n_detected);
+    virtual void tooMany(int maxv, int n_detected);
+    virtual bool good() const;
 
-    Ptr<AdjusterAdapter> clone() const;
-
-	void linkup(char* CLASS);
+    virtual Ptr<AdjusterAdapter> clone() const;
 
 protected:
-    void detectImpl( const Mat& image, vector<KeyPoint>& keypoints, const Mat& mask=Mat() ) const;
+    virtual void detectImpl( const Mat& image, vector<KeyPoint>& keypoints, const Mat& mask=Mat() ) const;
 
     double thresh_, init_thresh_, min_thresh_, max_thresh_;
-
+	String CLASS_;
 	SV* sv_thresh;
 	SV* sv_init_thresh;
 	SV* sv_min_thresh;
 	SV* sv_max_thresh;
-	SV* sv_tooFew;
-	SV* sv_tooMany;
-	SV* sv_good;
 };
 
-void xsStarAdjuster::linkup(char* CLASS)
-{
-	String xs = CLASS;
-
-	sv_thresh      = get_sv((xs + "::thresh"     ).c_str(), 0);
-	sv_init_thresh = get_sv((xs + "::init_thresh").c_str(), 0);
-	sv_min_thresh  = get_sv((xs + "::min_thresh" ).c_str(), 0);
-	sv_max_thresh  = get_sv((xs + "::max_thresh" ).c_str(), 0);
-
-	sv_setsv(sv_thresh,      newSVnv(init_thresh_));
-	sv_setsv(sv_init_thresh, newSVnv(init_thresh_));
-	sv_setsv(sv_min_thresh,  newSVnv(min_thresh_ ));
-	sv_setsv(sv_max_thresh,  newSVnv(max_thresh_ ));
-
-	sv_tooFew  = get_sv((xs + "::tooFew" ).c_str(), 0);
-	sv_tooMany = get_sv((xs + "::tooMany").c_str(), 0);
-	sv_good    = get_sv((xs + "::good"   ).c_str(), 0);
-
-}
-
-xsStarAdjuster::xsStarAdjuster(double initial_thresh, double min_thresh, double max_thresh) :
+XsStarAdjuster::XsStarAdjuster(String CLASS, double initial_thresh, double min_thresh, double max_thresh) :
+	CLASS_(CLASS),
     thresh_(initial_thresh), init_thresh_(initial_thresh),
     min_thresh_(min_thresh), max_thresh_(max_thresh)
-{}
+{
+	int n = CLASS_.find("=");
+	if (n >= 0) CLASS_ = CLASS_.substr(0, n);
 
-void xsStarAdjuster::detectImpl(const Mat& image, vector<KeyPoint>& keypoints, const Mat& mask) const
+	sv_thresh      = get_sv((CLASS_ + "::THRESH"     ).c_str(), GV_ADD);
+	sv_init_thresh = get_sv((CLASS_ + "::INIT_THRESH").c_str(), GV_ADD);
+	sv_min_thresh  = get_sv((CLASS_ + "::MIN_THRESH" ).c_str(), GV_ADD);
+	sv_max_thresh  = get_sv((CLASS_ + "::MAX_THRESH" ).c_str(), GV_ADD);
+
+	sv_setsv(sv_thresh,      sv_2mortal(newSVnv(init_thresh_)));
+	sv_setsv(sv_init_thresh, sv_2mortal(newSVnv(init_thresh_)));
+	sv_setsv(sv_min_thresh,  sv_2mortal(newSVnv(min_thresh_ )));
+	sv_setsv(sv_max_thresh,  sv_2mortal(newSVnv(max_thresh_ )));
+}
+
+void XsStarAdjuster::detectImpl(const Mat& image, vector<KeyPoint>& keypoints, const Mat& mask) const
 {
 	StarFeatureDetector detector_tmp(16, cvRound(thresh_), 10, 8, 3);
     detector_tmp.detect(image, keypoints, mask);
 }
 
-void xsStarAdjuster::tooFew(int minv, int n_detected)
+void XsStarAdjuster::tooFew(int minv, int n_detected)
 {
-	if (SvROK(sv_tooFew) && SvTYPE(SvRV(sv_tooFew)) == SVt_PVCV) {
-		dSP;
-		ENTER;
-		SAVETMPS;
-		PUSHMARK(SP);
-		XPUSHs(sv_2mortal(newSViv(minv)));
-		XPUSHs(sv_2mortal(newSViv(n_detected)));
-		PUTBACK;
-		call_sv(sv_tooFew, 0);
-		FREETMPS;
-		LEAVE;
-		thresh_ = SvNV(sv_thresh);
-	} else {
-	    thresh_ *= 0.9;
-	    if (thresh_ < 1.1) thresh_ = 1.1;
-	}
+	dSP;
+	ENTER;
+	SAVETMPS;
+	PUSHMARK(SP);
+	XPUSHs(sv_2mortal(newSViv(minv)));
+	XPUSHs(sv_2mortal(newSViv(n_detected)));
+	PUTBACK;
+	call_pv((CLASS_ + "::tooFew").c_str(), 0);
+	FREETMPS;
+	LEAVE;
+	thresh_ = SvNV(sv_thresh);
 }
 
-void xsStarAdjuster::tooMany(int maxv, int n_detected)
+void XsStarAdjuster::tooMany(int maxv, int n_detected)
 {
-	if (SvROK(sv_tooMany) && SvTYPE(SvRV(sv_tooMany)) == SVt_PVCV) {
-		dSP;
-		ENTER;
-		SAVETMPS;
-		PUSHMARK(SP);
-		XPUSHs(sv_2mortal(newSViv(maxv)));
-		XPUSHs(sv_2mortal(newSViv(n_detected)));
-		PUTBACK;
-		call_sv(sv_tooMany, 0);
-		FREETMPS;
-		LEAVE;
-		thresh_ = SvNV(sv_thresh);
-	} else {
-		thresh_ *= 1.1;
-	}
+	dSP;
+	ENTER;
+	SAVETMPS;
+	PUSHMARK(SP);
+	XPUSHs(sv_2mortal(newSViv(maxv)));
+	XPUSHs(sv_2mortal(newSViv(n_detected)));
+	PUTBACK;
+	call_pv((CLASS_ + "::tooMany").c_str(), 0);
+	FREETMPS;
+	LEAVE;
+	thresh_ = SvNV(sv_thresh);
 }
 
-bool xsStarAdjuster::good() const
+bool XsStarAdjuster::good() const
 {
-	if (SvROK(sv_good) && SvTYPE(SvRV(sv_good)) == SVt_PVCV) {
-		dSP;
-		ENTER;
-		SAVETMPS;
-		PUSHMARK(SP);
-		// PUTBACK;
-		int result = call_sv(sv_good, 0);
-		FREETMPS;
-		LEAVE;
-		return result;
-	} else {
-	    return (thresh_ > min_thresh_) && (thresh_ < max_thresh_);
-	}
+	dSP;
+	ENTER;
+	SAVETMPS;
+	PUSHMARK(SP);
+	// PUTBACK;
+	int result = call_pv((CLASS_ + "::good").c_str(), 0);
+	FREETMPS;
+	LEAVE;
+	return result;
 }
 
-Ptr<AdjusterAdapter> xsStarAdjuster::clone() const
+Ptr<AdjusterAdapter> XsStarAdjuster::clone() const
 {
-    Ptr<AdjusterAdapter> cloned_obj = new xsStarAdjuster(init_thresh_, min_thresh_, max_thresh_);
+    Ptr<AdjusterAdapter> cloned_obj = new XsStarAdjuster(
+		CLASS_, init_thresh_, min_thresh_, max_thresh_);
     return cloned_obj;
 }
 
-
 // ============================================================
 
-class xsSurfAdjuster: public SurfAdjuster
+class XsSurfAdjuster: public SurfAdjuster
 {
 public:
-    xsSurfAdjuster( double initial_thresh=400.f, double min_thresh=2, double max_thresh=1000 );
+    XsSurfAdjuster(String CLASS, double initial_thresh=400.f, double min_thresh=2, double max_thresh=1000 );
 
-    void tooFew(int minv, int n_detected);
-    void tooMany(int maxv, int n_detected);
-    bool good() const;
+    virtual void tooFew(int minv, int n_detected);
+    virtual void tooMany(int maxv, int n_detected);
+    virtual bool good() const;
 
-    Ptr<AdjusterAdapter> clone() const;
-
-	void linkup(char* CLASS);
+    virtual Ptr<AdjusterAdapter> clone() const;
 
 protected:
-    void detectImpl( const Mat& image, vector<KeyPoint>& keypoints, const Mat& mask=Mat() ) const;
+    virtual void detectImpl( const Mat& image, vector<KeyPoint>& keypoints, const Mat& mask=Mat() ) const;
 
     double thresh_, init_thresh_, min_thresh_, max_thresh_;
 
+	String CLASS_;
 	SV* sv_thresh;
 	SV* sv_init_thresh;
 	SV* sv_min_thresh;
 	SV* sv_max_thresh;
-	SV* sv_tooFew;
-	SV* sv_tooMany;
-	SV* sv_good;
 };
 
-void xsSurfAdjuster::linkup(char* CLASS)
-{
-	String xs = CLASS;
-
-	sv_thresh      = get_sv((xs + "::thresh"     ).c_str(), 0);
-	sv_init_thresh = get_sv((xs + "::init_thresh").c_str(), 0);
-	sv_min_thresh  = get_sv((xs + "::min_thresh" ).c_str(), 0);
-	sv_max_thresh  = get_sv((xs + "::max_thresh" ).c_str(), 0);
-
-	sv_setsv(sv_thresh,      newSVnv(init_thresh_));
-	sv_setsv(sv_init_thresh, newSVnv(init_thresh_));
-	sv_setsv(sv_min_thresh,  newSVnv(min_thresh_ ));
-	sv_setsv(sv_max_thresh,  newSVnv(max_thresh_ ));
-
-	sv_tooFew  = get_sv((xs + "::tooFew" ).c_str(), 0);
-	sv_tooMany = get_sv((xs + "::tooMany").c_str(), 0);
-	sv_good    = get_sv((xs + "::good"   ).c_str(), 0);
-
-}
-
-xsSurfAdjuster::xsSurfAdjuster(double initial_thresh, double min_thresh, double max_thresh) :
+XsSurfAdjuster::XsSurfAdjuster(String CLASS, double initial_thresh, double min_thresh, double max_thresh) :
+	CLASS_(CLASS),
     thresh_(initial_thresh), init_thresh_(initial_thresh),
     min_thresh_(min_thresh), max_thresh_(max_thresh)
-{}
+{
+	int n = CLASS_.find("=");
+	if (n >= 0) CLASS_ = CLASS_.substr(0, n);
 
-void xsSurfAdjuster::detectImpl(const Mat& image, vector<KeyPoint>& keypoints, const cv::Mat& mask) const
+	sv_thresh      = get_sv((CLASS_ + "::THRESH"     ).c_str(), GV_ADD);
+	sv_init_thresh = get_sv((CLASS_ + "::INIT_THRESH").c_str(), GV_ADD);
+	sv_min_thresh  = get_sv((CLASS_ + "::MIN_THRESH" ).c_str(), GV_ADD);
+	sv_max_thresh  = get_sv((CLASS_ + "::MAX_THRESH" ).c_str(), GV_ADD);
+
+	sv_setsv(sv_thresh,      sv_2mortal(newSVnv(init_thresh_)));
+	sv_setsv(sv_init_thresh, sv_2mortal(newSVnv(init_thresh_)));
+	sv_setsv(sv_min_thresh,  sv_2mortal(newSVnv(min_thresh_ )));
+	sv_setsv(sv_max_thresh,  sv_2mortal(newSVnv(max_thresh_ )));
+}
+
+void XsSurfAdjuster::detectImpl(const Mat& image, vector<KeyPoint>& keypoints, const cv::Mat& mask) const
 {
     Ptr<FeatureDetector> surf = FeatureDetector::create("SURF");
     surf->set("hessianThreshold", thresh_);
     surf->detect(image, keypoints, mask);
 }
 
-void xsSurfAdjuster::tooFew(int minv, int n_detected)
+void XsSurfAdjuster::tooFew(int minv, int n_detected)
 {
-	if (SvROK(sv_tooFew) && SvTYPE(SvRV(sv_tooFew)) == SVt_PVCV) {
-		dSP;
-		ENTER;
-		SAVETMPS;
-		PUSHMARK(SP);
-		XPUSHs(sv_2mortal(newSViv(minv)));
-		XPUSHs(sv_2mortal(newSViv(n_detected)));
-		PUTBACK;
-		call_sv(sv_tooFew, 0);
-		FREETMPS;
-		LEAVE;
-		thresh_ = SvNV(sv_thresh);
-	} else {
-	    thresh_ *= 0.9;
-	    if (thresh_ < 1.1) thresh_ = 1.1;
-	}
+	dSP;
+	ENTER;
+	SAVETMPS;
+	PUSHMARK(SP);
+	XPUSHs(sv_2mortal(newSViv(minv)));
+	XPUSHs(sv_2mortal(newSViv(n_detected)));
+	PUTBACK;
+	call_pv((CLASS_ + "::tooFew").c_str(), 0);
+	FREETMPS;
+	LEAVE;
+	thresh_ = SvNV(sv_thresh);
 }
 
-void xsSurfAdjuster::tooMany(int maxv, int n_detected)
+void XsSurfAdjuster::tooMany(int maxv, int n_detected)
 {
-	if (SvROK(sv_tooMany) && SvTYPE(SvRV(sv_tooMany)) == SVt_PVCV) {
-		dSP;
-		ENTER;
-		SAVETMPS;
-		PUSHMARK(SP);
-		XPUSHs(sv_2mortal(newSViv(maxv)));
-		XPUSHs(sv_2mortal(newSViv(n_detected)));
-		PUTBACK;
-		call_sv(sv_tooMany, 0);
-		FREETMPS;
-		LEAVE;
-		thresh_ = SvNV(sv_thresh);
-	} else {
-		thresh_ *= 1.1;
-	}
+	dSP;
+	ENTER;
+	SAVETMPS;
+	PUSHMARK(SP);
+	XPUSHs(sv_2mortal(newSViv(maxv)));
+	XPUSHs(sv_2mortal(newSViv(n_detected)));
+	PUTBACK;
+	call_pv((CLASS_ + "::tooMany").c_str(), 0);
+	FREETMPS;
+	LEAVE;
+	thresh_ = SvNV(sv_thresh);
 }
 
-bool xsSurfAdjuster::good() const
+bool XsSurfAdjuster::good() const
 {
-	if (SvROK(sv_good) && SvTYPE(SvRV(sv_good)) == SVt_PVCV) {
-		dSP;
-		ENTER;
-		SAVETMPS;
-		PUSHMARK(SP);
-		// PUTBACK;
-		int result = call_sv(sv_good, 0);
-		FREETMPS;
-		LEAVE;
-		return result;
-	} else {
-	    return (thresh_ > min_thresh_) && (thresh_ < max_thresh_);
-	}
+	dSP;
+	ENTER;
+	SAVETMPS;
+	PUSHMARK(SP);
+	// PUTBACK;
+	int result = call_pv((CLASS_ + "::good").c_str(), 0);
+	FREETMPS;
+	LEAVE;
+	return result;
 }
 
-Ptr<AdjusterAdapter> xsSurfAdjuster::clone() const
+Ptr<AdjusterAdapter> XsSurfAdjuster::clone() const
 {
-    Ptr<AdjusterAdapter> cloned_obj = new xsSurfAdjuster(init_thresh_, min_thresh_, max_thresh_);
+    Ptr<AdjusterAdapter> cloned_obj = new XsSurfAdjuster(
+		CLASS_, init_thresh_, min_thresh_, max_thresh_);
     return cloned_obj;
 }
 
+#define FIX_CLASS(sv) \
+	if (SvROK(sv)) { \
+		char *p = strchr(CLASS, '='); \
+		if (p) *p = '\0'; \
+	} else
+
+#define CHECK_DESTROY(sv) \
+	if (SvREFCNT(sv) > 1) { \
+		/* const char* CLASS = (const char*)sv_reftype(SvRV(sv), TRUE); \
+		fprintf(stderr, "%s::DESTROY - ignored\n", CLASS); */ \
+		XSRETURN_EMPTY; \
+	} else
 
 MODULE = Cv::Features2d		PACKAGE = Cv::Features2d
 
@@ -545,10 +484,7 @@ MODULE = Cv::Features2d		PACKAGE = Cv::Features2d::Feature2D::BRISK
 BRISK*
 BRISK::new(int thresh=30, int octaves=3, float patternScale=1.0)
 INIT:
-	if (SvROK(ST(0))) {
-		char *p = strchr(CLASS, '=');
-		if (p) *p = '\0';
-	}
+	FIX_CLASS(ST(0));
 	if (sv_isobject(ST(0)) && (SvTYPE(SvRV(ST(0))) == SVt_PVMG)) {
 		BRISK* THIS = (BRISK*)SvIV((SV*)SvRV(ST(0)));
 		if (items < 2) thresh = THIS->get<int>("thres");
@@ -558,6 +494,7 @@ INIT:
 
 void
 BRISK::DESTROY()
+
 
 # ============================================================
 #  Common Interfaces of Feature Detectors
@@ -583,8 +520,8 @@ OUTPUT:
 
 void
 FeatureDetector::DESTROY()
-CODE:
-	((Ptr<FeatureDetector>)THIS).release();
+INIT:
+	CHECK_DESTROY(ST(0));
 
 
 MODULE = Cv::Features2d		PACKAGE = Cv::Features2d::FeatureDetector::GoodFeaturesToTrackDetector
@@ -592,10 +529,7 @@ MODULE = Cv::Features2d		PACKAGE = Cv::Features2d::FeatureDetector::GoodFeatures
 GoodFeaturesToTrackDetector*
 GoodFeaturesToTrackDetector::new(int maxCorners=1000, double qualityLevel=0.01, double minDistance=1, int blockSize=3, bool useHarrisDetector=false, double k=0.04)
 INIT:
-	if (SvROK(ST(0))) {
-		char *p = strchr(CLASS, '=');
-		if (p) *p = '\0';
-	}
+	FIX_CLASS(ST(0));
 	if (sv_isobject(ST(0)) && (SvTYPE(SvRV(ST(0))) == SVt_PVMG)) {
 		GoodFeaturesToTrackDetector* THIS = (GoodFeaturesToTrackDetector*)SvIV((SV*)SvRV(ST(0)));
 		if (items < 2) maxCorners = THIS->get<int>("nfeatures");
@@ -608,27 +542,36 @@ INIT:
 
 void
 GoodFeaturesToTrackDetector::DESTROY()
+INIT:
+	CHECK_DESTROY(ST(0));
+
 
 MODULE = Cv::Features2d		PACKAGE = Cv::Features2d::FeatureDetector::PyramidAdaptedFeatureDetector
 
 PyramidAdaptedFeatureDetector*
 PyramidAdaptedFeatureDetector::new(VOID* detector, int levels=2)
+INIT:
+	SvREFCNT_inc(ST(0));
 C_ARGS: (FeatureDetector*)detector, levels
 
 void
 PyramidAdaptedFeatureDetector::DESTROY()
+INIT:
+	CHECK_DESTROY(ST(0));
+
 
 MODULE = Cv::Features2d		PACKAGE = Cv::Features2d::FeatureDetector::DynamicAdaptedFeatureDetector
 
 DynamicAdaptedFeatureDetector*
 DynamicAdaptedFeatureDetector::new(VOID* adjuster, int min_features=400, int max_features=500, int max_iters=5)
+C_ARGS: (AdjusterAdapter*)adjuster, min_features, max_features, max_iters
 INIT:
-	Ptr<AdjusterAdapter> _adjuster = ((AdjusterAdapter*)adjuster)->clone();
-C_ARGS: _adjuster, min_features, max_features, max_iters
-
+	SvREFCNT_inc(ST(0));
 
 void
 DynamicAdaptedFeatureDetector::DESTROY()
+INIT:
+	CHECK_DESTROY(ST(0));
 
 
 MODULE = Cv::Features2d		PACKAGE = Cv::Features2d::AdjusterAdapter
@@ -655,38 +598,44 @@ OUTPUT:
 
 void
 AdjusterAdapter::DESTROY()
+INIT:
+	CHECK_DESTROY(ST(0));
+
 
 MODULE = Cv::Features2d		PACKAGE = Cv::Features2d::AdjusterAdapter::FastAdjuster
 
-xsFastAdjuster*
-xsFastAdjuster::new(int init_thresh = 20, bool nonmax = true, int min_thresh=1, int max_thresh=200)
-POSTCALL:
-	RETVAL->linkup(CLASS);
+XsFastAdjuster*
+XsFastAdjuster::new(int init_thresh = 20, bool nonmax = true, int min_thresh=1, int max_thresh=200)
+C_ARGS:	(String)CLASS, init_thresh, nonmax, min_thresh, max_thresh
 
 void
-xsFastAdjuster::DESTROY()
+XsFastAdjuster::DESTROY()
+INIT:
+	CHECK_DESTROY(ST(0));
 
 
 MODULE = Cv::Features2d		PACKAGE = Cv::Features2d::AdjusterAdapter::StarAdjuster
 
-xsStarAdjuster*
-xsStarAdjuster::new(int init_thresh = 20, bool nonmax = true)
-POSTCALL:
-	RETVAL->linkup(CLASS);
+XsStarAdjuster*
+XsStarAdjuster::new(int init_thresh = 20, bool nonmax = true)
+C_ARGS:	(String)CLASS, init_thresh, nonmax
 
 void
-xsStarAdjuster::DESTROY()
+XsStarAdjuster::DESTROY()
+INIT:
+	CHECK_DESTROY(ST(0));
 
 
 MODULE = Cv::Features2d		PACKAGE = Cv::Features2d::AdjusterAdapter::SurfAdjuster
 
-xsSurfAdjuster*
-xsSurfAdjuster::new(double initial_thresh=400.f, double min_thresh=2, double max_thresh=1000)
-POSTCALL:
-	RETVAL->linkup(CLASS);
+XsSurfAdjuster*
+XsSurfAdjuster::new(double initial_thresh=400.f, double min_thresh=2, double max_thresh=1000)
+C_ARGS:	(String)CLASS, initial_thresh, min_thresh, max_thresh
 
 void
-xsSurfAdjuster::DESTROY()
+XsSurfAdjuster::DESTROY()
+INIT:
+	CHECK_DESTROY(ST(0));
 
 
 # ============================================================
@@ -721,17 +670,23 @@ OUTPUT:
 
 void
 DescriptorExtractor::DESTROY()
-CODE:
-	((Ptr<DescriptorExtractor>)THIS).release();
+INIT:
+	CHECK_DESTROY(ST(0));
+
 
 MODULE = Cv::Features2d		PACKAGE = Cv::Features2d::DescriptorExtractor::OpponentColorDescriptorExtractor
 
 OpponentColorDescriptorExtractor*
 OpponentColorDescriptorExtractor::new(VOID* dextractor)
+INIT:
+	SvREFCNT_inc(ST(0));
 C_ARGS: (DescriptorExtractor*)dextractor
 
 void
 OpponentColorDescriptorExtractor::DESTROY()
+INIT:
+	CHECK_DESTROY(ST(0));
+
 
 # ============================================================
 #  Common Interfaces of Descriptor Matchers
@@ -774,6 +729,7 @@ BFMatcher::new(int normType=NORM_L2, bool crossCheck=false)
 void
 BFMatcher::DESTROY()
 
+
 MODULE = Cv::Features2d		PACKAGE = Cv::Features2d::DescriptorMatcher::FlannBasedMatcher
 
 FlannBasedMatcher*
@@ -791,6 +747,7 @@ C_ARGS:	_indexParams, _searchParams
 
 void
 FlannBasedMatcher::DESTROY()
+
 
 MODULE = Cv::Features2d		PACKAGE = Cv::Features2d::Algorithm
 
