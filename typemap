@@ -134,6 +134,7 @@ T_MatV
 			cvSetData(cvmat, ${var}[i].data, CV_AUTOSTEP);
 			SV* sv = sv_newmortal();
 			sv_setref_pv(sv, \"Cv::Mat\", (void*)cvmat);
+			av_push(av, sv);
 		}
 		$arg = newRV((SV*)av);
 		sv_2mortal($arg);
