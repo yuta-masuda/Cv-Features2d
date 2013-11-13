@@ -4,7 +4,7 @@ use strict;
 use warnings;
 use Test::More qw(no_plan);
 # use Test::More;
-use Test::Exception;
+# use Test::Exception;
 BEGIN { use_ok('Cv') }
 BEGIN { use_ok('Cv::Features2d', ':all') }
 
@@ -78,28 +78,34 @@ if (1) {
 	is($p{searchParams}{'hw:a'}, 'hello, world', "$sp.hw");
 }
 
-if (1) {
-	my %indexParams = (
-		algorithm => 6,
-		'table_number:x' => 6,
-		key_size => 12,
-		multi_probe_level => 1,
-		);
-	throws_ok {
-		FlannBasedMatcher(\%indexParams);
-	} qr/can't use "x" to set indexParams/;
+
+SKIP: {
+	skip "Test::Exception required", 2 unless eval "use Test::Exception";
+
+	{
+		my %indexParams = (
+			algorithm => 6,
+			'table_number:x' => 6,
+			key_size => 12,
+			multi_probe_level => 1,
+			);
+		throws_ok {
+			FlannBasedMatcher(\%indexParams);
+		} qr/can't use "x" to set indexParams/;
+	}
+
+	{
+		my %indexParams = (
+			algorithm => 6,
+			table_number => 6,
+			key_size => [1],
+			multi_probe_level => 1,
+			);
+		throws_ok {
+			my %p = FlannBasedMatcher(\%indexParams);
+			use Data::Dumper;
+			print STDERR Data::Dumper->Dump([\%p], [qw(*p)]);
+		} qr/can't use ref to set indexParams/;
+	}
 }
 
-if (1) {
-	my %indexParams = (
-		algorithm => 6,
-		table_number => 6,
-		key_size => [1],
-		multi_probe_level => 1,
-		);
-	throws_ok {
-		my %p = FlannBasedMatcher(\%indexParams);
-		use Data::Dumper;
-		print STDERR Data::Dumper->Dump([\%p], [qw(*p)]);
-	} qr/can't use ref to set indexParams/;
-}

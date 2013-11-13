@@ -4,7 +4,6 @@ use strict;
 use warnings;
 use Test::More qw(no_plan);
 # use Test::More tests => 13;
-use Test::Exception;
 BEGIN { use_ok('Cv', -nonfree) }
 BEGIN { use_ok('Cv::Features2d', ':all') }
 
@@ -69,13 +68,16 @@ if (1) {
 }
 
 
-if (1) {
+SKIP: {
+	skip "Test::Exception required", 3 unless eval "use Test::Exception";
+
 	lives_ok { Cv::Features2d::SURF->new(500) };
 	lives_ok { SURF(500) };
+
+	{
+		my $surf = Cv::Features2d::FeatureDetector->create("SURF");
+		bless $surf, 'Cv::Features2d::SURF';
+		lives_ok { $surf->hessianThreshold };
+	}
 }
 
-if (2) {
-	my $surf = Cv::Features2d::FeatureDetector->create("SURF");
-	bless $surf, 'Cv::Features2d::SURF';
-	lives_ok { $surf->hessianThreshold };
-}

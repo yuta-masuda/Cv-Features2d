@@ -2,9 +2,15 @@
 
 use strict;
 use warnings;
-use Test::More qw(no_plan);
-# use Test::More;
-use Test::Exception;
+use Test::More;
+BEGIN {
+	eval "use Test::Exception";
+	if ($@) {
+		plan skip_all => "Test::Exception";
+	} else {
+		plan qw(no_plan);
+	}
+}
 BEGIN { use_ok('Cv', -nonfree) }
 BEGIN { use_ok('Cv::Features2d', qw(:all)) }
 

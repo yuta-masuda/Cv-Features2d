@@ -4,7 +4,6 @@ use strict;
 use warnings;
 use Test::More qw(no_plan);
 # use Test::More;
-use Test::Exception;
 BEGIN { use_ok('Cv', -nonfree) }
 BEGIN { use_ok('Cv::Features2d', qw(:all)) }
 
@@ -43,9 +42,12 @@ if (2) {
 	my $fast = FastAdjuster();
 	my $star = StarAdjuster();
 	my $surf = SurfAdjuster();
-	lives_ok { $fast->DESTROY; };
-	lives_ok { $star->DESTROY; };
-	lives_ok { $surf->DESTROY; };
+  SKIP: {
+	  skip "Test::Exception required", 2 unless eval "use Test::Exception";
+	  lives_ok { $fast->DESTROY; };
+	  lives_ok { $star->DESTROY; };
+	  lives_ok { $surf->DESTROY; };
+	}
 }
 
 if (3) {
@@ -55,8 +57,11 @@ if (3) {
 		SurfAdjuster(),
 		) {
 		my $detector;
-		lives_ok { $detector = DynamicAdaptedFeatureDetector($_); };
-		lives_ok { $detector->DESTROY; };
+	  SKIP: {
+		  skip "Test::Exception required", 2 unless eval "use Test::Exception";
+		  lives_ok { $detector = DynamicAdaptedFeatureDetector($_); };
+		  lives_ok { $detector->DESTROY; };
+		}
 	}
 }
 
