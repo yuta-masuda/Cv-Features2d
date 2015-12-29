@@ -2,7 +2,7 @@
 
 #include "Cv.inc"
 
-#if _CV_VERSION() >= _VERSION(2,4,0)
+#ifdef HAVE_OPENCV_NONFREE
 #  include "opencv2/nonfree/nonfree.hpp"
 #endif
 

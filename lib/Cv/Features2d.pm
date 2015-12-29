@@ -28,7 +28,7 @@ use Carp;
 use Data::Structure::Util qw(unbless);
 use Cv ();
 
-our $VERSION = '0.10';
+our $VERSION = '0.11';
 
 require XSLoader;
 XSLoader::load('Cv::Features2d', $VERSION);

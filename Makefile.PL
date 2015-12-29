@@ -4,9 +4,9 @@ use 5.008008;
 use ExtUtils::MakeMaker;
 
 our %CONFIGURE_REQUIRES = (
-	'ExtUtils::ParseXS'   => '2.220',
-	'ExtUtils::PkgConfig' => '1.120',
-	'Cv' => '0.31',
+	'ExtUtils::ParseXS'     => '2.220',
+	'ExtUtils::PkgConfig'   => '1.120',
+	'Cv'                    => '0.33',
 	'Data::Structure::Util' => '0.15',
 	$^O eq 'cygwin' ? ('ExtUtils::MM_Cygwin' => '6.620') : (),
 );
